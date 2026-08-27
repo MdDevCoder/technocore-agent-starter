@@ -96,6 +96,14 @@ export default function LandingPage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse" />
                 FLOP Network · @flop_labs
               </span>
+              <a
+                href="https://exo-tech.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-panel text-muted hover:text-ink border border-hairline transition-colors"
+              >
+                Engineered by ExoTech
+              </a>
             </div>
 
             <h1 className="display text-ink mt-6 text-[2.5rem] sm:text-[3.25rem] lg:text-[3.75rem]">

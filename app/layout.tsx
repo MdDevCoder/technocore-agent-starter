@@ -41,12 +41,25 @@ export const metadata: Metadata = {
   title: { default: TITLE, template: `%s · ${TITLE}` },
   description: DESCRIPTION,
   applicationName: TITLE,
-  // Community tooling. Saying so in the metadata as well as the footer means it survives being
-  // shared as a link preview, which is exactly where an unofficial tool gets mistaken for an
-  // official one.
-  authors: [{ name: "Community-built tooling for Technocore" }],
-  openGraph: { title: TITLE, description: DESCRIPTION, type: "website" },
-  twitter: { card: "summary", title: TITLE, description: DESCRIPTION },
+  authors: [
+    { name: "Shaikh Muhammad (Owner)", url: "https://x.com/Muhammad_0423" },
+    { name: "ExoTech", url: "https://exo-tech.org/" },
+  ],
+  creator: "Shaikh Muhammad",
+  publisher: "ExoTech",
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    siteName: "Technocore Agent Starter by ExoTech",
+  },
+  twitter: {
+    card: "summary",
+    title: TITLE,
+    description: DESCRIPTION,
+    creator: "@Muhammad_0423",
+    site: "@ExoTech_HQ",
+  },
   robots: { index: true, follow: true },
   formatDetection: { telephone: false, email: false, address: false },
 };
