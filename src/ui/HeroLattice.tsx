@@ -74,7 +74,9 @@ export function HeroLattice() {
     probe.phase === "verified" ? "verified" : probe.phase === "working" ? "working" : "fault";
 
   return (
-    <figure className="panel bg-graphite/60 flex flex-col gap-5 p-5 sm:p-6">
+    <div className="relative group animate-fade-in-up delay-200">
+      <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-br from-signal/20 via-transparent to-signal/15 blur-xl opacity-60 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+      <figure className="panel bg-graphite/75 backdrop-blur-md relative flex flex-col gap-5 p-5 sm:p-6 border-hairline/80 shadow-[0_16px_48px_rgba(0,0,0,0.6)]">
       <ByteLattice
         bytes={probe.phase === "verified" ? probe.signature : null}
         state={state}
@@ -132,5 +134,6 @@ export function HeroLattice() {
         </p>
       </figcaption>
     </figure>
+    </div>
   );
 }

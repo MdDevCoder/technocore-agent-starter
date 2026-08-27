@@ -87,12 +87,16 @@ export default function LandingPage() {
     <>
       {/* ---------- Hero ---------- */}
       <section className="relative overflow-hidden">
+        {/* Ambient cyber atmospheric glow */}
+        <div aria-hidden="true" className="pointer-events-none absolute top-10 left-1/4 -translate-x-1/2 w-96 h-96 rounded-full bg-signal/10 blur-[130px] animate-aurora" />
+        <div aria-hidden="true" className="pointer-events-none absolute top-40 right-10 w-80 h-80 rounded-full bg-emerald-500/5 blur-[120px] animate-aurora delay-200" />
         <div aria-hidden="true" className="hairline-grid pointer-events-none absolute inset-0" />
+
         <div className="relative mx-auto grid w-full max-w-6xl gap-14 px-5 pt-16 pb-20 sm:px-8 sm:pt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16 lg:pt-28">
-          <div>
+          <div className="animate-fade-in-up">
             <div className="flex flex-wrap items-center gap-2.5">
               <p className="eyebrow">Community-built · Technocore protocol</p>
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-signal/10 text-signal border border-signal/20">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-signal/10 text-signal border border-signal/20 shadow-[0_0_12px_rgba(79,227,193,0.15)]">
                 <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse" />
                 FLOP Network · @flop_labs
               </span>
@@ -100,7 +104,7 @@ export default function LandingPage() {
                 href="https://exo-tech.org/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-panel text-muted hover:text-ink border border-hairline transition-colors"
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-panel text-muted hover:text-ink hover:border-signal/30 border border-hairline transition-all"
               >
                 Engineered by ExoTech
               </a>
@@ -125,12 +129,8 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/*
-              This is the single most important sentence on the page for a visitor deciding whether to
-              proceed, so it sits directly under the primary action rather than in a security section
-              further down that many people will never reach.
-            */}
-            <div className="border-hairline bg-panel/40 mt-9 flex max-w-[56ch] items-start gap-3 rounded-md border p-4">
+            {/* Security Guarantee Box */}
+            <div className="border-hairline bg-panel/50 backdrop-blur-sm mt-9 flex max-w-[56ch] items-start gap-3 rounded-lg border p-4 shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all hover:border-signal/30">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 16 16"
@@ -161,8 +161,8 @@ export default function LandingPage() {
       </section>
 
       {/* ---------- Value propositions ---------- */}
-      <section className="border-hairline border-t">
-        <div className="mx-auto grid w-full max-w-6xl gap-px px-5 sm:px-8 md:grid-cols-3">
+      <section className="border-hairline border-t bg-graphite/20">
+        <div className="mx-auto grid w-full max-w-6xl gap-6 p-6 sm:p-8 md:grid-cols-3">
           {[
             {
               title: "The key stays in the tab",
@@ -194,9 +194,9 @@ export default function LandingPage() {
               ),
             },
           ].map(({ title, body }) => (
-            <div key={title} className="border-hairline py-10 md:border-l md:px-8 md:first:border-l-0 md:first:pl-0">
+            <div key={title} className="cyber-card panel bg-graphite/50 p-6 rounded-lg">
               <h2 className="text-ink text-[0.9375rem] font-medium">{title}</h2>
-              <p className="text-muted mt-3 max-w-[42ch] text-sm leading-relaxed">{body}</p>
+              <p className="text-muted mt-3 text-sm leading-relaxed">{body}</p>
             </div>
           ))}
         </div>
@@ -214,22 +214,22 @@ export default function LandingPage() {
             until you have decrypted your own backup file once.
           </p>
 
-          <ol className="mt-12 space-y-px">
+          <ol className="mt-12 space-y-3">
             {STEPS.map((step, index) => (
               <li
                 key={step.id}
-                className="border-hairline hover:bg-panel/35 group grid gap-x-6 gap-y-3 border-t py-7 transition-colors last:border-b sm:grid-cols-[3rem_minmax(0,14rem)_minmax(0,1fr)] sm:items-baseline"
+                className="cyber-card panel bg-graphite/40 rounded-lg p-5 sm:p-6 group grid gap-x-6 gap-y-3 sm:grid-cols-[3rem_minmax(0,14rem)_minmax(0,1fr)] sm:items-baseline"
               >
-                <span className="mono text-faint group-hover:text-signal text-[0.8125rem] transition-colors">
+                <span className="mono text-faint group-hover:text-signal text-[0.875rem] font-semibold transition-colors">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <h3 className="display text-ink text-lg">{step.name}</h3>
+                  <h3 className="display text-ink text-lg group-hover:text-signal transition-colors">{step.name}</h3>
                   <p className="text-muted mt-1 text-sm">{step.summary}</p>
                 </div>
                 <div className="sm:pl-2">
                   <p className="text-muted max-w-[58ch] text-sm leading-relaxed">{step.detail}</p>
-                  <p className="mono text-faint mt-3 text-[0.6875rem] break-all">{step.artifact}</p>
+                  <p className="mono text-faint group-hover:text-muted mt-3 text-[0.6875rem] break-all transition-colors">{step.artifact}</p>
                 </div>
               </li>
             ))}
@@ -250,7 +250,7 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-2">
-            <div className="panel p-6">
+            <div className="cyber-card panel p-6 bg-graphite/40">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-ink text-[0.9375rem] font-medium">Never leaves your browser</h3>
                 <StatusPill tone="signal" dot={false}>
@@ -260,14 +260,14 @@ export default function LandingPage() {
               <ul className="mt-5 space-y-3">
                 {LOCAL_ONLY.map((item) => (
                   <li key={item} className="text-muted flex gap-3 text-sm leading-relaxed">
-                    <span aria-hidden="true" className="bg-signal mt-2 size-1 shrink-0 rounded-full" />
+                    <span aria-hidden="true" className="bg-signal mt-2 size-1 shrink-0 rounded-full shadow-[0_0_8px_var(--color-signal)]" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="panel p-6">
+            <div className="cyber-card panel p-6 bg-graphite/40">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-ink text-[0.9375rem] font-medium">Sent to Technocore, when you post</h3>
                 <StatusPill tone="neutral" dot={false}>
@@ -354,7 +354,7 @@ export default function LandingPage() {
       {/* ---------- Closing ---------- */}
       <section className="border-hairline border-t">
         <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
-          <div className="panel bg-graphite/60 flex flex-col items-start gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+          <div className="cyber-card panel bg-graphite/70 backdrop-blur-md relative flex flex-col items-start gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between border-hairline hover:border-signal/40 shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
             <div>
               <h2 className="display text-ink text-[1.5rem] sm:text-[1.875rem]">
                 Ready when you are.
