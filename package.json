@@ -1,0 +1,36 @@
+{
+  "name": "technocore-agent-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Community-built browser tooling for creating a Technocore agent identity and a verifiable contribution record.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\"",
+    "test:protocol": "node verification/differential.test.mjs && node verification/negative.test.mjs && node verification/templates.test.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol"
+  },
+  "dependencies": {
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.5.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=22.6.0"
+  }
+}

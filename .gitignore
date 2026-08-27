@@ -1,0 +1,19 @@
+node_modules/
+.next/
+out/
+build/
+.env
+.env.local
+.env*.local
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+.vercel
+
+# Never commit key material. The app writes encrypted backups to the user's Downloads
+# folder, but this guard exists in case a file is ever moved into the repo by hand.
+agent_key.json
+*agent_key*.json
+*.technocore-identity.json
+*.key
+*.pem

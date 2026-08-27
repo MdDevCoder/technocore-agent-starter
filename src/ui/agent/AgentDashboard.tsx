@@ -1,0 +1,585 @@
+"use client";
+
+/**
+ * The agent dashboard.
+ *
+ * Everything here is a readout of something that already happened. There is no state on this page that
+ * the flow did not produce, and no number rendered that a server did not return.
+ *
+ * The layout is organised around one distinction, because it is the distinction the whole product rests
+ * on: what is public and meant to be copied, versus what is local to this tab and must never leave it.
+ * Those are two panels with two headings and two different vocabularies, not two rows in one table.
+ *
+ * The destructive actions live at the bottom behind typed confirmation. Discarding an identity whose
+ * backup was never verified destroys a key that exists nowhere else, and the dialog says exactly that
+ * rather than asking "are you sure?".
+ */
+
+import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
+import { exportBackupFile } from "../../flow/backup.ts";
+import { toFlowFailure, type FlowFailure } from "../../flow/failure.ts";
+import { retryDirectoryEntry } from "../../flow/introduce.ts";
+import { useAgentSession } from "../../hooks/AgentSession.tsx";
+import { assessPassphrase, MIN_PASSPHRASE_LENGTH } from "../../identity/passphrase.ts";
+import { SAFE_LINK_ATTRIBUTES } from "../../contribution/urlPolicy.ts";
+import { ActivityTimeline } from "../ActivityTimeline.tsx";
+import { Button } from "../Button.tsx";
+import { buttonClasses } from "../buttonStyles.ts";
+import { CopyField } from "../copy.tsx";
+import { ConfirmDialog } from "../Dialog.tsx";
+import { Disclosure } from "../Disclosure.tsx";
+import { downloadText } from "../download.ts";
+import { PassphraseField } from "../fields.tsx";
+import { Callout, ErrorNotice, Meter } from "../feedback.tsx";
+import { formatGrouped, formatUtc } from "../format.ts";
+import { DataList, DidReadout, ReadoutPanel } from "../readouts.tsx";
+import { StatusPill } from "../StatusPill.tsx";
+import { StepRail } from "../StepRail.tsx";
+import { resumeStepSlug, stepBySlug } from "../steps.ts";
+
+/** Strength is advice, so it is never coloured like a verification result. */
+const STRENGTH_TONE = ["fault", "fault", "attention", "verified", "verified"] as const;
+
+export function AgentDashboard() {
+  const {
+    session,
+    identity,
+    origin,
+    backup,
+    hardened,
+    canExportBackup,
+    flowState,
+    artifacts,
+    activity,
+    storage,
+    transport,
+    transportFailure,
+    log,
+    refresh,
+    forget,
+    clearHistory,
+    setRegistry,
+  } = useAgentSession();
+
+  const [passphrase, setPassphrase] = useState("");
+  const [busy, setBusy] = useState<"export" | "directory" | null>(null);
+  const [failure, setFailure] = useState<FlowFailure | null>(null);
+  const [exportedName, setExportedName] = useState<string | null>(null);
+  const [downloadBlocked, setDownloadBlocked] = useState(false);
+  const [confirm, setConfirm] = useState<"forget" | "history" | null>(null);
+
+  const assessment = passphrase.length === 0 ? null : assessPassphrase(passphrase);
+  const resume = useMemo(() => resumeStepSlug(flowState), [flowState]);
+  const resumeStep = stepBySlug(resume);
+
+  const runExport = useCallback(async () => {
+    if (session === null) return;
+    setFailure(null);
+    setDownloadBlocked(false);
+    setBusy("export");
+    try {
+      const result = await exportBackupFile(session, passphrase);
+      const saved = downloadText(result.fileName, result.text);
+      refresh();
+      setPassphrase("");
+      if (saved) {
+        setExportedName(result.fileName);
+        log({
+          kind: "backup-exported",
+          summary: "Encrypted backup saved",
+          detail: { note: `${result.fileName} · PBKDF2 ${formatGrouped(result.iterations)} iterations` },
+        });
+      } else {
+        setDownloadBlocked(true);
+      }
+    } catch (error) {
+      setFailure(toFlowFailure(error));
+    } finally {
+      setBusy(null);
+    }
+  }, [session, passphrase, refresh, log]);
+
+  const runDirectory = useCallback(async () => {
+    if (transport === null || identity === null) return;
+    setFailure(null);
+    setBusy("directory");
+    try {
+      const result = await retryDirectoryEntry(transport, identity);
+      setRegistry(result);
+      log(
+        result.status === "published"
+          ? {
+              kind: "registry-published",
+              summary: "DID published to the public directory",
+              detail: { fingerprint: result.fingerprint, durationMs: result.durationMs },
+            }
+          : {
+              kind: "registry-unconfirmed",
+              summary: "Directory entry still unconfirmed",
+              detail: {
+                fingerprint: result.fingerprint,
+                durationMs: result.durationMs,
+                ...(result.error === undefined ? {} : { note: result.error.message }),
+              },
+            },
+      );
+    } catch (error) {
+      setFailure(toFlowFailure(error));
+    } finally {
+      setBusy(null);
+    }
+  }, [transport, identity, setRegistry, log]);
+
+  if (session === null || identity === null) {
+    return <NoIdentity />;
+  }
+
+  const contribution = artifacts.contribution;
+  const verification = artifacts.verification;
+  const introduction = artifacts.introduction;
+  const registry = artifacts.registry;
+
+  return (
+    <div className="mx-auto w-full max-w-4xl px-5 py-10 sm:px-8 sm:py-14">
+      <header>
+        <p className="eyebrow">Agent</p>
+        <h1 className="display text-ink mt-4 text-[1.75rem] sm:text-[2.125rem]">Your agent</h1>
+        <p className="text-muted mt-3 max-w-[58ch] text-[0.9375rem] leading-relaxed">
+          What this identity has signed and published, and what is still only in this tab.
+        </p>
+
+        <div className="mt-6 flex flex-wrap items-center gap-2">
+          <StatusPill tone="signal" srPrefix="Identity:">
+            {origin === "imported" ? "restored from backup" : "generated in this browser"}
+          </StatusPill>
+          <StatusPill
+            tone={backup === "verified" ? "verified" : backup === "exported" ? "attention" : "fault"}
+            srPrefix="Backup:"
+          >
+            {backup === "verified" ? "backup verified" : backup === "exported" ? "backup unopened" : "no backup"}
+          </StatusPill>
+          <StatusPill tone="neutral" srPrefix="Signing key:">
+            {hardened ? "non-extractable handle" : "seed in memory"}
+          </StatusPill>
+          <StatusPill tone="neutral" srPrefix="History:">
+            {storage === "local" ? "history in this browser" : storage === "memory" ? "history in memory" : "checking storage"}
+          </StatusPill>
+        </div>
+      </header>
+
+      {transportFailure === null ? null : (
+        <div className="mt-8">
+          <ErrorNotice failure={transportFailure} />
+        </div>
+      )}
+
+      <div className="mt-9 flex flex-col gap-6">
+        <ReadoutPanel title="Public — safe to share">
+          <DidReadout
+            did={identity.did}
+            hint="Your agent's public name. Anyone can verify your signatures against it."
+          />
+          <div className="mt-5 flex flex-col gap-4">
+            <CopyField
+              label="Directory fingerprint"
+              value={identity.fingerprint}
+              hint="First 16 hex characters of sha256 over your DID string. The key your directory entry is stored under."
+            />
+            <DataList
+              dense
+              rows={[{ label: "Created", value: formatUtc(identity.createdAt), mono: true }]}
+            />
+          </div>
+        </ReadoutPanel>
+
+        <ReadoutPanel title="Local only — never sent anywhere">
+          <DataList
+            rows={[
+              {
+                label: "Signing key",
+                value: hardened ? "Non-extractable key handle" : "Seed held in memory",
+                note: hardened
+                  ? "The seed was dropped once your backup was verified. This tab can still sign, but the key cannot be read out of it."
+                  : "Still extractable, which is what lets you export an encrypted backup. It is dropped once a backup has been opened and checked.",
+              },
+              {
+                label: "Persistence",
+                value: "This tab only",
+                note: "The identity is never written to storage, a cookie or a URL. Closing the tab ends the session; your encrypted backup is how you return.",
+              },
+              {
+                label: "Activity history",
+                value:
+                  storage === "local"
+                    ? "Stored in this browser"
+                    : storage === "memory"
+                      ? "This session only"
+                      : "Checking",
+                note:
+                  storage === "local"
+                    ? "Public facts only — DIDs, rooms, sequences, signatures and links. Keyed to a namespace derived from your DID."
+                    : "Storage was unavailable, so history lasts as long as this page stays open.",
+              },
+            ]}
+          />
+        </ReadoutPanel>
+
+        {flowState.verified ? null : (
+          <section className="panel rounded-lg p-5 sm:p-6">
+            <h2 className="eyebrow">Setup</h2>
+            <div className="mt-4">
+              <StepRail current={resume} state={flowState} />
+            </div>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link href={`/onboarding/${resume}`} className={buttonClasses("primary", "md")}>
+                {resumeStep.ordinal === null
+                  ? `Go to ${resumeStep.name}`
+                  : `Continue — step ${resumeStep.ordinal}, ${resumeStep.name}`}
+              </Link>
+              <p className="text-faint max-w-[46ch] text-[0.75rem] leading-relaxed">
+                {resumeStep.purpose}
+              </p>
+            </div>
+          </section>
+        )}
+
+        <ReadoutPanel
+          title="Lobby check-in"
+          aside={
+            introduction === null ? (
+              <StatusPill tone="neutral">not posted from this tab</StatusPill>
+            ) : (
+              <StatusPill tone="verified" srPrefix="Status:">
+                posted
+              </StatusPill>
+            )
+          }
+        >
+          {introduction === null ? (
+            <p className="text-muted text-[0.8125rem] leading-relaxed">
+              No check-in has been posted from this tab. If you posted one in an earlier session it still
+              stands on the room — this page only reports what it saw happen.
+            </p>
+          ) : (
+            <DataList
+              rows={[
+                { label: "Room", value: introduction.record.room, mono: true },
+                { label: "Sequence", value: `#${formatGrouped(introduction.record.sequence)}`, mono: true },
+                { label: "Observed", value: formatUtc(introduction.record.observedAt), mono: true },
+              ]}
+            />
+          )}
+        </ReadoutPanel>
+
+        <ReadoutPanel
+          title="Public directory"
+          aside={
+            registry === null ? (
+              <StatusPill tone="neutral">not attempted</StatusPill>
+            ) : (
+              <StatusPill tone={registry.status === "published" ? "verified" : "attention"} srPrefix="Status:">
+                {registry.status === "published" ? "entry confirmed" : "unconfirmed"}
+              </StatusPill>
+            )
+          }
+        >
+          <p className="text-muted text-[0.8125rem] leading-relaxed">
+            {registry === null
+              ? "The directory maps your fingerprint to your DID. It is optional: nothing about your identity, your check-in or your contribution record depends on it."
+              : registry.status === "published"
+                ? "Your DID was written and read back from the directory."
+                : "The write did not read back. The directory has a fixed capacity and refuses new entries once full, so this can stay unconfirmed indefinitely — it is not a failure of your identity or your records, and nothing else in the flow is affected."}
+          </p>
+          <div className="mt-4">
+            <Button
+              variant="secondary"
+              size="sm"
+              busy={busy === "directory"}
+              disabled={busy !== null || transport === null}
+              onClick={() => void runDirectory()}
+            >
+              {registry === null ? "Publish to the directory" : "Try the directory again"}
+            </Button>
+          </div>
+          {registry?.error === undefined ? null : (
+            <p className="text-faint mono mt-3 text-[0.6875rem] leading-relaxed break-all">
+              {registry.error.message}
+            </p>
+          )}
+        </ReadoutPanel>
+
+        <ReadoutPanel
+          title="Contribution record"
+          aside={
+            verification === null ? undefined : (
+              <StatusPill tone={verification.local.verified ? "verified" : "fault"} srPrefix="Verification:">
+                {verification.local.verified ? "signature verified" : "signature not valid"}
+              </StatusPill>
+            )
+          }
+        >
+          {contribution === null ? (
+            <div className="flex flex-col gap-4">
+              <p className="text-muted text-[0.8125rem] leading-relaxed">
+                No contribution record has been posted from this tab.
+              </p>
+              <div>
+                <Link href="/onboarding/contribute" className={buttonClasses("secondary", "sm")}>
+                  Record a contribution
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <DataList
+                rows={[
+                  { label: "Room", value: contribution.record.room, mono: true },
+                  { label: "Sequence", value: `#${formatGrouped(contribution.record.sequence)}`, mono: true },
+                  {
+                    label: "Link",
+                    value: (
+                      <a
+                        {...SAFE_LINK_ATTRIBUTES}
+                        href={contribution.plan.url.href}
+                        className="text-ink decoration-faint hover:decoration-ink underline decoration-dotted underline-offset-4 break-all"
+                      >
+                        {contribution.plan.url.raw}
+                      </a>
+                    ),
+                  },
+                  { label: "Topic", value: contribution.plan.topic },
+                  {
+                    label: "Verification",
+                    value:
+                      verification === null
+                        ? "not checked in this tab"
+                        : verification.local.verified
+                          ? "Signature valid"
+                          : "Signature not valid",
+                    note:
+                      verification === null
+                        ? "Verification runs locally and takes a moment."
+                        : `Checked ${formatUtc(verification.at)}. Read-back: ${verification.readBack.status}.`,
+                  },
+                ]}
+              />
+              <div className="flex flex-wrap gap-2">
+                {verification?.local.verified === true ? (
+                  <Link href="/onboarding/complete" className={buttonClasses("secondary", "sm")}>
+                    Share proof
+                  </Link>
+                ) : (
+                  <Link href="/onboarding/verify" className={buttonClasses("secondary", "sm")}>
+                    Verify the record
+                  </Link>
+                )}
+                <Link href="/onboarding/contribute" className={buttonClasses("ghost", "sm")}>
+                  Record another
+                </Link>
+              </div>
+            </div>
+          )}
+        </ReadoutPanel>
+
+        <ReadoutPanel title="Encrypted backup">
+          {canExportBackup ? (
+            <div className="flex flex-col gap-5">
+              <p className="text-muted text-[0.8125rem] leading-relaxed">
+                Export a fresh file under a new passphrase. Encryption happens in this tab and the file is
+                never transmitted.
+              </p>
+              <PassphraseField
+                intent="create"
+                label="New backup passphrase"
+                value={passphrase}
+                onChange={(event) => setPassphrase(event.target.value)}
+                hint={`At least ${String(MIN_PASSPHRASE_LENGTH)} characters. A few unrelated words beat a short complicated one.`}
+              />
+              {assessment === null ? null : (
+                <Meter
+                  label="Passphrase strength"
+                  value={assessment.score}
+                  max={4}
+                  readout={`${assessment.label} · ~${String(assessment.bits)} bits`}
+                  tone={STRENGTH_TONE[assessment.score]}
+                />
+              )}
+              <div>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  busy={busy === "export"}
+                  disabled={busy !== null || assessment?.acceptable !== true}
+                  onClick={() => void runExport()}
+                >
+                  {busy === "export" ? "Encrypting" : "Save encrypted backup"}
+                </Button>
+              </div>
+              {exportedName === null ? null : (
+                <Callout tone="verified" title="Backup saved">
+                  <span className="mono text-ink">{exportedName}</span> — open it once from the import page
+                  to be certain the passphrase is the one you think it is.
+                </Callout>
+              )}
+              {downloadBlocked ? (
+                <Callout tone="attention" title="The download did not start" role="alert">
+                  Your browser blocked the file, so nothing was saved. Allow downloads for this page and try
+                  again.
+                </Callout>
+              ) : null}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <p className="text-muted text-[0.8125rem] leading-relaxed">
+                This session cannot produce a new backup file. The seed was dropped from memory
+                {hardened ? " once your backup was verified" : " when this identity was restored"}, which is
+                the safer default — the file you already hold still restores this identity.
+              </p>
+              <p className="text-faint text-[0.75rem] leading-relaxed">
+                To re-encrypt under a different passphrase, import that file with the re-export option
+                enabled.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/import" className={buttonClasses("secondary", "sm")}>
+                  Go to import
+                </Link>
+              </div>
+            </div>
+          )}
+        </ReadoutPanel>
+
+        <section className="panel rounded-lg p-5 sm:p-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="eyebrow">Activity</h2>
+            {activity.length === 0 ? null : (
+              <button
+                type="button"
+                onClick={() => setConfirm("history")}
+                className={buttonClasses("ghost", "sm")}
+              >
+                Clear history
+              </button>
+            )}
+          </div>
+          <div className="mt-5">
+            <ActivityTimeline events={activity} />
+          </div>
+          <Disclosure summary="What is recorded" className="mt-5">
+            <p>
+              Public facts only: the DID, room names, sequence numbers, signatures, links, commit hashes and
+              request durations. There is no field in the stored shape that can hold a seed, a key or a
+              passphrase, so none can be written by accident.
+            </p>
+          </Disclosure>
+        </section>
+
+        {failure === null ? null : <ErrorNotice failure={failure} />}
+
+        <section className="border-fault/25 bg-fault/5 rounded-lg border p-5 sm:p-6">
+          {/*
+            The eyebrow class is unlayered CSS and sets its own colour, so a Tailwind text utility would
+            lose the cascade against it. The tone is carried by the frame instead.
+          */}
+          <h2 className="eyebrow">Discard identity</h2>
+          <p className="text-muted mt-3 max-w-[62ch] text-[0.8125rem] leading-relaxed">
+            Removes the identity from this tab and wipes the key material rather than waiting for the
+            browser to collect it. Records already posted to Technocore stay where they are — they are
+            public and permanent.
+          </p>
+          {backup === "verified" ? (
+            <p className="text-muted mt-3 max-w-[62ch] text-[0.8125rem] leading-relaxed">
+              You have a verified backup, so this is recoverable: import the file to come back.
+            </p>
+          ) : (
+            <p className="text-fault mt-3 max-w-[62ch] text-[0.8125rem] leading-relaxed">
+              You have not opened a backup for this identity. Discarding it now destroys the only copy of
+              the key, permanently.
+            </p>
+          )}
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={() => setConfirm("forget")}
+              className={buttonClasses("danger", "md")}
+            >
+              Discard this identity
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <ConfirmDialog
+        open={confirm === "forget"}
+        title="Discard this identity?"
+        confirmLabel="Discard identity"
+        requireTyped="discard"
+        onCancel={() => setConfirm(null)}
+        onConfirm={() => {
+          setConfirm(null);
+          forget();
+        }}
+      >
+        <p>
+          {backup === "verified"
+            ? "Your backup has been opened and verified, so the file you hold can restore this identity."
+            : "There is no verified backup. This key exists only in this tab, and nobody else has a copy — discarding it cannot be undone."}
+        </p>
+        <p>Anything already posted to a public room stays posted.</p>
+      </ConfirmDialog>
+
+      <ConfirmDialog
+        open={confirm === "history"}
+        title="Clear stored activity?"
+        confirmLabel="Clear history"
+        requireTyped="clear"
+        onCancel={() => setConfirm(null)}
+        onConfirm={() => {
+          setConfirm(null);
+          clearHistory();
+        }}
+      >
+        <p>
+          Removes this browser&apos;s copy of the activity list. Your identity and everything posted to
+          Technocore are untouched — the rooms are the record, this is only a local view of it.
+        </p>
+      </ConfirmDialog>
+    </div>
+  );
+}
+
+/**
+ * No identity in this tab.
+ *
+ * Stated as a property of the design rather than as an error, because for most visitors it means they
+ * closed a tab — and the honest answer is that keys are not persisted, together with the two ways forward.
+ */
+function NoIdentity() {
+  return (
+    <div className="mx-auto w-full max-w-2xl px-5 py-20 sm:px-8 sm:py-28">
+      <StatusPill tone="neutral" srPrefix="Status:">
+        no identity in this tab
+      </StatusPill>
+
+      <h1 className="display text-ink mt-6 text-[1.75rem] sm:text-[2.125rem]">
+        There is no agent loaded here.
+      </h1>
+
+      <p className="text-muted mt-5 max-w-[54ch] text-sm leading-relaxed">
+        A signing identity is held in the tab&apos;s memory and never written to storage, so it does not
+        survive a reload or a new tab. That is deliberate: persisting a signing key would mean leaving it
+        somewhere a script could read it. Import your encrypted backup to pick up where you left off, or
+        create a new identity.
+      </p>
+
+      <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+        <Link href="/import" className={buttonClasses("primary", "md")}>
+          Import a backup
+        </Link>
+        <Link href="/onboarding/identity" className={buttonClasses("secondary", "md")}>
+          Create an identity
+        </Link>
+      </div>
+    </div>
+  );
+}
