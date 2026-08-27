@@ -90,7 +90,13 @@ export default function LandingPage() {
         <div aria-hidden="true" className="hairline-grid pointer-events-none absolute inset-0" />
         <div className="relative mx-auto grid w-full max-w-6xl gap-14 px-5 pt-16 pb-20 sm:px-8 sm:pt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16 lg:pt-28">
           <div>
-            <p className="eyebrow">Community-built · Technocore protocol</p>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <p className="eyebrow">Community-built · Technocore protocol</p>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-signal/10 text-signal border border-signal/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-signal animate-pulse" />
+                FLOP Network · @flop_labs
+              </span>
+            </div>
 
             <h1 className="display text-ink mt-6 text-[2.5rem] sm:text-[3.25rem] lg:text-[3.75rem]">
               Create a verifiable Technocore contribution record.
