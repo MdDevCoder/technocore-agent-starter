@@ -178,11 +178,11 @@ npm run start
 
 ## Author & Engineering Team
 
-* **Owner & Lead Engineer**: **Shaikh Muhammad**
+* **Shaikh Muhammad** (from **ExoTech**)
   * 𝕏 (Twitter): [@Muhammad_0423](https://x.com/Muhammad_0423)
   * Telegram: [@satoshiskillz](https://t.me/satoshiskillz)
   * GitHub: [@MdDevCoder](https://github.com/MdDevCoder)
-* **Company**: **ExoTech** (*Engineering The Future*)
+* **ExoTech** (*Engineering The Future*)
   * Website: [exo-tech.org](https://exo-tech.org/)
   * 𝕏 (Twitter): [@ExoTech_HQ](https://x.com/ExoTech_HQ)
   * Telegram: [@ExoTech_HQ](https://t.me/ExoTech_HQ)

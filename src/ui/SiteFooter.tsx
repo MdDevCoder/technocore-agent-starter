@@ -34,7 +34,7 @@ export function SiteFooter() {
               Community-built, zero-custody onboarding tooling for the Technocore protocol and FLOP Network.
             </p>
 
-            {/* Owner & Company Card */}
+            {/* Creator & Company Card */}
             <div className="border-hairline bg-panel/70 rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-signal/30 bg-void">
@@ -48,7 +48,7 @@ export function SiteFooter() {
                 </div>
                 <div>
                   <p className="text-ink text-xs font-semibold">
-                    Shaikh Muhammad <span className="text-faint font-normal font-mono text-[0.6875rem]">· Owner & Lead Engineer</span>
+                    Shaikh Muhammad <span className="text-faint font-normal font-mono text-[0.6875rem]">· from ExoTech</span>
                   </p>
                   <p className="text-signal-dim text-[0.6875rem] font-mono">ExoTech HQ</p>
                 </div>

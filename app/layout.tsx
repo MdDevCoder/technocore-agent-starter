@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: TITLE,
   authors: [
-    { name: "Shaikh Muhammad (Owner)", url: "https://x.com/Muhammad_0423" },
+    { name: "Shaikh Muhammad from ExoTech", url: "https://x.com/Muhammad_0423" },
     { name: "ExoTech", url: "https://exo-tech.org/" },
   ],
   creator: "Shaikh Muhammad",
