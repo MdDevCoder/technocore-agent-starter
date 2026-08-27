@@ -12,13 +12,11 @@ import { NextResponse, type NextRequest } from "next/server";
  *  - No third-party analytics, tag manager, or error reporter is permitted anywhere in this policy.
  */
 export function middleware(request: NextRequest) {
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const upstream = process.env.TECHNOCORE_API_BASE_URL ?? "https://technocore.chat";
-  const isDev = process.env.NODE_ENV === "development";
 
   const csp = [
     `default-src 'self'`,
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'unsafe-inline' 'unsafe-eval'`,
     `style-src 'self' 'unsafe-inline'`,
     `img-src 'self' data:`,
     `font-src 'self' data:`,
@@ -32,18 +30,7 @@ export function middleware(request: NextRequest) {
     `upgrade-insecure-requests`,
   ].join("; ");
 
-  const headers = new Headers(request.headers);
-  headers.set("x-nonce", nonce);
-  // The policy must go on the *forwarded request* as well as the response, and this is not
-  // belt-and-braces — it is the only way Next learns the nonce. Its renderer reads the nonce out of
-  // the incoming `content-security-policy` request header (`getScriptNonceFromHeader` in
-  // next/dist/server/app-render/app-render.js) and stamps it onto the script tags it emits. Setting
-  // the policy on the response alone is silently catastrophic: `strict-dynamic` makes the browser
-  // ignore `'self'` once a nonce is present, so every un-nonced Next chunk is refused, and the page
-  // arrives fully rendered but never hydrates. Verified against the installed Next 15.5.24.
-  headers.set("Content-Security-Policy", csp);
-
-  const response = NextResponse.next({ request: { headers } });
+  const response = NextResponse.next();
   response.headers.set("Content-Security-Policy", csp);
   return response;
 }
