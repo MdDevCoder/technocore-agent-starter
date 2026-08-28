@@ -183,7 +183,6 @@ npm run start
   * 𝕏 (Twitter): [@ExoTech_HQ](https://x.com/ExoTech_HQ)
   * Telegram: [@ExoTech_HQ](https://t.me/ExoTech_HQ)
   * GitHub: [@MdDevCoder/technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)
-  * Developer 𝕏: [@Muhammad_0423](https://x.com/Muhammad_0423)
 
 ---
 

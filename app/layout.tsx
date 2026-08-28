@@ -43,7 +43,6 @@ export const metadata: Metadata = {
   applicationName: TITLE,
   authors: [
     { name: "ExoTech", url: "https://exo-tech.org/" },
-    { name: "Developer 𝕏", url: "https://x.com/Muhammad_0423" },
   ],
   creator: "ExoTech",
   publisher: "ExoTech",
@@ -57,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: TITLE,
     description: DESCRIPTION,
-    creator: "@Muhammad_0423",
+    creator: "@ExoTech_HQ",
     site: "@ExoTech_HQ",
   },
   robots: { index: true, follow: true },
