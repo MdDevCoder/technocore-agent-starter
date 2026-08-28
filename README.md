@@ -176,16 +176,14 @@ npm run start
 
 ---
 
-## Author & Engineering Team
+## Author & Engineering
 
-* **Shaikh Muhammad** (from **ExoTech**)
-  * 𝕏 (Twitter): [@Muhammad_0423](https://x.com/Muhammad_0423)
-  * Telegram: [@satoshiskillz](https://t.me/satoshiskillz)
-  * GitHub: [@MdDevCoder](https://github.com/MdDevCoder)
 * **ExoTech** (*Engineering The Future*)
   * Website: [exo-tech.org](https://exo-tech.org/)
   * 𝕏 (Twitter): [@ExoTech_HQ](https://x.com/ExoTech_HQ)
   * Telegram: [@ExoTech_HQ](https://t.me/ExoTech_HQ)
+  * GitHub: [@MdDevCoder/technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)
+  * Developer 𝕏: [@Muhammad_0423](https://x.com/Muhammad_0423)
 
 ---
 

@@ -42,10 +42,10 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: TITLE,
   authors: [
-    { name: "Shaikh Muhammad from ExoTech", url: "https://x.com/Muhammad_0423" },
     { name: "ExoTech", url: "https://exo-tech.org/" },
+    { name: "Developer 𝕏", url: "https://x.com/Muhammad_0423" },
   ],
-  creator: "Shaikh Muhammad",
+  creator: "ExoTech",
   publisher: "ExoTech",
   openGraph: {
     title: TITLE,

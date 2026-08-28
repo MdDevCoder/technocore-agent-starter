@@ -34,7 +34,7 @@ export function SiteFooter() {
               Community-built, zero-custody onboarding tooling for the Technocore protocol and FLOP Network.
             </p>
 
-            {/* Creator & Company Card */}
+            {/* ExoTech Engineering Card */}
             <div className="border-hairline bg-panel/70 rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-3">
                 <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-signal/30 bg-void">
@@ -48,38 +48,15 @@ export function SiteFooter() {
                 </div>
                 <div>
                   <p className="text-ink text-xs font-semibold">
-                    Shaikh Muhammad <span className="text-faint font-normal font-mono text-[0.6875rem]">· from ExoTech</span>
+                    ExoTech <span className="text-signal-dim font-normal font-mono text-[0.6875rem]">· Engineering The Future</span>
                   </p>
-                  <p className="text-signal-dim text-[0.6875rem] font-mono">ExoTech HQ</p>
+                  <p className="text-faint text-[0.6875rem] font-mono">Autonomous AI & Decentralized Systems</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-hairline text-[0.75rem]">
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-hairline text-[0.75rem]">
                 <div>
-                  <span className="text-faint block font-mono text-[0.625rem] uppercase tracking-wider">Shaikh Muhammad</span>
-                  <div className="flex items-center gap-2.5 mt-0.5">
-                    <a
-                      href="https://x.com/Muhammad_0423"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted hover:text-signal transition-colors font-medium"
-                    >
-                      X (Twitter)
-                    </a>
-                    <span className="text-faint">·</span>
-                    <a
-                      href="https://t.me/satoshiskillz"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted hover:text-signal transition-colors font-medium"
-                    >
-                      Telegram
-                    </a>
-                  </div>
-                </div>
-
-                <div>
-                  <span className="text-faint block font-mono text-[0.625rem] uppercase tracking-wider">ExoTech</span>
+                  <span className="text-faint block font-mono text-[0.625rem] uppercase tracking-wider">ExoTech Official</span>
                   <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                     <a
                       href="https://exo-tech.org/"
@@ -96,7 +73,7 @@ export function SiteFooter() {
                       rel="noopener noreferrer"
                       className="text-muted hover:text-signal transition-colors font-medium"
                     >
-                      X
+                      𝕏 (Twitter)
                     </a>
                     <span className="text-faint">·</span>
                     <a
@@ -106,6 +83,20 @@ export function SiteFooter() {
                       className="text-muted hover:text-signal transition-colors font-medium"
                     >
                       TG
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-faint block font-mono text-[0.625rem] uppercase tracking-wider">Developer 𝕏</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <a
+                      href="https://x.com/Muhammad_0423"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted hover:text-signal transition-colors font-medium font-mono text-[0.75rem]"
+                    >
+                      @Muhammad_0423 ↗
                     </a>
                   </div>
                 </div>
@@ -192,7 +183,7 @@ export function SiteFooter() {
         </div>
 
         <div className="border-hairline text-faint mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 border-t pt-6 text-[0.75rem]">
-          <p>{YEAR} · Built with precision by Shaikh Muhammad at ExoTech.</p>
+          <p>{YEAR} · Built with precision by ExoTech.</p>
           <p>No account, no wallet, and no private key ever leaves your browser.</p>
         </div>
       </div>
