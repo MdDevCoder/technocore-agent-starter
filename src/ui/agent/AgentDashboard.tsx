@@ -86,21 +86,46 @@ export function AgentDashboard() {
   const [networkRecords, setNetworkRecords] = useState<readonly NetworkDiscoveredRecord[]>([]);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
 
+  // Sequence Lookup State
+  const [showLookup, setShowLookup] = useState(false);
+  const [lookupSeq, setLookupSeq] = useState("");
+  const [lookupRoom, setLookupRoom] = useState<"technocore" | "lobby">("technocore");
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+  const [lookupSuccess, setLookupSuccess] = useState<string | null>(null);
+
   const assessment = passphrase.length === 0 ? null : assessPassphrase(passphrase);
   const resume = useMemo(() => resumeStepSlug(flowState), [flowState]);
   const resumeStep = stepBySlug(resume);
+
+  // Load cached verified records from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && identity) {
+      try {
+        const saved = localStorage.getItem(`technocore_records_${identity.did}`);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setNetworkRecords(parsed);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    }
+  }, [identity]);
 
   // Sync contributions and check-ins directly from the Technocore network
   const syncNetworkRecords = useCallback(async () => {
     if (transport === null || identity === null) return;
     setBusy("sync");
     try {
-      const records: NetworkDiscoveredRecord[] = [];
-      const seenIds = new Set<string>();
+      const records: NetworkDiscoveredRecord[] = [...networkRecords];
+      const seenIds = new Set<string>(records.map((r) => r.id));
 
-      // 1. Fetch from 'technocore' contribution room
+      // 1. Fetch recent from 'technocore' contribution room (up to 200)
       try {
-        const technocoreSnapshot = await readRoom(transport, "technocore", { limit: 50 });
+        const technocoreSnapshot = await readRoom(transport, "technocore", { limit: 200 });
         for (const msg of technocoreSnapshot.messages) {
           if (msg.did === identity.did && msg.sequence !== null && msg.nonce && msg.signature) {
             const id = `technocore_${msg.sequence}`;
@@ -129,9 +154,9 @@ export function AgentDashboard() {
         // Continue if room is offline
       }
 
-      // 2. Fetch from 'lobby' check-in room
+      // 2. Fetch recent from 'lobby' check-in room
       try {
-        const lobbySnapshot = await readRoom(transport, "lobby", { limit: 50 });
+        const lobbySnapshot = await readRoom(transport, "lobby", { limit: 200 });
         for (const msg of lobbySnapshot.messages) {
           if (msg.did === identity.did && msg.sequence !== null && msg.nonce && msg.signature) {
             const id = `lobby_${msg.sequence}`;
@@ -161,13 +186,90 @@ export function AgentDashboard() {
       }
 
       setNetworkRecords(records);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(`technocore_records_${identity.did}`, JSON.stringify(records));
+        } catch {}
+      }
       setLastSyncTime(new Date().toLocaleTimeString());
     } catch (err) {
       setFailure(toFlowFailure(err));
     } finally {
       setBusy(null);
     }
-  }, [transport, identity]);
+  }, [transport, identity, networkRecords]);
+
+  // Lookup record by exact sequence number (from WSL CLI output)
+  const handleLookup = useCallback(async () => {
+    if (!lookupSeq.trim() || transport === null || identity === null) return;
+    setIsLookingUp(true);
+    setLookupError(null);
+    setLookupSuccess(null);
+    try {
+      const seqs = lookupSeq
+        .split(/[\s,]+/)
+        .map((s) => parseInt(s.replace(/#/g, "").trim(), 10))
+        .filter((n) => !isNaN(n) && n >= 0);
+
+      if (seqs.length === 0) {
+        setLookupError("Please enter a valid sequence number (e.g. 2450860).");
+        return;
+      }
+
+      const newlyFound: NetworkDiscoveredRecord[] = [];
+      for (const seq of seqs) {
+        const snapshot = await readRoom(transport, lookupRoom, { since: Math.max(0, seq - 1), limit: 1 });
+        const target = snapshot.messages.find((m) => m.sequence === seq);
+        if (!target) {
+          throw new Error(`No message found at sequence #${seq} in room "${lookupRoom}" on the Technocore network.`);
+        }
+        if (target.did !== identity.did) {
+          throw new Error(
+            `Sequence #${seq} was signed by another DID (${target.did?.slice(0, 20)}...). It does not match your active agent DID.`
+          );
+        }
+        if (!target.nonce || !target.signature) {
+          throw new Error(`Message at sequence #${seq} is missing nonce or signature payload.`);
+        }
+        const ver = await verifyRoomMessage(lookupRoom, {
+          did: identity.did,
+          nonce: target.nonce,
+          text: target.text,
+          sig: target.signature,
+        });
+
+        newlyFound.push({
+          id: `${lookupRoom}_${seq}`,
+          room: lookupRoom,
+          sequence: seq,
+          text: target.text,
+          nonce: target.nonce,
+          signature: target.signature,
+          verified: ver.verified,
+          source: "wsl_cli",
+        });
+      }
+
+      const updated = [...networkRecords];
+      for (const item of newlyFound) {
+        if (!updated.some((r) => r.id === item.id)) {
+          updated.push(item);
+        }
+      }
+      setNetworkRecords(updated);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(`technocore_records_${identity.did}`, JSON.stringify(updated));
+        } catch {}
+      }
+      setLookupSuccess(`Successfully fetched and cryptographically verified ${newlyFound.length} record(s) from Technocore!`);
+      setLookupSeq("");
+    } catch (err: any) {
+      setLookupError(err.message || "Failed to lookup sequence from network.");
+    } finally {
+      setIsLookingUp(false);
+    }
+  }, [lookupSeq, lookupRoom, transport, identity, networkRecords]);
 
   // Automatically sync on initial load
   useEffect(() => {
@@ -413,16 +515,28 @@ export function AgentDashboard() {
         <ReadoutPanel
           title="Contribution & Network records"
           aside={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant={showLookup ? "secondary" : "ghost"}
+                size="sm"
+                onClick={() => {
+                  setShowLookup(!showLookup);
+                  setLookupError(null);
+                  setLookupSuccess(null);
+                }}
+                className="mono text-xs text-signal hover:bg-signal/10"
+              >
+                {showLookup ? "✕ Close Lookup" : "+ Import WSL Sequence"}
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 busy={busy === "sync"}
                 disabled={busy !== null || transport === null}
                 onClick={() => void syncNetworkRecords()}
-                className="mono text-xs text-signal hover:bg-signal/10"
+                className="mono text-xs text-muted hover:text-ink hover:bg-panel"
               >
-                {busy === "sync" ? "Syncing..." : "↻ Sync Network"}
+                {busy === "sync" ? "Syncing..." : "↻ Scan Recent"}
               </Button>
               {verification !== null ? (
                 <StatusPill tone={verification.local.verified ? "verified" : "fault"} srPrefix="Verification:">
@@ -430,25 +544,89 @@ export function AgentDashboard() {
                 </StatusPill>
               ) : networkRecords.length > 0 ? (
                 <StatusPill tone="verified" srPrefix="Status:">
-                  {networkRecords.length} network record{networkRecords.length > 1 ? "s" : ""} found
+                  {networkRecords.length} verified record{networkRecords.length > 1 ? "s" : ""}
                 </StatusPill>
               ) : null}
             </div>
           }
         >
+          {/* WSL Sequence Number Import Form */}
+          {showLookup && (
+            <div className="mb-6 rounded-lg border border-signal/40 bg-panel p-4 shadow-lg animate-fade-in-up">
+              <div className="flex items-center justify-between">
+                <p className="eyebrow text-signal">Import & Verify WSL / Linux Terminal Contribution</p>
+                <span className="mono text-[0.6875rem] text-muted">2.45M+ Live Network Records</span>
+              </div>
+              <p className="text-muted mt-2 text-xs leading-relaxed">
+                When you ran <code className="mono text-ink text-[0.75rem]">python3 flop_agent.py contribute</code> in WSL, it returned a <span className="text-ink font-semibold">Sequence Number</span> (e.g. <code className="mono text-signal font-semibold">#2450860</code>). Enter your sequence number below to fetch and cryptographically verify the original message directly from the live Technocore network.
+              </p>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+                <input
+                  type="text"
+                  placeholder="Sequence # (e.g. 2450860, 2441023)"
+                  value={lookupSeq}
+                  onChange={(e) => setLookupSeq(e.target.value)}
+                  className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink placeholder:text-faint focus:border-signal focus:outline-none"
+                />
+                <select
+                  value={lookupRoom}
+                  onChange={(e) => setLookupRoom(e.target.value as "technocore" | "lobby")}
+                  className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink focus:border-signal focus:outline-none"
+                >
+                  <option value="technocore">Room: technocore (Contribution)</option>
+                  <option value="lobby">Room: lobby (Check-in)</option>
+                </select>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  busy={isLookingUp}
+                  disabled={isLookingUp || !lookupSeq.trim()}
+                  onClick={() => void handleLookup()}
+                >
+                  {isLookingUp ? "Fetching & Verifying..." : "Fetch & Verify"}
+                </Button>
+              </div>
+
+              {lookupError && (
+                <p className="mt-3 text-xs text-fault mono bg-fault/10 border border-fault/30 p-2.5 rounded">
+                  ⚠️ {lookupError}
+                </p>
+              )}
+              {lookupSuccess && (
+                <p className="mt-3 text-xs text-signal mono bg-signal/10 border border-signal/30 p-2.5 rounded">
+                  ✨ {lookupSuccess}
+                </p>
+              )}
+            </div>
+          )}
+
           {contribution === null && networkRecords.length === 0 ? (
             <div className="flex flex-col gap-4">
               <p className="text-muted text-[0.8125rem] leading-relaxed">
-                No contribution record has been posted from this tab or found in the network rooms for this DID yet.
+                No contribution record has been posted from this tab, and no record was in the latest 200 global network room messages.
               </p>
+              <div className="rounded-md border border-hairline bg-graphite/40 p-3 text-xs text-muted space-y-1.5">
+                <p className="text-ink font-medium">💡 Did you post from WSL / Linux CLI?</p>
+                <p>
+                  The live Technocore public network has over <strong className="text-ink">2,450,000 messages</strong>. If your contribution was submitted earlier, click <span className="text-signal font-semibold cursor-pointer hover:underline" onClick={() => setShowLookup(true)}>"+ Import WSL Sequence"</span> above and enter your sequence number from your terminal output to verify and pin it to your dashboard!
+                </p>
+              </div>
               {lastSyncTime && (
                 <p className="mono text-faint text-[0.6875rem]">
-                  Last synced with network rooms: {lastSyncTime}
+                  Last scanned recent network room messages: {lastSyncTime}
                 </p>
               )}
-              <div className="flex flex-wrap gap-2">
-                <Link href="/onboarding/contribute" className={buttonClasses("secondary", "sm")}>
-                  Record a contribution
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowLookup(true)}
+                >
+                  + Import WSL Sequence
+                </Button>
+                <Link href="/onboarding/contribute" className={buttonClasses("ghost", "sm")}>
+                  Record a web contribution
                 </Link>
                 <Button
                   variant="ghost"
@@ -456,7 +634,7 @@ export function AgentDashboard() {
                   busy={busy === "sync"}
                   onClick={() => void syncNetworkRecords()}
                 >
-                  Check network again
+                  Scan recent messages
                 </Button>
               </div>
             </div>
@@ -534,10 +712,17 @@ export function AgentDashboard() {
               ))}
 
               <div className="flex flex-wrap gap-2 pt-2 border-t border-hairline">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowLookup(true)}
+                >
+                  + Add another sequence #
+                </Button>
                 <Link href="/onboarding/contribute" className={buttonClasses("ghost", "sm")}>
-                  Record another contribution
+                  Record a web contribution
                 </Link>
-                <Link href="/civilization" className={buttonClasses("secondary", "sm")}>
+                <Link href="/civilization" className={buttonClasses("ghost", "sm")}>
                   View Observatory
                 </Link>
               </div>
