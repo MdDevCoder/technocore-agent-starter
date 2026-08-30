@@ -16,13 +16,15 @@
  */
 
 import Link from "next/link";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { exportBackupFile } from "../../flow/backup.ts";
 import { toFlowFailure, type FlowFailure } from "../../flow/failure.ts";
 import { retryDirectoryEntry } from "../../flow/introduce.ts";
 import { useAgentSession } from "../../hooks/AgentSession.tsx";
 import { assessPassphrase, MIN_PASSPHRASE_LENGTH } from "../../identity/passphrase.ts";
 import { SAFE_LINK_ATTRIBUTES } from "../../contribution/urlPolicy.ts";
+import { readRoom } from "../../technocore/room.ts";
+import { verifyRoomMessage } from "../../technocore/verify.ts";
 import { ActivityTimeline } from "../ActivityTimeline.tsx";
 import { Button } from "../Button.tsx";
 import { buttonClasses } from "../buttonStyles.ts";
@@ -40,6 +42,17 @@ import { resumeStepSlug, stepBySlug } from "../steps.ts";
 
 /** Strength is advice, so it is never coloured like a verification result. */
 const STRENGTH_TONE = ["fault", "fault", "attention", "verified", "verified"] as const;
+
+export interface NetworkDiscoveredRecord {
+  readonly id: string;
+  readonly room: string;
+  readonly sequence: number;
+  readonly text: string;
+  readonly nonce: string;
+  readonly signature: string;
+  readonly verified: boolean;
+  readonly source: "wsl_cli" | "room" | "civilization";
+}
 
 export function AgentDashboard() {
   const {
@@ -63,15 +76,103 @@ export function AgentDashboard() {
   } = useAgentSession();
 
   const [passphrase, setPassphrase] = useState("");
-  const [busy, setBusy] = useState<"export" | "directory" | null>(null);
+  const [busy, setBusy] = useState<"export" | "directory" | "sync" | null>(null);
   const [failure, setFailure] = useState<FlowFailure | null>(null);
   const [exportedName, setExportedName] = useState<string | null>(null);
   const [downloadBlocked, setDownloadBlocked] = useState(false);
   const [confirm, setConfirm] = useState<"forget" | "history" | null>(null);
 
+  // Live Network Discovered Contributions State
+  const [networkRecords, setNetworkRecords] = useState<readonly NetworkDiscoveredRecord[]>([]);
+  const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+
   const assessment = passphrase.length === 0 ? null : assessPassphrase(passphrase);
   const resume = useMemo(() => resumeStepSlug(flowState), [flowState]);
   const resumeStep = stepBySlug(resume);
+
+  // Sync contributions and check-ins directly from the Technocore network
+  const syncNetworkRecords = useCallback(async () => {
+    if (transport === null || identity === null) return;
+    setBusy("sync");
+    try {
+      const records: NetworkDiscoveredRecord[] = [];
+      const seenIds = new Set<string>();
+
+      // 1. Fetch from 'technocore' contribution room
+      try {
+        const technocoreSnapshot = await readRoom(transport, "technocore", { limit: 50 });
+        for (const msg of technocoreSnapshot.messages) {
+          if (msg.did === identity.did && msg.sequence !== null && msg.nonce && msg.signature) {
+            const id = `technocore_${msg.sequence}`;
+            if (!seenIds.has(id)) {
+              seenIds.add(id);
+              const ver = await verifyRoomMessage("technocore", {
+                did: identity.did,
+                nonce: msg.nonce,
+                text: msg.text,
+                sig: msg.signature,
+              });
+              records.push({
+                id,
+                room: "technocore",
+                sequence: msg.sequence,
+                text: msg.text,
+                nonce: msg.nonce,
+                signature: msg.signature,
+                verified: ver.verified,
+                source: "wsl_cli",
+              });
+            }
+          }
+        }
+      } catch {
+        // Continue if room is offline
+      }
+
+      // 2. Fetch from 'lobby' check-in room
+      try {
+        const lobbySnapshot = await readRoom(transport, "lobby", { limit: 50 });
+        for (const msg of lobbySnapshot.messages) {
+          if (msg.did === identity.did && msg.sequence !== null && msg.nonce && msg.signature) {
+            const id = `lobby_${msg.sequence}`;
+            if (!seenIds.has(id)) {
+              seenIds.add(id);
+              const ver = await verifyRoomMessage("lobby", {
+                did: identity.did,
+                nonce: msg.nonce,
+                text: msg.text,
+                sig: msg.signature,
+              });
+              records.push({
+                id,
+                room: "lobby",
+                sequence: msg.sequence,
+                text: msg.text,
+                nonce: msg.nonce,
+                signature: msg.signature,
+                verified: ver.verified,
+                source: "room",
+              });
+            }
+          }
+        }
+      } catch {
+        // Continue
+      }
+
+      setNetworkRecords(records);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    } catch (err) {
+      setFailure(toFlowFailure(err));
+    } finally {
+      setBusy(null);
+    }
+  }, [transport, identity]);
+
+  // Automatically sync on initial load
+  useEffect(() => {
+    void syncNetworkRecords();
+  }, [syncNetworkRecords]);
 
   const runExport = useCallback(async () => {
     if (session === null) return;
@@ -310,72 +411,134 @@ export function AgentDashboard() {
         </ReadoutPanel>
 
         <ReadoutPanel
-          title="Contribution record"
+          title="Contribution & Network records"
           aside={
-            verification === null ? undefined : (
-              <StatusPill tone={verification.local.verified ? "verified" : "fault"} srPrefix="Verification:">
-                {verification.local.verified ? "signature verified" : "signature not valid"}
-              </StatusPill>
-            )
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                busy={busy === "sync"}
+                disabled={busy !== null || transport === null}
+                onClick={() => void syncNetworkRecords()}
+                className="mono text-xs text-signal hover:bg-signal/10"
+              >
+                {busy === "sync" ? "Syncing..." : "↻ Sync Network"}
+              </Button>
+              {verification !== null ? (
+                <StatusPill tone={verification.local.verified ? "verified" : "fault"} srPrefix="Verification:">
+                  {verification.local.verified ? "signature verified" : "signature not valid"}
+                </StatusPill>
+              ) : networkRecords.length > 0 ? (
+                <StatusPill tone="verified" srPrefix="Status:">
+                  {networkRecords.length} network record{networkRecords.length > 1 ? "s" : ""} found
+                </StatusPill>
+              ) : null}
+            </div>
           }
         >
-          {contribution === null ? (
+          {contribution === null && networkRecords.length === 0 ? (
             <div className="flex flex-col gap-4">
               <p className="text-muted text-[0.8125rem] leading-relaxed">
-                No contribution record has been posted from this tab.
+                No contribution record has been posted from this tab or found in the network rooms for this DID yet.
               </p>
-              <div>
+              {lastSyncTime && (
+                <p className="mono text-faint text-[0.6875rem]">
+                  Last synced with network rooms: {lastSyncTime}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2">
                 <Link href="/onboarding/contribute" className={buttonClasses("secondary", "sm")}>
                   Record a contribution
                 </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  busy={busy === "sync"}
+                  onClick={() => void syncNetworkRecords()}
+                >
+                  Check network again
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              <DataList
-                rows={[
-                  { label: "Room", value: contribution.record.room, mono: true },
-                  { label: "Sequence", value: `#${formatGrouped(contribution.record.sequence)}`, mono: true },
-                  {
-                    label: "Link",
-                    value: (
-                      <a
-                        {...SAFE_LINK_ATTRIBUTES}
-                        href={contribution.plan.url.href}
-                        className="text-ink decoration-faint hover:decoration-ink underline decoration-dotted underline-offset-4 break-all"
-                      >
-                        {contribution.plan.url.raw}
-                      </a>
-                    ),
-                  },
-                  { label: "Topic", value: contribution.plan.topic },
-                  {
-                    label: "Verification",
-                    value:
-                      verification === null
-                        ? "not checked in this tab"
-                        : verification.local.verified
-                          ? "Signature valid"
-                          : "Signature not valid",
-                    note:
-                      verification === null
-                        ? "Verification runs locally and takes a moment."
-                        : `Checked ${formatUtc(verification.at)}. Read-back: ${verification.readBack.status}.`,
-                  },
-                ]}
-              />
-              <div className="flex flex-wrap gap-2">
-                {verification?.local.verified === true ? (
-                  <Link href="/onboarding/complete" className={buttonClasses("secondary", "sm")}>
-                    Share proof
-                  </Link>
-                ) : (
-                  <Link href="/onboarding/verify" className={buttonClasses("secondary", "sm")}>
-                    Verify the record
-                  </Link>
-                )}
+            <div className="flex flex-col gap-6">
+              {/* Tab Contribution (if any) */}
+              {contribution && (
+                <div className="rounded-lg border border-hairline p-4 bg-graphite/40">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="eyebrow text-ink">Active Session Record</span>
+                    <span className="mono text-xs text-signal font-semibold">Sequence #{contribution.record.sequence}</span>
+                  </div>
+                  <DataList
+                    rows={[
+                      { label: "Room", value: contribution.record.room, mono: true },
+                      { label: "Sequence", value: `#${formatGrouped(contribution.record.sequence)}`, mono: true },
+                      {
+                        label: "Link / Text",
+                        value: (
+                          <a
+                            {...SAFE_LINK_ATTRIBUTES}
+                            href={contribution.plan.url.href}
+                            className="text-ink decoration-faint hover:decoration-ink underline decoration-dotted underline-offset-4 break-all"
+                          >
+                            {contribution.plan.url.raw}
+                          </a>
+                        ),
+                      },
+                      { label: "Topic", value: contribution.plan.topic },
+                    ]}
+                  />
+                </div>
+              )}
+
+              {/* Network Discovered Records (from WSL / Linux CLI or Network Rooms) */}
+              {networkRecords.map((rec) => (
+                <div key={rec.id} className="rounded-lg border border-signal/30 p-4 bg-panel/80 shadow-md space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="mono text-xs font-bold text-signal px-2 py-0.5 rounded bg-signal/15 border border-signal/30">
+                        {rec.source === "wsl_cli" ? "WSL / Linux CLI" : "Network Room"}
+                      </span>
+                      <span className="mono text-xs text-ink font-semibold">Room: {rec.room}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="mono text-xs text-muted">Sequence #{formatGrouped(rec.sequence)}</span>
+                      <StatusPill tone={rec.verified ? "verified" : "attention"}>
+                        {rec.verified ? "signature verified" : "unverified"}
+                      </StatusPill>
+                    </div>
+                  </div>
+
+                  <DataList
+                    dense
+                    rows={[
+                      { label: "Room", value: rec.room, mono: true },
+                      { label: "Sequence", value: `#${formatGrouped(rec.sequence)}`, mono: true },
+                      {
+                        label: "Content",
+                        value: (
+                          <p className="mono text-ink text-[0.8125rem] break-all leading-relaxed bg-void/50 p-2.5 rounded border border-hairline">
+                            {rec.text}
+                          </p>
+                        ),
+                      },
+                      {
+                        label: "Signature",
+                        value: `${rec.signature.slice(0, 24)}...${rec.signature.slice(-12)}`,
+                        mono: true,
+                        note: "Cryptographically verified against this agent's public key.",
+                      },
+                    ]}
+                  />
+                </div>
+              ))}
+
+              <div className="flex flex-wrap gap-2 pt-2 border-t border-hairline">
                 <Link href="/onboarding/contribute" className={buttonClasses("ghost", "sm")}>
-                  Record another
+                  Record another contribution
+                </Link>
+                <Link href="/civilization" className={buttonClasses("secondary", "sm")}>
+                  View Observatory
                 </Link>
               </div>
             </div>
