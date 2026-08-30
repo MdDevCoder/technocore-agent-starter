@@ -55,17 +55,17 @@ export const AgentNode: React.FC<AgentNodeProps> = ({
     >
       {/* Outer pulse when awakened */}
       {isAwakened && (
-        <circle r={32} fill="none" stroke="#4fe3c1" strokeWidth={1.5} opacity={0.6} className="animate-ping" />
+        <circle r={35} fill="none" stroke="#4fe3c1" strokeWidth={1.5} opacity={0.6} className="animate-ping" />
       )}
 
       {/* Selection highlight ring */}
       {isSelected && (
-        <circle r={28} fill="none" stroke="#4fe3c1" strokeWidth={2.5} strokeDasharray="4 2" />
+        <circle r={30} fill="none" stroke="#4fe3c1" strokeWidth={2.5} strokeDasharray="4 2" />
       )}
 
       {/* Base node background */}
       <circle
-        r={22}
+        r={24}
         fill="#16191d"
         stroke={isSelected ? "#4fe3c1" : "#23272d"}
         strokeWidth={1.5}
@@ -76,8 +76,8 @@ export const AgentNode: React.FC<AgentNodeProps> = ({
       <text
         textAnchor="middle"
         dy=".35em"
-        fill="#e6e8eb"
-        fontSize={11}
+        fill="#f8fafc"
+        fontSize={12}
         fontFamily="var(--font-mono)"
         fontWeight="600"
       >
@@ -85,13 +85,13 @@ export const AgentNode: React.FC<AgentNodeProps> = ({
       </text>
 
       {/* Mini Reputation Pill */}
-      <g transform="translate(14, -14)">
+      <g transform="translate(16, -16)">
         <rect
-          x={-10}
-          y={-7}
-          width={20}
-          height={14}
-          rx={3}
+          x={-11}
+          y={-7.5}
+          width={22}
+          height={15}
+          rx={3.5}
           fill="#101215"
           stroke={badgeColor}
           strokeWidth={1}
@@ -100,7 +100,7 @@ export const AgentNode: React.FC<AgentNodeProps> = ({
           textAnchor="middle"
           dy=".35em"
           fill={badgeColor}
-          fontSize={8}
+          fontSize={8.5}
           fontFamily="var(--font-mono)"
           fontWeight="bold"
         >
@@ -110,22 +110,22 @@ export const AgentNode: React.FC<AgentNodeProps> = ({
 
       {/* Agent Name Tag */}
       <text
-        y={32}
+        y={35}
         textAnchor="middle"
-        fill="#e6e8eb"
-        fontSize={9.5}
+        fill="#f8fafc"
+        fontSize={11}
         fontFamily="var(--font-sans)"
-        fontWeight="500"
+        fontWeight="600"
       >
         {profile.displayName}
       </text>
 
       {/* Subtitle / Role Tag */}
       <text
-        y={43}
+        y={47}
         textAnchor="middle"
-        fill="#8b929c"
-        fontSize={8}
+        fill="#cbd5e1"
+        fontSize={9.5}
         fontFamily="var(--font-mono)"
       >
         {profile.role.length > 20 ? `${profile.role.slice(0, 18)}...` : profile.role}

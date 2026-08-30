@@ -39,11 +39,11 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
       };
     }
 
-    const width = 800;
-    const height = 580;
+    const width = 760;
+    const height = 560;
     const centerX = width / 2;
-    const centerY = height / 2;
-    const radius = 180;
+    const centerY = 265;
+    const radius = 205;
 
     // 1. Position 9 Agents in Outer Orbit
     const agentDids = Array.from(worldState.population.keys());
@@ -61,15 +61,15 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
     const activeMissions = Array.from(worldState.activeMissions.values());
     const missionPosMap = new Map<string, { x: number; y: number }>();
     activeMissions.forEach((m, i) => {
-      const offsetX = (i - (activeMissions.length - 1) / 2) * 110;
-      missionPosMap.set(m.missionId, { x: centerX + offsetX, y: centerY - 55 });
+      const offsetX = (i - (activeMissions.length - 1) / 2) * 115;
+      missionPosMap.set(m.missionId, { x: centerX + offsetX, y: centerY - 65 });
     });
 
     // 3. Position Active Teams in Center
     const activeTeams = Array.from(worldState.activeTeams.values());
     const teamPosMap = new Map<string, { x: number; y: number }>();
     activeTeams.forEach((t, i) => {
-      const offsetX = (i - (activeTeams.length - 1) / 2) * 90;
+      const offsetX = (i - (activeTeams.length - 1) / 2) * 95;
       teamPosMap.set(t.teamId, { x: centerX + offsetX, y: centerY + 15 });
     });
 
@@ -77,8 +77,8 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
     const activeDisputes = Array.from(worldState.activeDisputes.values());
     const disputePosMap = new Map<string, { x: number; y: number }>();
     activeDisputes.forEach((d, i) => {
-      const offsetX = (i - (activeDisputes.length - 1) / 2) * 100;
-      disputePosMap.set(d.disputeId, { x: centerX + offsetX, y: centerY + 75 });
+      const offsetX = (i - (activeDisputes.length - 1) / 2) * 105;
+      disputePosMap.set(d.disputeId, { x: centerX + offsetX, y: centerY + 85 });
     });
 
     // 5. Build Graph Edges
@@ -194,7 +194,7 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
       {/* Interactive SVG Surface */}
       <div className="relative flex-1 cursor-crosshair min-h-0 overflow-hidden">
         <svg
-          viewBox="0 0 800 580"
+          viewBox="0 0 760 560"
           preserveAspectRatio="xMidYMid meet"
           className="h-full w-full select-none"
           role="img"
@@ -211,12 +211,12 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
             </radialGradient>
           </defs>
 
-          <rect width="800" height="580" fill="url(#world-grid)" />
-          <circle cx="400" cy="290" r="230" fill="url(#center-glow)" />
+          <rect width="760" height="560" fill="url(#world-grid)" />
+          <circle cx="380" cy="265" r="250" fill="url(#center-glow)" />
 
           {/* Orbital Guidelines */}
-          <circle cx="400" cy="290" r="180" fill="none" stroke="rgba(48, 53, 60, 0.35)" strokeDasharray="3 6" />
-          <circle cx="400" cy="290" r="90" fill="none" stroke="rgba(48, 53, 60, 0.2)" strokeDasharray="2 4" />
+          <circle cx="380" cy="265" r="205" fill="none" stroke="rgba(48, 53, 60, 0.35)" strokeDasharray="3 6" />
+          <circle cx="380" cy="265" r="105" fill="none" stroke="rgba(48, 53, 60, 0.2)" strokeDasharray="2 4" />
 
           {/* Relationship Edges Layer */}
           <g className="edges-layer">

@@ -37,13 +37,13 @@ export const MissionNode: React.FC<MissionNodeProps> = ({
       }}
     >
       {isSelected && (
-        <rect x={-45} y={-25} width={90} height={50} rx={6} fill="none" stroke="#4fe3c1" strokeWidth={2} />
+        <rect x={-52} y={-27} width={104} height={54} rx={6} fill="none" stroke="#4fe3c1" strokeWidth={2} />
       )}
       <rect
-        x={-42}
-        y={-22}
-        width={84}
-        height={44}
+        x={-48}
+        y={-24}
+        width={96}
+        height={48}
         rx={5}
         fill="#16191d"
         stroke={isSelected ? "#4fe3c1" : "#30353c"}
@@ -53,27 +53,28 @@ export const MissionNode: React.FC<MissionNodeProps> = ({
       <text
         y={-6}
         textAnchor="middle"
-        fill="#e6e8eb"
-        fontSize={9}
+        fill="#f8fafc"
+        fontSize={10}
         fontFamily="var(--font-sans)"
         fontWeight="600"
       >
-        {mission.title.length > 14 ? `${mission.title.slice(0, 12)}..` : mission.title}
+        {mission.title.length > 15 ? `${mission.title.slice(0, 13)}..` : mission.title}
       </text>
       {/* Budget / Status */}
       <text
-        y={8}
+        y={9}
         textAnchor="middle"
         fill="#4fe3c1"
-        fontSize={8}
+        fontSize={9}
         fontFamily="var(--font-mono)"
+        fontWeight="bold"
       >
         {mission.budget ? `${(mission.budget.amount / 1000).toFixed(0)}k FLOP` : "ACTIVE"}
       </text>
       {/* Requirements dot indicators */}
-      <g transform="translate(0, 16)">
+      <g transform="translate(0, 18)">
         {mission.requirements.map((_, i) => (
-          <circle key={i} cx={(i - (mission.requirements.length - 1) / 2) * 8} cy={0} r={2} fill="#3fd98b" />
+          <circle key={i} cx={(i - (mission.requirements.length - 1) / 2) * 9} cy={0} r={2.5} fill="#4ade80" />
         ))}
       </g>
     </g>
@@ -108,24 +109,24 @@ export const TeamNode: React.FC<TeamNodeProps> = ({
       }}
     >
       {isSelected && (
-        <polygon points="0,-24 24,0 0,24 -24,0" fill="none" stroke="#3fd98b" strokeWidth={2} />
+        <polygon points="0,-26 26,0 0,26 -26,0" fill="none" stroke="#4ade80" strokeWidth={2} />
       )}
-      <polygon points="0,-20 20,0 0,20 -20,0" fill="#16191d" stroke="#3fd98b" strokeWidth={1.5} />
+      <polygon points="0,-22 22,0 0,22 -22,0" fill="#16191d" stroke="#4ade80" strokeWidth={1.5} />
       <text
         dy=".3em"
         textAnchor="middle"
-        fill="#3fd98b"
-        fontSize={9}
+        fill="#4ade80"
+        fontSize={10}
         fontFamily="var(--font-mono)"
         fontWeight="bold"
       >
         {team.memberDids.length}p
       </text>
       <text
-        y={28}
+        y={30}
         textAnchor="middle"
-        fill="#8b929c"
-        fontSize={7.5}
+        fill="#cbd5e1"
+        fontSize={8.5}
         fontFamily="var(--font-mono)"
       >
         Team {team.teamId.slice(0, 7)}
@@ -162,22 +163,22 @@ export const DisputeNode: React.FC<DisputeNodeProps> = ({
       }}
     >
       {isSelected && (
-        <circle r={22} fill="none" stroke="#ff6b6b" strokeWidth={2} />
+        <circle r={24} fill="none" stroke="#f87171" strokeWidth={2} />
       )}
-      <circle r={18} fill="#16191d" stroke="#ff6b6b" strokeWidth={1.5} className="animate-pulse" />
+      <circle r={20} fill="#16191d" stroke="#f87171" strokeWidth={1.5} className="animate-pulse" />
       <text
         dy=".35em"
         textAnchor="middle"
-        fill="#ff6b6b"
-        fontSize={11}
+        fill="#f87171"
+        fontSize={12}
       >
         ⚖️
       </text>
       <text
-        y={26}
+        y={28}
         textAnchor="middle"
-        fill="#ff6b6b"
-        fontSize={8}
+        fill="#f87171"
+        fontSize={9}
         fontFamily="var(--font-mono)"
         fontWeight="bold"
       >

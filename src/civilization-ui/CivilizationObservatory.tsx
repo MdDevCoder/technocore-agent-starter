@@ -125,7 +125,7 @@ export function CivilizationObservatory() {
       )}
 
       {/* Main Observatory Layout: 2 Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:h-[680px] lg:max-h-[680px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:h-[700px] lg:max-h-[700px]">
         {/* Left Column: Visual Map / Market / Economy / Evolution Views (7 Cols on large screen) */}
         <div className="lg:col-span-7 flex flex-col gap-3 h-full min-h-0 overflow-hidden">
           {/* View Mode Switcher */}
