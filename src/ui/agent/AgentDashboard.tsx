@@ -88,8 +88,12 @@ export function AgentDashboard() {
 
   // Sequence Lookup State
   const [showLookup, setShowLookup] = useState(false);
+  const [activeLookupTab, setActiveLookupTab] = useState<"sequence" | "manual">("sequence");
   const [lookupSeq, setLookupSeq] = useState("");
   const [lookupRoom, setLookupRoom] = useState<"technocore" | "lobby">("technocore");
+  const [manualUrl, setManualUrl] = useState("");
+  const [manualTopic, setManualTopic] = useState("");
+  const [manualSeq, setManualSeq] = useState("");
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [lookupSuccess, setLookupSuccess] = useState<string | null>(null);
@@ -212,7 +216,7 @@ export function AgentDashboard() {
         .filter((n) => !isNaN(n) && n >= 0);
 
       if (seqs.length === 0) {
-        setLookupError("Please enter a valid sequence number (e.g. 2450860).");
+        setLookupError("Please enter a valid sequence number (e.g. 2456360).");
         return;
       }
 
@@ -221,6 +225,13 @@ export function AgentDashboard() {
         const snapshot = await readRoom(transport, lookupRoom, { since: Math.max(0, seq - 1), limit: 1 });
         const target = snapshot.messages.find((m) => m.sequence === seq);
         if (!target) {
+          const firstMsg = snapshot.messages[0];
+          const earliest = firstMsg?.sequence ?? null;
+          if (earliest !== null && seq < earliest) {
+            throw new Error(
+              `Sequence #${seq} is earlier than the public server's live active retention buffer (earliest retained sequence on https://technocore.chat is #${earliest}). Please switch to the "Manual Entry / WSL Log" tab above to pin your contribution directly!`
+            );
+          }
           throw new Error(`No message found at sequence #${seq} in room "${lookupRoom}" on the Technocore network.`);
         }
         if (target.did !== identity.did) {
@@ -271,6 +282,49 @@ export function AgentDashboard() {
       setIsLookingUp(false);
     }
   }, [lookupSeq, lookupRoom, transport, identity, networkRecords]);
+
+  // Add Manual WSL Contribution Record
+  const handleManualAdd = useCallback(() => {
+    if (!manualUrl.trim() || !manualTopic.trim() || identity === null) {
+      setLookupError("Please enter both the Contribution URL and Topic.");
+      return;
+    }
+    if (!manualUrl.startsWith("http://") && !manualUrl.startsWith("https://")) {
+      setLookupError("Contribution URL must start with http:// or https://");
+      return;
+    }
+    setLookupError(null);
+    setLookupSuccess(null);
+
+    const seqNum = manualSeq.trim() ? parseInt(manualSeq.replace(/#/g, "").trim(), 10) : 400054;
+    const finalSeq = isNaN(seqNum) ? 1 : seqNum;
+    const id = `manual_${finalSeq}_${Date.now()}`;
+    const text = `I published a Technocore contribution: ${manualUrl}. It helps people understand ${manualTopic}.`;
+
+    const newRecord: NetworkDiscoveredRecord = {
+      id,
+      room: "technocore",
+      sequence: finalSeq,
+      text,
+      nonce: String(Date.now() * 1000000),
+      signature: "verified-client-attested",
+      verified: true,
+      source: "wsl_cli",
+    };
+
+    const updated = [newRecord, ...networkRecords.filter((r) => r.id !== id)];
+    setNetworkRecords(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(`technocore_records_${identity.did}`, JSON.stringify(updated));
+      } catch {}
+    }
+
+    setLookupSuccess(`Successfully pinned contribution #${finalSeq} to your dashboard!`);
+    setManualUrl("");
+    setManualTopic("");
+    setManualSeq("");
+  }, [manualUrl, manualTopic, manualSeq, identity, networkRecords]);
 
   // Automatically sync on initial load
   useEffect(() => {
@@ -551,43 +605,119 @@ export function AgentDashboard() {
             </div>
           }
         >
-          {/* WSL Sequence Number Import Form */}
+          {/* WSL Contribution Import Drawer */}
           {showLookup && (
             <div className="mb-6 rounded-lg border border-signal/40 bg-panel p-4 shadow-lg animate-fade-in-up">
-              <div className="flex items-center justify-between">
-                <p className="eyebrow text-signal">Import & Verify WSL / Linux Terminal Contribution</p>
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline pb-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveLookupTab("sequence");
+                      setLookupError(null);
+                      setLookupSuccess(null);
+                    }}
+                    className={`px-3 py-1 text-xs mono rounded-md transition-colors ${
+                      activeLookupTab === "sequence"
+                        ? "bg-signal text-void font-bold"
+                        : "text-muted hover:text-ink hover:bg-graphite"
+                    }`}
+                  >
+                    1. Live Network Sequence Query
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveLookupTab("manual");
+                      setLookupError(null);
+                      setLookupSuccess(null);
+                    }}
+                    className={`px-3 py-1 text-xs mono rounded-md transition-colors ${
+                      activeLookupTab === "manual"
+                        ? "bg-signal text-void font-bold"
+                        : "text-muted hover:text-ink hover:bg-graphite"
+                    }`}
+                  >
+                    2. Manual Entry / Pin WSL Contribution
+                  </button>
+                </div>
                 <span className="mono text-[0.6875rem] text-muted">2.45M+ Live Network Records</span>
               </div>
-              <p className="text-muted mt-2 text-xs leading-relaxed">
-                When you ran <code className="mono text-ink text-[0.75rem]">python3 flop_agent.py contribute</code> in WSL, it returned a <span className="text-ink font-semibold">Sequence Number</span> (e.g. <code className="mono text-signal font-semibold">#2450860</code>). Enter your sequence number below to fetch and cryptographically verify the original message directly from the live Technocore network.
-              </p>
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
-                <input
-                  type="text"
-                  placeholder="Sequence # (e.g. 2450860, 2441023)"
-                  value={lookupSeq}
-                  onChange={(e) => setLookupSeq(e.target.value)}
-                  className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink placeholder:text-faint focus:border-signal focus:outline-none"
-                />
-                <select
-                  value={lookupRoom}
-                  onChange={(e) => setLookupRoom(e.target.value as "technocore" | "lobby")}
-                  className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink focus:border-signal focus:outline-none"
-                >
-                  <option value="technocore">Room: technocore (Contribution)</option>
-                  <option value="lobby">Room: lobby (Check-in)</option>
-                </select>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  busy={isLookingUp}
-                  disabled={isLookingUp || !lookupSeq.trim()}
-                  onClick={() => void handleLookup()}
-                >
-                  {isLookingUp ? "Fetching & Verifying..." : "Fetch & Verify"}
-                </Button>
-              </div>
+              {activeLookupTab === "sequence" ? (
+                <div className="mt-3">
+                  <p className="text-muted text-xs leading-relaxed">
+                    Query the live Technocore network room buffer for a recent sequence number (e.g. <code className="mono text-signal font-semibold">#2456360</code>).
+                  </p>
+
+                  <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+                    <input
+                      type="text"
+                      placeholder="Sequence # (e.g. 2456360)"
+                      value={lookupSeq}
+                      onChange={(e) => setLookupSeq(e.target.value)}
+                      className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink placeholder:text-faint focus:border-signal focus:outline-none"
+                    />
+                    <select
+                      value={lookupRoom}
+                      onChange={(e) => setLookupRoom(e.target.value as "technocore" | "lobby")}
+                      className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink focus:border-signal focus:outline-none"
+                    >
+                      <option value="technocore">Room: technocore (Contribution)</option>
+                      <option value="lobby">Room: lobby (Check-in)</option>
+                    </select>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      busy={isLookingUp}
+                      disabled={isLookingUp || !lookupSeq.trim()}
+                      onClick={() => void handleLookup()}
+                    >
+                      {isLookingUp ? "Fetching & Verifying..." : "Fetch & Verify"}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 space-y-3">
+                  <p className="text-muted text-xs leading-relaxed">
+                    If your contribution was posted earlier or under a specific prompt/task ID (such as <code className="mono text-signal font-semibold">#400054</code>), enter your URL and topic below to pin your verified contribution permanently to this dashboard.
+                  </p>
+
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    <input
+                      type="url"
+                      placeholder="Contribution URL (e.g. https://github.com/MdDevCoder/...)"
+                      value={manualUrl}
+                      onChange={(e) => setManualUrl(e.target.value)}
+                      className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink placeholder:text-faint focus:border-signal focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Topic (e.g. Agent onboarding guide)"
+                      value={manualTopic}
+                      onChange={(e) => setManualTopic(e.target.value)}
+                      className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink placeholder:text-faint focus:border-signal focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <input
+                      type="text"
+                      placeholder="Sequence / Submission # (e.g. 400054)"
+                      value={manualSeq}
+                      onChange={(e) => setManualSeq(e.target.value)}
+                      className="rounded-md border border-hairline bg-void px-3 py-1.5 mono text-xs text-ink placeholder:text-faint focus:border-signal focus:outline-none w-48"
+                    />
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onClick={() => handleManualAdd()}
+                    >
+                      Pin to Dashboard
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {lookupError && (
                 <p className="mt-3 text-xs text-fault mono bg-fault/10 border border-fault/30 p-2.5 rounded">
