@@ -11,6 +11,7 @@ import * as path from "node:path";
 import { SqliteDatabaseAdapter } from "../persistence/sqlite-adapter.ts";
 import { PostgresDatabaseAdapter } from "../persistence/postgres-adapter.ts";
 import { SqlEventStore } from "../persistence/sql-store.ts";
+import { InMemoryEventStore } from "../persistence/in-memory-store.ts";
 import type { CivilizationEventStore } from "../persistence/types.ts";
 import { EventIngestionGateway } from "./ingestion.ts";
 import { TokenBucketRateLimiter } from "./rate-limiter.ts";
@@ -20,7 +21,7 @@ let globalStore: CivilizationEventStore | null = null;
 let globalGateway: EventIngestionGateway | null = null;
 
 export function getServerProductionConfig(): ProductionConfig {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
     return assertValidProductionStartup();
   }
   return loadProductionConfig();
@@ -52,6 +53,9 @@ export function getServerEventStore(customLocation?: string): CivilizationEventS
       };
       const pgAdapter = new PostgresDatabaseAdapter(pool);
       globalStore = new SqlEventStore(pgAdapter);
+    } else if (process.env.VERCEL || process.env.NEXT_PUBLIC_VERCEL_ENV) {
+      // Graceful serverless preview fallback when external PostgreSQL is not configured
+      globalStore = new InMemoryEventStore();
     } else {
       if (config.isProduction) {
         throw new Error("[Technocore] Security Invariant: SQLite is strictly forbidden in production mode.");
