@@ -240,16 +240,16 @@ export function ImportPanel() {
             </Button>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link href={`/onboarding/${resume}`} className={buttonClasses("primary", "lg")}>
               {resumeStep.ordinal === null
-                ? `Go to ${resumeStep.name}`
-                : `Continue — step ${resumeStep.ordinal}, ${resumeStep.name}`}
+                ? `Continue: ${resumeStep.name} →`
+                : `Continue to Step ${resumeStep.ordinal} (${resumeStep.name}) →`}
             </Link>
             <Link href="/agent" className={buttonClasses("secondary", "lg")}>
-              Open the dashboard
+              Open Dashboard
             </Link>
-            <Link href="/civilization" className={buttonClasses("ghost", "lg")}>
+            <Link href="/civilization" className={buttonClasses("secondary", "lg")}>
               Civilization Observatory
             </Link>
           </div>
@@ -290,16 +290,16 @@ export function ImportPanel() {
           </ReadoutPanel>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-8 flex flex-wrap items-center gap-3">
           <Link href={`/onboarding/${resume}`} className={buttonClasses("primary", "lg")}>
             {resumeStep.ordinal === null
-              ? `Go to ${resumeStep.name}`
-              : `Continue — step ${resumeStep.ordinal}, ${resumeStep.name}`}
+              ? `Continue: ${resumeStep.name} →`
+              : `Continue to Step ${resumeStep.ordinal} (${resumeStep.name}) →`}
           </Link>
           <Link href="/agent" className={buttonClasses("secondary", "lg")}>
-            Open the dashboard
+            Open Dashboard
           </Link>
-          <Link href="/civilization" className={buttonClasses("ghost", "lg")}>
+          <Link href="/civilization" className={buttonClasses("secondary", "lg")}>
             Civilization Observatory
           </Link>
         </div>
