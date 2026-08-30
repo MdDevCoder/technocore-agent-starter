@@ -12,15 +12,17 @@
 
 import Link from "next/link";
 import { buttonClasses } from "./buttonStyles.ts";
+import { ThemeToggle } from "./ThemeToggle.tsx";
 
 const LINKS = [
+  { href: "/civilization", label: "Civilization" },
   { href: "/agent", label: "Agent" },
   { href: "/import", label: "Import" },
 ] as const;
 
 export function SiteHeader() {
   return (
-    <header className="border-hairline bg-void/80 sticky top-0 z-40 border-b backdrop-blur-md">
+    <header className="border-hairline bg-void/80 sticky top-0 z-40 border-b backdrop-blur-md transition-colors duration-200">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-5 sm:px-8">
         <Link
           href="/"
@@ -33,7 +35,7 @@ export function SiteHeader() {
           technocore<span className="text-faint">/</span>starter
         </Link>
 
-        <nav aria-label="Main" className="flex items-center gap-1">
+        <nav aria-label="Main" className="flex items-center gap-1.5 sm:gap-2">
           {LINKS.map(({ href, label }) => (
             <Link
               key={href}
@@ -43,9 +45,10 @@ export function SiteHeader() {
               {label}
             </Link>
           ))}
-          <Link href="/onboarding/identity" className={buttonClasses("primary", "sm", "ml-2")}>
+          <Link href="/onboarding/identity" className={buttonClasses("primary", "sm", "ml-1")}>
             Create identity
           </Link>
+          <ThemeToggle className="ml-1" />
         </nav>
       </div>
     </header>

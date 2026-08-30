@@ -101,12 +101,12 @@ export default function LandingPage() {
                 FLOP Network · @flop_labs
               </span>
               <a
-                href="https://exo-tech.org/"
+                href="https://github.com/MdDevCoder"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-panel text-muted hover:text-ink hover:border-signal/30 border border-hairline transition-all"
               >
-                Engineered by ExoTech
+                Built by Shaikh Muhammad (@MdDevCoder)
               </a>
             </div>
 
@@ -121,10 +121,13 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link href="/onboarding/identity" className={buttonClasses("primary", "lg")}>
+              <Link href="/civilization" className={buttonClasses("primary", "lg", "bg-signal text-void font-bold hover:bg-signal/90")}>
+                ★ Enter Civilization
+              </Link>
+              <Link href="/onboarding/identity" className={buttonClasses("secondary", "lg")}>
                 Create identity
               </Link>
-              <Link href="/import" className={buttonClasses("secondary", "lg")}>
+              <Link href="/import" className={buttonClasses("ghost", "lg")}>
                 Import a backup
               </Link>
             </div>

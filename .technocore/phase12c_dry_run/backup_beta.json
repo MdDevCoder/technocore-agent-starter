@@ -1,0 +1,17 @@
+{
+  "schema": "technocore-agent-backup-v1",
+  "did": "did:key:z6Mkk6A3avnyX4J19tA2VQg3GBT2RcsyUsP7TQcgG4yVcjP4",
+  "created_at": "2026-08-29T21:51:46Z",
+  "kdf": {
+    "name": "PBKDF2",
+    "hash": "SHA-256",
+    "iterations": 600000,
+    "salt": "0mexCpFi8g9sRlFGeP36Tw"
+  },
+  "cipher": {
+    "name": "AES-256-GCM",
+    "iv": "-0PBZWu6g56NbO6V",
+    "ciphertext": "rneejCeTnnRCT3IWh-HsL9AeCIcEMmYBzO202QpDoCg2MhnJcE2ptBSDjuFOkMjz"
+  },
+  "note": "Encrypted Technocore agent identity. The passphrase is required to restore it and cannot be recovered or reset by anyone. Store this file and the passphrase separately."
+}

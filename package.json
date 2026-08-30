@@ -10,6 +10,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "db:migrate": "node --experimental-strip-types scripts/migrate.ts",
+    "worker:projections": "node --experimental-strip-types scripts/projection-worker-cli.ts",
+    "agent:daemon": "node --experimental-strip-types src/civilization/daemon/cli.ts",
     "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\"",
     "test:protocol": "node verification/differential.test.mjs && node verification/negative.test.mjs && node verification/templates.test.mjs",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol"

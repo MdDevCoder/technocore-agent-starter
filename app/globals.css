@@ -24,25 +24,25 @@
    achromatic. Colour therefore encodes truth rather than decorating the page.
    ========================================================================= */
 @theme {
-  --color-void: #08090b;
-  --color-graphite: #101215;
-  --color-panel: #16191d;
-  --color-panel-high: #1c2025;
-  --color-hairline: #23272d;
-  --color-hairline-bright: #30353c;
-  --color-ink: #e6e8eb;
-  --color-muted: #8b929c;
-  --color-faint: #5c636d;
+  --color-void: var(--theme-void);
+  --color-graphite: var(--theme-graphite);
+  --color-panel: var(--theme-panel);
+  --color-panel-high: var(--theme-panel-high);
+  --color-hairline: var(--theme-hairline);
+  --color-hairline-bright: var(--theme-hairline-bright);
+  --color-ink: var(--theme-ink);
+  --color-muted: var(--theme-muted);
+  --color-faint: var(--theme-faint);
 
   /* The one accent. Reserved for real cryptographic material. */
-  --color-signal: #4fe3c1;
-  --color-signal-dim: #2a7566;
-  --color-signal-wash: #0f2b26;
+  --color-signal: var(--theme-signal);
+  --color-signal-dim: var(--theme-signal-dim);
+  --color-signal-wash: var(--theme-signal-wash);
 
   /* Semantic, state only. Never decorative. */
-  --color-verified: #3fd98b;
-  --color-attention: #f2b23e;
-  --color-fault: #ff6b6b;
+  --color-verified: var(--theme-verified);
+  --color-attention: var(--theme-attention);
+  --color-fault: var(--theme-fault);
 
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -56,9 +56,65 @@
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-:root {
+:root,
+[data-theme="dark"],
+.dark {
   color-scheme: dark;
-  --grid-line: color-mix(in oklab, var(--color-hairline) 55%, transparent);
+  --theme-void: #090b0e;
+  --theme-graphite: #12161d;
+  --theme-panel: #161c26;
+  --theme-panel-high: #1f2735;
+  --theme-hairline: #2b3648;
+  --theme-hairline-bright: #43526a;
+  --theme-ink: #f8fafc;
+  --theme-muted: #cbd5e1;
+  --theme-faint: #94a3b8;
+
+  --theme-signal: #4fe3c1;
+  --theme-signal-dim: #2dd4bf;
+  --theme-signal-wash: rgba(79, 227, 193, 0.12);
+
+  --theme-verified: #4ade80;
+  --theme-attention: #fbbf24;
+  --theme-fault: #f87171;
+
+  --grid-line: color-mix(in oklab, var(--theme-hairline) 55%, transparent);
+
+  /* Component variables */
+  --color-border: #2b3648;
+  --color-border-attention: rgba(251, 191, 36, 0.35);
+  --color-surface: #161c26;
+  --color-surface-subtle: #12161d;
+}
+
+[data-theme="light"],
+.light {
+  color-scheme: light;
+  --theme-void: #f8fafc;
+  --theme-graphite: #f1f5f9;
+  --theme-panel: #ffffff;
+  --theme-panel-high: #f8fafc;
+  --theme-hairline: #cbd5e1;
+  --theme-hairline-bright: #94a3b8;
+  --theme-ink: #090d16;
+  --theme-muted: #334155;
+  --theme-faint: #64748b;
+
+  --theme-signal: #0d9488;
+  --theme-signal-dim: #0f766e;
+  --theme-signal-wash: #f0fdfa;
+
+  --theme-verified: #16a34a;
+  --theme-attention: #d97706;
+  --theme-fault: #dc2626;
+
+  --grid-line: color-mix(in oklab, var(--theme-hairline) 75%, transparent);
+
+  /* Component variables */
+  --color-border: #cbd5e1;
+  --color-border-attention: rgba(217, 119, 6, 0.35);
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f1f5f9;
 }
 
 * {
@@ -68,6 +124,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body {
@@ -78,12 +135,13 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ---- Typography -------------------------------------------------------- */
 .display {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.02;
   text-wrap: balance;
@@ -92,10 +150,10 @@ body {
 .eyebrow {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-faint);
+  color: var(--color-muted);
 }
 
 .mono {
@@ -119,6 +177,12 @@ body {
   background-color: var(--color-panel);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-lg);
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+[data-theme="light"] .panel,
+.light .panel {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
 }
 
 .hairline-grid {
@@ -285,6 +349,12 @@ body {
   transform: translateY(-3px);
   border-color: rgba(79, 227, 193, 0.35);
   box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6), 0 0 28px -4px rgba(79, 227, 193, 0.12);
+}
+
+[data-theme="light"] .cyber-card:hover,
+.light .cyber-card:hover {
+  border-color: rgba(13, 148, 136, 0.4);
+  box-shadow: 0 14px 28px -5px rgba(0, 0, 0, 0.08), 0 0 24px -2px rgba(13, 148, 136, 0.15);
 }
 
 /* Button Shimmer Flare */

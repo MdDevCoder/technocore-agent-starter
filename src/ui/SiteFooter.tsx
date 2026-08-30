@@ -11,7 +11,6 @@
  * is worth more than an assurance they cannot.
  */
 
-import Image from "next/image";
 import Link from "next/link";
 import { PROTOCOL_SOURCE } from "../technocore/profile.ts";
 
@@ -34,48 +33,43 @@ export function SiteFooter() {
               Community-built, zero-custody onboarding tooling for the Technocore protocol and FLOP Network.
             </p>
 
-            {/* ExoTech Engineering Card */}
-            <div className="border-hairline bg-panel/70 rounded-lg p-4 space-y-3.5">
+            {/* Developer Identity Card */}
+            <div className="border-hairline bg-panel/70 rounded-lg p-4 space-y-3.5 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-signal/30 bg-void">
-                  <Image
-                    src="/images/exotech-icon.png"
-                    alt="ExoTech Logo"
-                    fill
-                    className="object-cover"
-                    sizes="36px"
-                  />
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-signal/40 bg-void mono text-xs font-bold text-signal shadow-[0_0_10px_rgba(79,227,193,0.15)]">
+                  SM
                 </div>
                 <div>
                   <p className="text-ink text-xs font-semibold">
-                    ExoTech <span className="text-signal-dim font-normal font-mono text-[0.6875rem]">· Engineering The Future</span>
+                    Shaikh Muhammad <span className="text-signal font-normal font-mono text-[0.6875rem]">· Developer</span>
                   </p>
                   <p className="text-faint text-[0.6875rem] font-mono">Autonomous AI & Decentralized Systems</p>
                 </div>
               </div>
 
-              {/* Social Icon Links */}
+              {/* Social / Developer Links */}
               <div className="flex items-center gap-2 pt-2 border-t border-hairline">
+                {/* GitHub */}
                 <a
-                  href="https://exo-tech.org/"
+                  href="https://github.com/MdDevCoder"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="ExoTech Official Website"
-                  title="ExoTech Website"
+                  aria-label="Shaikh Muhammad on GitHub"
+                  title="GitHub: @MdDevCoder"
                   className="border-hairline bg-graphite/80 hover:bg-panel-high hover:border-signal/40 hover:text-signal text-muted flex size-9 items-center justify-center rounded-md border transition-all duration-200 hover:scale-105 hover:shadow-[0_0_12px_rgba(79,227,193,0.2)]"
                 >
-                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 2a14.5 14.5 0 0 0 0 20M2 12h20" />
+                  <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                   </svg>
                 </a>
 
+                {/* X (Twitter) */}
                 <a
-                  href="https://x.com/ExoTech_HQ"
+                  href="https://x.com/Muhammad_0423"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="ExoTech on X (Twitter)"
-                  title="ExoTech on 𝕏"
+                  aria-label="Shaikh Muhammad on X (Twitter)"
+                  title="X: @Muhammad_0423"
                   className="border-hairline bg-graphite/80 hover:bg-panel-high hover:border-signal/40 hover:text-signal text-muted flex size-9 items-center justify-center rounded-md border transition-all duration-200 hover:scale-105 hover:shadow-[0_0_12px_rgba(79,227,193,0.2)]"
                 >
                   <svg className="size-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -83,12 +77,13 @@ export function SiteFooter() {
                   </svg>
                 </a>
 
+                {/* Telegram */}
                 <a
-                  href="https://t.me/ExoTech_HQ"
+                  href="https://t.me/satoshiskillz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="ExoTech Telegram Community"
-                  title="ExoTech Telegram"
+                  aria-label="Shaikh Muhammad on Telegram"
+                  title="Telegram: @satoshiskillz"
                   className="border-hairline bg-graphite/80 hover:bg-panel-high hover:border-signal/40 hover:text-signal text-muted flex size-9 items-center justify-center rounded-md border transition-all duration-200 hover:scale-105 hover:shadow-[0_0_12px_rgba(79,227,193,0.2)]"
                 >
                   <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
@@ -96,16 +91,17 @@ export function SiteFooter() {
                   </svg>
                 </a>
 
+                {/* Instagram */}
                 <a
-                  href="https://github.com/MdDevCoder/technocore-agent-starter"
+                  href="https://www.instagram.com/muhammad__0423?igsi=MW04ZXVxdmNzaGVnZQ=="
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Technocore Agent Starter GitHub Repository"
-                  title="GitHub Repository"
+                  aria-label="Shaikh Muhammad on Instagram"
+                  title="Instagram: @muhammad__0423"
                   className="border-hairline bg-graphite/80 hover:bg-panel-high hover:border-signal/40 hover:text-signal text-muted flex size-9 items-center justify-center rounded-md border transition-all duration-200 hover:scale-105 hover:shadow-[0_0_12px_rgba(79,227,193,0.2)]"
                 >
                   <svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                   </svg>
                 </a>
               </div>
@@ -127,6 +123,11 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/civilization" className="text-muted hover:text-ink transition-colors">
+                    Civilization Observatory
+                  </Link>
+                </li>
+                <li>
                   <Link href="/agent" className="text-muted hover:text-ink transition-colors">
                     Agent activity
                   </Link>
@@ -140,36 +141,46 @@ export function SiteFooter() {
             </nav>
 
             <div className="space-y-3">
-              <p className="eyebrow">ExoTech Ecosystem</p>
+              <p className="eyebrow">Connect</p>
               <ul className="space-y-2 text-sm">
                 <li>
                   <a
-                    href="https://exo-tech.org/"
+                    href="https://github.com/MdDevCoder"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted hover:text-ink transition-colors"
                   >
-                    exo-tech.org ↗
+                    GitHub ↗
                   </a>
                 </li>
                 <li>
                   <a
-                    href="https://github.com/MdDevCoder/technocore-agent-starter"
+                    href="https://x.com/Muhammad_0423"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted hover:text-ink transition-colors"
                   >
-                    GitHub Repo ↗
+                    𝕏 (Twitter) ↗
                   </a>
                 </li>
                 <li>
                   <a
-                    href="https://x.com/ExoTech_HQ"
+                    href="https://t.me/satoshiskillz"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted hover:text-ink transition-colors"
                   >
-                    @ExoTech_HQ ↗
+                    Telegram ↗
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://www.instagram.com/muhammad__0423?igsi=MW04ZXVxdmNzaGVnZQ=="
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted hover:text-ink transition-colors"
+                  >
+                    Instagram ↗
                   </a>
                 </li>
               </ul>
@@ -191,7 +202,7 @@ export function SiteFooter() {
         </div>
 
         <div className="border-hairline text-faint mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 border-t pt-6 text-[0.75rem]">
-          <p>{YEAR} · Built with precision by ExoTech.</p>
+          <p>{YEAR} · Built with precision by Shaikh Muhammad (@MdDevCoder).</p>
           <p>No account, no wallet, and no private key ever leaves your browser.</p>
         </div>
       </div>

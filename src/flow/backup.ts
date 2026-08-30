@@ -27,6 +27,21 @@ import {
   importIdentitySession,
   type IdentitySession,
 } from "../identity/session.ts";
+import {
+  migrateLegacyIdentityFile,
+  summarizeLegacyIdentityFile,
+  LegacyIdentityFormatError,
+  LegacyIdentityMismatchError,
+  type LegacyIdentitySummary,
+} from "../identity/legacy.ts";
+
+export {
+  migrateLegacyIdentityFile,
+  summarizeLegacyIdentityFile,
+  LegacyIdentityFormatError,
+  LegacyIdentityMismatchError,
+  type LegacyIdentitySummary,
+};
 
 export class WeakPassphraseError extends Error {
   override readonly name = "WeakPassphraseError";

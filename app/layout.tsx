@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { AgentSessionProvider } from "@/hooks/AgentSession.tsx";
+import { ThemeProvider } from "@/hooks/useTheme.tsx";
 import { SiteFooter } from "@/ui/SiteFooter.tsx";
 import { SiteHeader } from "@/ui/SiteHeader.tsx";
 import "./globals.css";
@@ -42,22 +43,22 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: TITLE,
   authors: [
-    { name: "ExoTech", url: "https://exo-tech.org/" },
+    { name: "Shaikh Muhammad", url: "https://github.com/MdDevCoder" },
   ],
-  creator: "ExoTech",
-  publisher: "ExoTech",
+  creator: "Shaikh Muhammad",
+  publisher: "Shaikh Muhammad",
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
     type: "website",
-    siteName: "Technocore Agent Starter by ExoTech",
+    siteName: "Technocore Agent Starter",
   },
   twitter: {
     card: "summary",
     title: TITLE,
     description: DESCRIPTION,
-    creator: "@ExoTech_HQ",
-    site: "@ExoTech_HQ",
+    creator: "@Muhammad_0423",
+    site: "@Muhammad_0423",
   },
   robots: { index: true, follow: true },
   formatDetection: { telephone: false, email: false, address: false },
@@ -65,15 +66,26 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#08090b",
-  colorScheme: "dark",
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: { readonly children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
-      <body className="bg-void text-ink min-h-dvh antialiased">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("technocore_theme")||"dark";var d=t==="system"?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":t;document.documentElement.setAttribute("data-theme",d);if(d==="dark"){document.documentElement.classList.add("dark");document.documentElement.classList.remove("light");document.documentElement.style.colorScheme="dark";}else{document.documentElement.classList.add("light");document.documentElement.classList.remove("dark");document.documentElement.style.colorScheme="light";}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="bg-void text-ink min-h-dvh antialiased transition-colors duration-200">
         {/*
           The skip link is the first focusable thing on every page. The onboarding flow puts a step
           rail and an egress ledger around the workspace, so without this a keyboard user would tab
@@ -85,21 +97,17 @@ export default function RootLayout({ children }: { readonly children: React.Reac
         >
           Skip to content
         </a>
-        {/*
-          The provider holds the identity for the whole tab, so it wraps the layout rather than a single
-          route: navigating from the last onboarding step to the dashboard must not remount it, because a
-          remount would drop a signing key that exists nowhere else. It is mounted here and not around the
-          header so that the header, the footer and every static page stay server-rendered.
-        */}
-        <AgentSessionProvider>
-          <div className="flex min-h-dvh flex-col">
-            <SiteHeader />
-            <main id="main" className="flex-1">
-              {children}
-            </main>
-            <SiteFooter />
-          </div>
-        </AgentSessionProvider>
+        <ThemeProvider>
+          <AgentSessionProvider>
+            <div className="flex min-h-dvh flex-col">
+              <SiteHeader />
+              <main id="main" className="flex-1">
+                {children}
+              </main>
+              <SiteFooter />
+            </div>
+          </AgentSessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

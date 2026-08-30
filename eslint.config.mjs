@@ -33,7 +33,7 @@ export default [
   },
   {
     // The restriction above applies only to the protocol core; UI code needs React.
-    files: ["src/ui/**", "src/hooks/**", "app/**", "middleware.ts", "next.config.ts"],
+    files: ["src/ui/**", "src/hooks/**", "src/civilization-ui/**", "app/**", "middleware.ts", "next.config.ts"],
     rules: { "no-restricted-imports": "off" },
   },
 ];
