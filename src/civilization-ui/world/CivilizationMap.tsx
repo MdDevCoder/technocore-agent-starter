@@ -40,7 +40,6 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
     }
 
     const width = 760;
-    const height = 560;
     const centerX = width / 2;
     const centerY = 265;
     const radius = 205;

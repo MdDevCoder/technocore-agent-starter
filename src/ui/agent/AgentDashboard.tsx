@@ -264,8 +264,9 @@ export function AgentDashboard() {
       }
       setLookupSuccess(`Successfully fetched and cryptographically verified ${newlyFound.length} record(s) from Technocore!`);
       setLookupSeq("");
-    } catch (err: any) {
-      setLookupError(err.message || "Failed to lookup sequence from network.");
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Failed to lookup sequence from network.";
+      setLookupError(errorMsg);
     } finally {
       setIsLookingUp(false);
     }
@@ -609,7 +610,7 @@ export function AgentDashboard() {
               <div className="rounded-md border border-hairline bg-graphite/40 p-3 text-xs text-muted space-y-1.5">
                 <p className="text-ink font-medium">💡 Did you post from WSL / Linux CLI?</p>
                 <p>
-                  The live Technocore public network has over <strong className="text-ink">2,450,000 messages</strong>. If your contribution was submitted earlier, click <span className="text-signal font-semibold cursor-pointer hover:underline" onClick={() => setShowLookup(true)}>"+ Import WSL Sequence"</span> above and enter your sequence number from your terminal output to verify and pin it to your dashboard!
+                  The live Technocore public network has over <strong className="text-ink">2,450,000 messages</strong>. If your contribution was submitted earlier, click <span className="text-signal font-semibold cursor-pointer hover:underline" onClick={() => setShowLookup(true)}>&ldquo;+ Import WSL Sequence&rdquo;</span> above and enter your sequence number from your terminal output to verify and pin it to your dashboard!
                 </p>
               </div>
               {lastSyncTime && (
