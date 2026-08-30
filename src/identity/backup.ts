@@ -158,7 +158,7 @@ export function parseBackupFile(text: string): BackupEnvelope {
   if (record["schema"] !== BACKUP_SCHEMA) {
     throw new BackupFormatError(
       `Unrecognised backup format. Expected "${BACKUP_SCHEMA}". This app cannot read plaintext key ` +
-        "files, and never asks for a raw private key.",
+        "files, and never asks for a raw private key. If this is a WSL/Linux CLI identity (\"agent_key.json\"), use the WSL/Linux Migration tab on the Import page to securely protect it.",
     );
   }
 

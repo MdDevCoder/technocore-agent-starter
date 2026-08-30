@@ -75,15 +75,36 @@ export function ImportPanel() {
   const [failure, setFailure] = useState<FlowFailure | null>(null);
   const [imported, setImported] = useState(false);
 
+  const [autoDetectedNote, setAutoDetectedNote] = useState<string | null>(null);
+
   /* ---------- Encrypted Backup Handlers ---------- */
 
   const pickBackupFile = useCallback(async (selected: File) => {
     setFailure(null);
     setBackupFileError(null);
+    setLegacyFileError(null);
     setChosenBackup(null);
+    setAutoDetectedNote(null);
     try {
       const text = await readFileText(selected);
-      setChosenBackup({ name: selected.name, text, summary: summarizeBackupFile(text) });
+      // 1. Try reading as encrypted backup file (.backup.json)
+      try {
+        const summary = summarizeBackupFile(text);
+        setChosenBackup({ name: selected.name, text, summary });
+        return;
+      } catch (backupErr) {
+        // 2. Auto-detect if this is an existing WSL/Linux identity file (agent_key.json)
+        try {
+          const legacySummary = await summarizeLegacyIdentityFile(text);
+          setTab("legacy");
+          setChosenLegacy({ name: selected.name, text, summary: legacySummary });
+          setAutoDetectedNote(`Auto-detected WSL/Linux identity file ("${selected.name}"). Switched to Migration mode.`);
+          return;
+        } catch {
+          // If neither, throw original backup format error
+          throw backupErr;
+        }
+      }
     } catch (error) {
       setBackupFileError(toFlowFailure(error).detail);
     }
@@ -112,11 +133,28 @@ export function ImportPanel() {
   const pickLegacyFile = useCallback(async (selected: File) => {
     setFailure(null);
     setLegacyFileError(null);
+    setBackupFileError(null);
     setChosenLegacy(null);
+    setAutoDetectedNote(null);
     try {
       const text = await readFileText(selected);
-      const summary = await summarizeLegacyIdentityFile(text);
-      setChosenLegacy({ name: selected.name, text, summary });
+      // 1. Try reading as legacy WSL/Linux identity (agent_key.json)
+      try {
+        const summary = await summarizeLegacyIdentityFile(text);
+        setChosenLegacy({ name: selected.name, text, summary });
+        return;
+      } catch (legacyErr) {
+        // 2. Auto-detect if this is an encrypted Technocore backup file (.backup.json)
+        try {
+          const backupSummary = summarizeBackupFile(text);
+          setTab("backup");
+          setChosenBackup({ name: selected.name, text, summary: backupSummary });
+          setAutoDetectedNote(`Auto-detected encrypted backup file ("${selected.name}"). Switched to Encrypted Backup mode.`);
+          return;
+        } catch {
+          throw legacyErr;
+        }
+      }
     } catch (error) {
       setLegacyFileError(toFlowFailure(error).detail);
     }
@@ -302,35 +340,50 @@ export function ImportPanel() {
         </div>
       )}
 
+      {/* Auto-detected notification banner */}
+      {autoDetectedNote && (
+        <div className="mt-6">
+          <Callout tone="verified" title="Smart File Format Detected">
+            {autoDetectedNote}
+          </Callout>
+        </div>
+      )}
+
       {/* Tabs Switcher */}
-      <div className="mt-8 flex rounded-lg border border-[var(--color-border)] p-1 bg-[var(--color-surface-subtle)]">
+      <div className="mt-8 flex flex-col sm:flex-row gap-2 rounded-lg border border-[var(--color-border)] p-1.5 bg-[var(--color-surface-subtle)]">
         <button
           type="button"
           onClick={() => {
             setTab("backup");
             setFailure(null);
+            setAutoDetectedNote(null);
           }}
-          className={`flex-1 rounded-md py-2.5 px-3 text-sm font-medium transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 rounded-md py-3 px-4 text-sm font-medium transition-all ${
             tab === "backup"
-              ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-sm font-semibold"
+              ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-sm font-bold border border-signal/30"
               : "text-[var(--color-text-muted)] hover:text-[var(--color-ink)]"
           }`}
         >
-          Encrypted Technocore Backup
+          <span>📁</span>
+          <span>Encrypted Web Backup</span>
+          <span className="mono text-[0.6875rem] px-1.5 py-0.5 rounded bg-panel-high text-muted">.backup.json</span>
         </button>
         <button
           type="button"
           onClick={() => {
             setTab("legacy");
             setFailure(null);
+            setAutoDetectedNote(null);
           }}
-          className={`flex-1 rounded-md py-2.5 px-3 text-sm font-medium transition-all ${
+          className={`flex-1 flex items-center justify-center gap-2 rounded-md py-3 px-4 text-sm font-medium transition-all ${
             tab === "legacy"
-              ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-sm font-semibold"
+              ? "bg-[var(--color-surface)] text-[var(--color-ink)] shadow-sm font-bold border border-signal/30"
               : "text-[var(--color-text-muted)] hover:text-[var(--color-ink)]"
           }`}
         >
-          Existing WSL / Linux Identity
+          <span>🐧</span>
+          <span>WSL / Linux CLI Key</span>
+          <span className="mono text-[0.6875rem] px-1.5 py-0.5 rounded bg-panel-high text-signal">agent_key.json</span>
         </button>
       </div>
 
