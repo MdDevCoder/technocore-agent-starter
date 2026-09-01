@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { AgentSessionProvider } from "@/hooks/AgentSession.tsx";
 import { ThemeProvider } from "@/hooks/useTheme.tsx";
+import { CustomCursor } from "@/ui/CustomCursor.tsx";
 import { SiteFooter } from "@/ui/SiteFooter.tsx";
 import { SiteHeader } from "@/ui/SiteHeader.tsx";
 import "./globals.css";
@@ -99,6 +100,7 @@ export default function RootLayout({ children }: { readonly children: React.Reac
         </a>
         <ThemeProvider>
           <AgentSessionProvider>
+            <CustomCursor />
             <div className="flex min-h-dvh flex-col">
               <SiteHeader />
               <main id="main" className="flex-1">

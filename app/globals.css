@@ -124,6 +124,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -136,6 +137,31 @@ body {
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
   transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Custom Smooth Scrollbar for demo recordings */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-void);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-hairline);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-signal-dim);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-hairline) var(--color-void);
 }
 
 /* ---- Typography -------------------------------------------------------- */
