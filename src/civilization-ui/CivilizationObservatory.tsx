@@ -31,6 +31,9 @@ import { ChangeSummary } from "./time/ChangeSummary.tsx";
 import { SimulationControls } from "./controls/SimulationControls.tsx";
 import { DemoNarrativePanel } from "./controls/DemoNarrativePanel.tsx";
 import { RemoteAgentStatusPanel } from "./controls/RemoteAgentStatusPanel.tsx";
+import { DealObservatory } from "./deals/DealObservatory.tsx";
+import { DealInspector } from "./deals/DealInspector.tsx";
+import { aggregateDealsFromEvents } from "./deals/aggregateDeals.ts";
 
 export function CivilizationObservatory() {
   const {
@@ -108,6 +111,12 @@ export function CivilizationObservatory() {
       ? worldState.evolutionState.attestations.get(selectedTarget.attestationId)
       : undefined;
 
+  const allDeals = React.useMemo(() => aggregateDealsFromEvents(allEvents), [allEvents]);
+  const selectedDeal =
+    selectedTarget.type === "deal"
+      ? allDeals.find((d) => d.contractId === selectedTarget.contractId) ?? null
+      : null;
+
   return (
     <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] w-full max-w-[1500px] flex-col gap-4 p-3 sm:p-5">
       {/* Top World Stats Bar */}
@@ -132,7 +141,7 @@ export function CivilizationObservatory() {
           <div className="flex items-center justify-between rounded-lg border border-hairline bg-panel px-3 py-2 mono text-xs shrink-0 shadow-sm">
             <div className="flex items-center gap-1">
               <span className="text-muted font-semibold text-xs mr-2">VIEW_SURFACE:</span>
-              {(["MAP", "CAPABILITY_MARKET", "MACHINE_ECONOMY", "EVOLUTION", "GENERATIONS"] as const).map((mode) => (
+              {(["MAP", "CAPABILITY_MARKET", "MACHINE_ECONOMY", "DEALS", "EVOLUTION", "GENERATIONS"] as const).map((mode) => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
@@ -177,6 +186,15 @@ export function CivilizationObservatory() {
               <EconomyDashboard
                 worldState={worldState}
                 onSelectProof={(proofId) => setSelectedTarget({ type: "proof", proofId })}
+                onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+              />
+            )}
+
+            {viewMode === "DEALS" && (
+              <DealObservatory
+                events={allEvents}
+                selectedContractId={selectedTarget.type === "deal" ? selectedTarget.contractId : undefined}
+                onSelectDeal={(contractId) => setSelectedTarget({ type: "deal", contractId })}
                 onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
               />
             )}
@@ -245,6 +263,15 @@ export function CivilizationObservatory() {
             />
           )}
 
+          {selectedDeal && (
+            <DealInspector
+              deal={selectedDeal}
+              onClose={() => setSelectedTarget({ type: "none" })}
+              onSelectEvent={(eventId) => setSelectedTarget({ type: "event", eventId })}
+              onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+            />
+          )}
+
           {selectedEvent && (
             <EventInspector
               event={selectedEvent}
@@ -282,6 +309,7 @@ export function CivilizationObservatory() {
           {!selectedAgent &&
             !selectedMission &&
             !selectedDispute &&
+            !selectedDeal &&
             !selectedEvent &&
             !selectedProof &&
             !selectedAttestation &&

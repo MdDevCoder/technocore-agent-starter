@@ -15,6 +15,15 @@ import type {
 } from "./common.ts";
 import type { MissionBudget, MissionConstraint, MissionRequirement } from "./mission.ts";
 import type { DeliverableRef, TaskDependency } from "./task.ts";
+import type {
+  DealCancelledPayload,
+  DealFundsLockedPayload,
+  DealOfferAcceptedPayload,
+  DealOfferCreatedPayload,
+  DealReceiptIssuedPayload,
+  DealRefundClaimedPayload,
+  DealSecretRevealedPayload,
+} from "../deals/tclk/types.ts";
 
 export const CIVILIZATION_EVENT_TYPES = [
   "MISSION_CREATED",
@@ -69,6 +78,14 @@ export const CIVILIZATION_EVENT_TYPES = [
   "CAPABILITY_VERIFIED",
   "CAPABILITY_ATTESTED",
   "STRATEGY_ADAPTED",
+  // Phase 13: Technocore Lock Protocol (tclk/1) Deal Events
+  "DEAL_OFFER_CREATED",
+  "DEAL_OFFER_ACCEPTED",
+  "DEAL_FUNDS_LOCKED",
+  "DEAL_SECRET_REVEALED",
+  "DEAL_REFUND_CLAIMED",
+  "DEAL_CANCELLED",
+  "DEAL_RECEIPT_ISSUED",
 ] as const;
 
 export type CivilizationEventType = (typeof CIVILIZATION_EVENT_TYPES)[number];
@@ -560,6 +577,14 @@ export interface EventPayloadMap {
   CAPABILITY_VERIFIED: CapabilityVerifiedPayload;
   CAPABILITY_ATTESTED: CapabilityAttestedPayload;
   STRATEGY_ADAPTED: StrategyAdaptedPayload;
+  // Phase 13: Technocore Lock Protocol (tclk/1) Deal Payloads
+  DEAL_OFFER_CREATED: DealOfferCreatedPayload;
+  DEAL_OFFER_ACCEPTED: DealOfferAcceptedPayload;
+  DEAL_FUNDS_LOCKED: DealFundsLockedPayload;
+  DEAL_SECRET_REVEALED: DealSecretRevealedPayload;
+  DEAL_REFUND_CLAIMED: DealRefundClaimedPayload;
+  DEAL_CANCELLED: DealCancelledPayload;
+  DEAL_RECEIPT_ISSUED: DealReceiptIssuedPayload;
 }
 
 /**

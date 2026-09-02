@@ -27,6 +27,7 @@ import type {
   WhatChangedDelta,
 } from "../types.ts";
 import { deriveNarrativeFromEvents } from "../narrative/deriveNarrative.ts";
+import { createDemoDealEvents } from "../deals/demoDeals.ts";
 
 export interface UseCivilizationEngineReturn {
   readonly isInitialized: boolean;
@@ -242,6 +243,8 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     for (let i = 0; i < 5; i++) {
       await stepTick();
     }
+    const demoDeals = await createDemoDealEvents();
+    setAllEvents((prev) => [...prev, ...demoDeals]);
   }, [pauseSimulation, initializeGenesis, stepTick]);
 
   // Initial load
@@ -293,6 +296,7 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
         evt.eventType === "STRATEGY_ADAPTED"
       );
     }
+    if (eventFilter === "DEALS") return evt.eventType.startsWith("DEAL_");
     if (eventFilter === "SYSTEM") return evt.eventType === "MISSION_FAILED" || evt.eventType === "MISSION_COMPLETED";
     return true;
   });

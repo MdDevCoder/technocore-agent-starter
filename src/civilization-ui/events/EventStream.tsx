@@ -20,6 +20,7 @@ interface EventStreamProps {
 
 const CATEGORIES: readonly EventCategoryFilter[] = [
   "ALL",
+  "DEALS",
   "MISSIONS",
   "AGENTS",
   "TEAMS",

@@ -18,6 +18,7 @@ export type ObservatoryViewMode =
   | "TRUST_GRAPH"
   | "CAPABILITY_MARKET"
   | "MACHINE_ECONOMY"
+  | "DEALS"
   | "EVOLUTION"
   | "GENERATIONS";
 
@@ -31,6 +32,7 @@ export type EventCategoryFilter =
   | "COURT"
   | "REPUTATION"
   | "ECONOMY"
+  | "DEALS"
   | "EVOLUTION"
   | "SYSTEM";
 
@@ -44,6 +46,7 @@ export type SelectionTarget =
   | { readonly type: "escrow"; readonly escrowId: string }
   | { readonly type: "proof"; readonly proofId: string }
   | { readonly type: "attestation"; readonly attestationId: string }
+  | { readonly type: "deal"; readonly contractId: string }
   | {
       readonly type: "lineage";
       readonly entityType: "agent" | "capability" | "dispute" | "mission";

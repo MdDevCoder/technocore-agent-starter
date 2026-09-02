@@ -1050,3 +1050,123 @@ eventRegistry.register({
   },
 });
 
+// 39. DEAL_OFFER_CREATED
+eventRegistry.register({
+  eventType: "DEAL_OFFER_CREATED",
+  description: "An agent proposes a tclk/1 HTLC/PTLC deal offer.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.offerId)) errors.push("offerId must be a non-empty string");
+    if (!isNonEmptyString(payload.from) || !isValidDid(payload.from)) errors.push("from must be a valid did:key");
+    if (payload.role !== "payer" && payload.role !== "payee") errors.push("role must be 'payer' or 'payee'");
+    if (!isNonEmptyString(payload.amount)) errors.push("amount must be a decimal string");
+    if (!isNonEmptyString(payload.asset)) errors.push("asset must be a non-empty string");
+    if (payload.lockKind !== "hash" && payload.lockKind !== "point") errors.push("lockKind must be 'hash' or 'point'");
+    if (!Array.isArray(payload.rails) || payload.rails.length === 0) errors.push("rails must be a non-empty array");
+    if (typeof payload.claimByMs !== "number") errors.push("claimByMs must be a number");
+    if (typeof payload.refundAfterMs !== "number") errors.push("refundAfterMs must be a number");
+    if (typeof payload.expiresMs !== "number") errors.push("expiresMs must be a number");
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+
+// 40. DEAL_OFFER_ACCEPTED
+eventRegistry.register({
+  eventType: "DEAL_OFFER_ACCEPTED",
+  description: "An agent accepts a tclk/1 deal offer and commits the lock statement.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.contractId)) errors.push("contractId must be a non-empty string");
+    if (!isNonEmptyString(payload.offerId)) errors.push("offerId must be a non-empty string");
+    if (!isNonEmptyString(payload.from) || !isValidDid(payload.from)) errors.push("from must be a valid did:key");
+    if (!isNonEmptyString(payload.payerDid) || !isValidDid(payload.payerDid)) errors.push("payerDid must be a valid did:key");
+    if (!isNonEmptyString(payload.payeeDid) || !isValidDid(payload.payeeDid)) errors.push("payeeDid must be a valid did:key");
+    if (!isNonEmptyString(payload.statement)) errors.push("statement must be a non-empty string");
+    if (payload.lockKind !== "hash" && payload.lockKind !== "point") errors.push("lockKind must be 'hash' or 'point'");
+    if (!isNonEmptyString(payload.amount)) errors.push("amount must be a decimal string");
+    if (!isNonEmptyString(payload.asset)) errors.push("asset must be a non-empty string");
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+
+// 41. DEAL_FUNDS_LOCKED
+eventRegistry.register({
+  eventType: "DEAL_FUNDS_LOCKED",
+  description: "The payer locks funds on the designated settlement rail.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.contractId)) errors.push("contractId must be a non-empty string");
+    if (!isNonEmptyString(payload.lockedByDid) || !isValidDid(payload.lockedByDid)) errors.push("lockedByDid must be a valid did:key");
+    if (!isNonEmptyString(payload.rail)) errors.push("rail must be a non-empty string");
+    if (!isNonEmptyString(payload.railRef)) errors.push("railRef must be a non-empty string");
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+
+// 42. DEAL_SECRET_REVEALED
+eventRegistry.register({
+  eventType: "DEAL_SECRET_REVEALED",
+  description: "The payee reveals the secret preimage/witness to claim locked funds.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.contractId)) errors.push("contractId must be a non-empty string");
+    if (!isNonEmptyString(payload.revealedByDid) || !isValidDid(payload.revealedByDid)) errors.push("revealedByDid must be a valid did:key");
+    if (!isNonEmptyString(payload.secret)) errors.push("secret must be a non-empty string");
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+
+// 43. DEAL_REFUND_CLAIMED
+eventRegistry.register({
+  eventType: "DEAL_REFUND_CLAIMED",
+  description: "The payer reclaims locked funds after the refund timelock expires.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.contractId)) errors.push("contractId must be a non-empty string");
+    if (!isNonEmptyString(payload.refundedToDid) || !isValidDid(payload.refundedToDid)) errors.push("refundedToDid must be a valid did:key");
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+
+// 44. DEAL_CANCELLED
+eventRegistry.register({
+  eventType: "DEAL_CANCELLED",
+  description: "A party cancels a deal before funds are locked.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.contractId)) errors.push("contractId must be a non-empty string");
+    if (!isNonEmptyString(payload.cancelledByDid) || !isValidDid(payload.cancelledByDid)) errors.push("cancelledByDid must be a valid did:key");
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+
+// 45. DEAL_RECEIPT_ISSUED
+eventRegistry.register({
+  eventType: "DEAL_RECEIPT_ISSUED",
+  description: "A post-terminal receipt acknowledgment is issued for the deal.",
+  validatePayload: (payload) => {
+    if (!isObject(payload)) return validationFailure("payload must be an object");
+    const errors: string[] = [];
+    if (!isNonEmptyString(payload.contractId)) errors.push("contractId must be a non-empty string");
+    if (!isNonEmptyString(payload.issuedByDid) || !isValidDid(payload.issuedByDid)) errors.push("issuedByDid must be a valid did:key");
+    const validOutcomes = ["claimed", "refunded", "cancelled"];
+    if (!isNonEmptyString(payload.outcome) || !validOutcomes.includes(payload.outcome)) {
+      errors.push("outcome must be one of: claimed, refunded, cancelled");
+    }
+    if (!isNonEmptyString(payload.rawFrame)) errors.push("rawFrame must be a non-empty string");
+    return errors.length > 0 ? validationFailure(errors) : validationSuccess();
+  },
+});
+

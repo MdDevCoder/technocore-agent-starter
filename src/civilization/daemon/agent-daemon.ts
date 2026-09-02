@@ -19,6 +19,8 @@ import type { EventStoreReceipt, StoredCivilizationEvent } from "../persistence/
 import { DaemonCursorManager } from "./cursor.ts";
 import { defaultAgentReputation, type AgentCapability } from "../types/agent.ts";
 import type { AgentDaemonConfig, DaemonMetrics, DaemonState } from "./types.ts";
+import { TclkDealEngine } from "../deals/tclk/deal-engine.ts";
+import { TclkDealCapability } from "./deal-capability.ts";
 
 export class AgentDaemon {
   private readonly config: AgentDaemonConfig;
@@ -26,6 +28,8 @@ export class AgentDaemon {
   private identity: AgentIdentity | null = null;
   private readonly capabilities: readonly AgentCapability[];
   private runtime: UnifiedAgentRuntime | null = null;
+  private dealEngine: TclkDealEngine | null = null;
+  private dealCapability: TclkDealCapability | null = null;
   private cursorManager: DaemonCursorManager | null = null;
   private headSequence = 0;
   private submittedEventsCount = 0;
@@ -98,10 +102,28 @@ export class AgentDaemon {
       provider,
     });
 
-    // 4. Initial Sync with Gateway
+    // 4. Initialize TCLK Deal Engine & Capability
+    this.dealEngine = new TclkDealEngine({
+      did: this.identity.did,
+      signer: this.identity.signingHandle,
+      ...this.config.dealConfig,
+    });
+    this.dealCapability = new TclkDealCapability({
+      did: this.identity.did,
+      dealEngine: this.dealEngine,
+      client: this.config.client,
+      policy: this.config.dealPolicy,
+      workProvider: this.config.workExecutionProvider,
+      defaultRail:
+        this.config.dealConfig?.settlementRails?.get("memory") ??
+        this.config.dealConfig?.settlementRails?.get("paper"),
+      clock: this.config.dealConfig?.clock,
+    });
+
+    // 5. Initial Sync with Gateway
     await this.sync();
 
-    // 5. Ensure Initial Profile Discovery & Capability Advertisement
+    // 6. Ensure Initial Profile Discovery & Capability Advertisement
     await this.announcePresenceIfMissing();
 
     this.state = "IDLE";
@@ -134,6 +156,13 @@ export class AgentDaemon {
       if (newEvents.length > 0) {
         for (const evt of newEvents) {
           this.syncedEvents.push(evt);
+          if (this.dealCapability) {
+            try {
+              await this.dealCapability.ingestEvent(evt);
+            } catch (err) {
+              console.warn(`[AgentDaemon] Error ingesting deal event ${evt.eventId}:`, err);
+            }
+          }
         }
 
         const highestSeq = Math.max(...newEvents.map((e) => e.sequenceNum));
@@ -265,7 +294,17 @@ export class AgentDaemon {
       this.state = "OBSERVING";
       await this.runtime.observe(context);
 
-      // 4. Decide
+      // 4. Autonomous TCLK Deal Progression
+      if (this.dealCapability) {
+        try {
+          const dealResult = await this.dealCapability.progressDeals();
+          this.submittedEventsCount += dealResult.progressedCount;
+        } catch (dealErr) {
+          console.warn("[AgentDaemon] Error during deal progression:", dealErr);
+        }
+      }
+
+      // 5. Decide
       this.state = "DECIDING";
       const unsignedAction = await this.runtime.decide(context);
 
@@ -398,5 +437,13 @@ export class AgentDaemon {
 
   getHeadSequence(): number {
     return this.headSequence;
+  }
+
+  getDealEngine(): TclkDealEngine | null {
+    return this.dealEngine;
+  }
+
+  getDealCapability(): TclkDealCapability | null {
+    return this.dealCapability;
   }
 }

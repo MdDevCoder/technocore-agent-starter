@@ -512,6 +512,108 @@ export function deriveNarrativeFromEvents(
         break;
       }
 
+      case "DEAL_OFFER_CREATED": {
+        const amt = typeof payload.amount === "string" ? payload.amount : "0";
+        const asset = typeof payload.asset === "string" ? payload.asset : "FLOP";
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Offer Created (${amt} ${asset})`,
+          detail: `Agent ${authorShort} published an autonomous tclk/1 deal offer for task coordination.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "info",
+        });
+        break;
+      }
+
+      case "DEAL_OFFER_ACCEPTED": {
+        const contractId = typeof payload.contractId === "string" ? payload.contractId.slice(0, 12) + "..." : "contract";
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Offer Accepted [${contractId}]`,
+          detail: `Payee ${authorShort} accepted deal terms and committed public statement hash.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "info",
+        });
+        break;
+      }
+
+      case "DEAL_FUNDS_LOCKED": {
+        const rail = typeof payload.rail === "string" ? payload.rail : "rehearsal";
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Escrow Locked (${rail})`,
+          detail: `Payer ${authorShort} locked rehearsal escrow funds under commitment statement.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "info",
+        });
+        break;
+      }
+
+      case "DEAL_SECRET_REVEALED": {
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Secret Revealed & Escrow Claimed`,
+          detail: `Payee ${authorShort} published verified preimage, claiming protocol escrow.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "success",
+        });
+        break;
+      }
+
+      case "DEAL_REFUND_CLAIMED": {
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Escrow Refunded`,
+          detail: `Payer ${authorShort} reclaimed escrowed funds after timelock expiry.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "warning",
+        });
+        break;
+      }
+
+      case "DEAL_CANCELLED": {
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Cancelled`,
+          detail: `Deal cancelled before funds locked by ${authorShort}.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "warning",
+        });
+        break;
+      }
+
+      case "DEAL_RECEIPT_ISSUED": {
+        items.push({
+          id: `nar_${evt.eventId}`,
+          timestamp: time,
+          headline: `Deal Terminal Receipt Acknowledged`,
+          detail: `Agent ${authorShort} issued final protocol receipt acknowledging settlement.`,
+          eventType: evt.eventType,
+          sourceEventId: evt.eventId,
+          actorDid: evt.authorDid,
+          severity: "success",
+        });
+        break;
+      }
+
       default: {
         items.push({
           id: `nar_${evt.eventId}`,
