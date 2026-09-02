@@ -67,6 +67,7 @@ export function CivilizationObservatory() {
     setSelectedTarget,
     setExecutionMode,
     runCompleteDemo,
+    spawnDemoDeals,
   } = useCivilizationEngine();
 
   // Helper lookup for selected entities
@@ -196,6 +197,7 @@ export function CivilizationObservatory() {
                 selectedContractId={selectedTarget.type === "deal" ? selectedTarget.contractId : undefined}
                 onSelectDeal={(contractId) => setSelectedTarget({ type: "deal", contractId })}
                 onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+                onSpawnDemoDeals={spawnDemoDeals}
               />
             )}
 

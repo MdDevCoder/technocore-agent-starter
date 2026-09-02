@@ -17,6 +17,7 @@ interface DealObservatoryProps {
   readonly selectedContractId?: string;
   readonly onSelectDeal: (contractId: string) => void;
   readonly onSelectAgent?: (did: string) => void;
+  readonly onSpawnDemoDeals?: () => void;
 }
 
 function truncateDid(did: string): string {
@@ -49,6 +50,7 @@ export const DealObservatory: React.FC<DealObservatoryProps> = ({
   selectedContractId,
   onSelectDeal,
   onSelectAgent,
+  onSpawnDemoDeals,
 }) => {
   const [statusFilter, setStatusFilter] = useState<DealFilterStatus>("ALL");
   const [roleFilter, setRoleFilter] = useState<DealRoleFilter>("ALL");
@@ -189,6 +191,14 @@ export const DealObservatory: React.FC<DealObservatoryProps> = ({
               ? "No tclk/1 deal events have been published to the event ledger yet. Autonomous daemons will create offers when coordination tasks appear."
               : "No deals matched the active filters. Try changing your status or search criteria."}
           </div>
+          {deals.length === 0 && onSpawnDemoDeals && (
+            <button
+              onClick={onSpawnDemoDeals}
+              className="mt-4 rounded bg-signal/20 px-3.5 py-1.5 text-xs font-bold text-signal border border-signal/40 hover:bg-signal/30 transition-all cursor-pointer"
+            >
+              ✨ Load Autonomous Demo Deals
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

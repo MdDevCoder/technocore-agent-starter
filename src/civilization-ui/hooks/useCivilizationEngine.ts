@@ -63,6 +63,7 @@ export interface UseCivilizationEngineReturn {
   readonly setSelectedTarget: (target: SelectionTarget) => void;
   readonly setExecutionMode: (mode: NetworkExecutionMode) => void;
   readonly runCompleteDemo: () => Promise<void>;
+  readonly spawnDemoDeals: () => Promise<void>;
 }
 
 export function useCivilizationEngine(initialSeed = "technocore-observatory-01"): UseCivilizationEngineReturn {
@@ -102,9 +103,11 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
       snapshotsHistoryRef.current.clear();
       snapshotsHistoryRef.current.set(0, { snapshot: initialSnapshot, state });
 
-      const events = engine.getAllEvents();
+      const genesisEvents = engine.getAllEvents();
+      const demoDeals = await createDemoDealEvents();
+      const combinedEvents = [...genesisEvents, ...demoDeals];
       setWorldState(state);
-      setAllEvents(events);
+      setAllEvents(combinedEvents);
       setCurrentTick(0);
       setDisplayedTick(0);
       setIsInitialized(true);
@@ -127,7 +130,12 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
 
       const events = engineRef.current.getAllEvents();
       setWorldState(state);
-      setAllEvents(events);
+      setAllEvents((prev) => {
+        const dealEvts = prev.filter((e) => e.eventType.startsWith("DEAL_"));
+        const existingIds = new Set(events.map((e) => e.eventId));
+        const missingDealEvts = dealEvts.filter((d) => !existingIds.has(d.eventId));
+        return [...events, ...missingDealEvts];
+      });
       setCurrentTick(result.tick);
       setDisplayedTick(result.tick);
       setIsScrubbing(false);
@@ -247,6 +255,16 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     setAllEvents((prev) => [...prev, ...demoDeals]);
   }, [pauseSimulation, initializeGenesis, stepTick]);
 
+  // Spawn or reload demo deals into event ledger
+  const spawnDemoDeals = useCallback(async () => {
+    const demoDeals = await createDemoDealEvents();
+    setAllEvents((prev) => {
+      const existingIds = new Set(prev.map((e) => e.eventId));
+      const newDeals = demoDeals.filter((d) => !existingIds.has(d.eventId));
+      return [...prev, ...newDeals];
+    });
+  }, []);
+
   // Initial load
   useEffect(() => {
     void initializeGenesis();
@@ -357,5 +375,6 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     setSelectedTarget,
     setExecutionMode,
     runCompleteDemo,
+    spawnDemoDeals,
   };
 }
