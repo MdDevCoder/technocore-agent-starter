@@ -61,6 +61,14 @@ export class SqlEventStore implements CivilizationEventStore {
   }
 
   /**
+   * Exposes the underlying SQL adapter for auxiliary stores (e.g. PublicObservationStore).
+   */
+  getDbAdapter(): SqlDatabaseAdapter {
+    return this.db;
+  }
+
+
+  /**
    * Ensures migrations are applied before executing database operations.
    */
   async ensureInitialized(): Promise<void> {

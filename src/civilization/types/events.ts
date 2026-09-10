@@ -602,6 +602,8 @@ export interface CivilizationEvent<TType extends CivilizationEventType = Civiliz
   readonly parentEventIds: readonly string[];
   readonly payload: EventPayloadMap[TType];
   readonly signature: SignatureProof;
+  readonly sequence?: number;
+  readonly isDemo?: boolean;
 }
 
 /**

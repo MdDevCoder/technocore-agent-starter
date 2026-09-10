@@ -14,6 +14,8 @@ import type { DealContext, DealPublicState } from "../deals/tclk/types.ts";
 import { decodeTclkFrame } from "../deals/tclk/transcript.ts";
 import type { DealPolicy, WorkExecutionProvider } from "./types.ts";
 
+import type { AgentReputationSummary, ConfidenceLevel } from "../reputation/types.ts";
+
 export class MockWorkExecutionProvider implements WorkExecutionProvider {
   async executeTask(job: { proto: string; id: string; meta?: Record<string, unknown> } | undefined): Promise<{
     ok: boolean;
@@ -36,8 +38,17 @@ export interface DealCapabilityOptions {
   readonly policy?: DealPolicy;
   readonly workProvider?: WorkExecutionProvider;
   readonly defaultRail?: SettlementRail;
+  readonly reputationResolver?: (did: string) => AgentReputationSummary | undefined;
   readonly clock?: () => number;
 }
+
+const CONFIDENCE_LEVEL_ORDER: Record<ConfidenceLevel, number> = {
+  unverified: 0,
+  low: 1,
+  medium: 2,
+  high: 3,
+  authoritative: 4,
+};
 
 export class TclkDealCapability {
   readonly did: string;
@@ -46,6 +57,7 @@ export class TclkDealCapability {
   private readonly policy: DealPolicy;
   private readonly workProvider: WorkExecutionProvider;
   private readonly defaultRail?: SettlementRail;
+  private readonly reputationResolver?: (did: string) => AgentReputationSummary | undefined;
   private readonly clock: () => number;
 
   constructor(options: DealCapabilityOptions) {
@@ -55,6 +67,7 @@ export class TclkDealCapability {
     this.policy = options.policy ?? {};
     this.workProvider = options.workProvider ?? new MockWorkExecutionProvider();
     this.defaultRail = options.defaultRail;
+    this.reputationResolver = options.reputationResolver;
     this.clock = options.clock ?? (() => Date.now());
   }
 
@@ -106,8 +119,10 @@ export class TclkDealCapability {
   evaluateOfferPolicy(
     offer: OfferFrame,
     publicState?: DealPublicState,
+    counterpartyReputation?: AgentReputationSummary,
   ): { accept: boolean; reason?: string } {
     const nowMs = this.clock();
+    const rep = counterpartyReputation ?? this.reputationResolver?.(offer.from);
 
     // 1. Expiration check
     if (offer.expiresMs <= nowMs) {
@@ -122,7 +137,29 @@ export class TclkDealCapability {
       return { accept: false, reason: `Counterparty "${offer.from}" is not in allowed counterparties` };
     }
 
-    // 3. Amount constraint
+    // 3. Reputation & confidence constraints
+    if (this.policy.minReputationScore !== undefined) {
+      const score = rep?.overallScore ?? 0;
+      if (score < this.policy.minReputationScore) {
+        return {
+          accept: false,
+          reason: `Counterparty score (${score}) is below required minimum (${this.policy.minReputationScore})`,
+        };
+      }
+    }
+    if (this.policy.minConfidenceLevel !== undefined) {
+      const requiredRank = CONFIDENCE_LEVEL_ORDER[this.policy.minConfidenceLevel];
+      const actualLevel = rep?.confidence ?? "unverified";
+      const actualRank = CONFIDENCE_LEVEL_ORDER[actualLevel] ?? 0;
+      if (actualRank < requiredRank) {
+        return {
+          accept: false,
+          reason: `Counterparty confidence level (${actualLevel}) is below required minimum (${this.policy.minConfidenceLevel})`,
+        };
+      }
+    }
+
+    // 4. Amount constraint
     if (this.policy.maxDealAmount !== undefined) {
       const amt = BigInt(offer.amount);
       const maxAmt = BigInt(this.policy.maxDealAmount);
@@ -131,17 +168,17 @@ export class TclkDealCapability {
       }
     }
 
-    // 4. Asset constraint
+    // 5. Asset constraint
     if (this.policy.allowedAssets && !this.policy.allowedAssets.includes(offer.asset)) {
       return { accept: false, reason: `Asset "${offer.asset}" is not supported by policy` };
     }
 
-    // 5. Lock kind constraint
+    // 6. Lock kind constraint
     if (this.policy.allowedLockKinds && !this.policy.allowedLockKinds.includes(offer.lock)) {
       return { accept: false, reason: `Lock kind "${offer.lock}" is not supported by policy` };
     }
 
-    // 6. Rails constraint
+    // 7. Rails constraint
     if (this.policy.allowedRails) {
       const hasSupportedRail = offer.rails.some((r) => this.policy.allowedRails!.includes(r));
       if (!hasSupportedRail) {
@@ -149,7 +186,7 @@ export class TclkDealCapability {
       }
     }
 
-    // 7. Deadline safety buffers
+    // 8. Deadline safety buffers
     if (this.policy.minClaimBufferMs) {
       const buffer = offer.claimByMs - nowMs;
       if (buffer < this.policy.minClaimBufferMs) {
@@ -157,9 +194,9 @@ export class TclkDealCapability {
       }
     }
 
-    // 8. Custom policy callback
+    // 9. Custom policy callback
     if (this.policy.evaluateOffer) {
-      const customRes = this.policy.evaluateOffer(offer, publicState);
+      const customRes = this.policy.evaluateOffer(offer, publicState, rep);
       if (typeof customRes === "boolean") {
         return { accept: customRes, reason: customRes ? undefined : "Custom policy rejection" };
       }

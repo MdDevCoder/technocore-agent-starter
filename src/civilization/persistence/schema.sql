@@ -49,3 +49,48 @@ CREATE TABLE IF NOT EXISTS schema_migrations (
     version INT PRIMARY KEY,
     applied_at VARCHAR(64) NOT NULL
 );
+
+-- ============================================================================
+-- Migration v2: Technocore Public Network Observations & Sync Cursors
+-- ============================================================================
+
+-- 5. Raw Public Network Observation Store (Untrusted Wire Data)
+CREATE TABLE IF NOT EXISTS technocore_public_messages (
+    id VARCHAR(128) PRIMARY KEY,
+    room VARCHAR(128) NOT NULL,
+    sequence BIGINT NOT NULL,
+    nonce VARCHAR(128),
+    did VARCHAR(128),
+    signature VARCHAR(256),
+    text TEXT NOT NULL,
+    observed_at VARCHAR(64) NOT NULL,
+    verification_status VARCHAR(32) NOT NULL,
+    protocol_classification VARCHAR(64) NOT NULL,
+    source VARCHAR(32) NOT NULL DEFAULT 'public_room',
+    raw_hash VARCHAR(64) NOT NULL,
+    promoted_event_id VARCHAR(64),
+    created_at VARCHAR(64) NOT NULL,
+    UNIQUE(room, sequence)
+);
+
+CREATE INDEX IF NOT EXISTS idx_pub_msg_room_seq ON technocore_public_messages(room, sequence);
+CREATE INDEX IF NOT EXISTS idx_pub_msg_did ON technocore_public_messages(did);
+CREATE INDEX IF NOT EXISTS idx_pub_msg_verif ON technocore_public_messages(verification_status);
+CREATE INDEX IF NOT EXISTS idx_pub_msg_proto ON technocore_public_messages(protocol_classification);
+CREATE INDEX IF NOT EXISTS idx_pub_msg_promoted ON technocore_public_messages(promoted_event_id);
+
+-- 6. Incremental Room Synchronization Cursors
+CREATE TABLE IF NOT EXISTS technocore_room_sync_cursors (
+    room VARCHAR(128) PRIMARY KEY,
+    last_sequence BIGINT NOT NULL DEFAULT 0,
+    oldest_observed_sequence BIGINT NOT NULL DEFAULT 0,
+    highest_observed_sequence BIGINT NOT NULL DEFAULT 0,
+    status VARCHAR(32) NOT NULL DEFAULT 'IDLE',
+    last_fetched_at VARCHAR(64),
+    last_success_at VARCHAR(64),
+    error_message TEXT,
+    total_messages_observed BIGINT NOT NULL DEFAULT 0,
+    total_messages_promoted BIGINT NOT NULL DEFAULT 0,
+    updated_at VARCHAR(64) NOT NULL
+);
+

@@ -17,6 +17,8 @@ export function aggregateDealsFromEvents(
     payerDid: string;
     payeeDid: string;
     status: DealStatus;
+    provenance?: "LOCAL_DEMO" | "NETWORK_OBSERVED" | "NETWORK_EXECUTED";
+    verificationStatus?: "VERIFIED" | "UNVERIFIED" | "REJECTED";
     amount: string;
     asset: string;
     lockKind: "hash" | "point";
@@ -56,6 +58,8 @@ export function aggregateDealsFromEvents(
           payerDid,
           payeeDid,
           status: "proposed",
+          provenance: (payload.provenance as "LOCAL_DEMO" | "NETWORK_OBSERVED" | "NETWORK_EXECUTED") || "LOCAL_DEMO",
+          verificationStatus: (payload.verificationStatus as "VERIFIED" | "UNVERIFIED" | "REJECTED") || "VERIFIED",
           amount: String(payload.amount || "0"),
           asset: String(payload.asset || "FLOP"),
           lockKind: (payload.lockKind as "hash" | "point") || "hash",

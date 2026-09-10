@@ -162,6 +162,11 @@ export interface IssueDealReceiptOptions {
 }
 
 /**
+ * Strict Network Provenance classification for deal transparency.
+ */
+export type NetworkProvenance = "LOCAL_DEMO" | "NETWORK_OBSERVED" | "NETWORK_EXECUTED";
+
+/**
  * Public deal record tracked by the deal engine.
  */
 export interface TclkDealRecord {
@@ -171,6 +176,8 @@ export interface TclkDealRecord {
   readonly state: ContractState;
   readonly room: string;
   readonly missionId?: string;
+  readonly provenance?: NetworkProvenance;
+  readonly verificationStatus?: "VERIFIED" | "UNVERIFIED" | "REJECTED";
   readonly frames: readonly TclkFrame[];
   readonly signedMessages: readonly SignedRoomMessage[];
   readonly civilizationEventIds?: readonly string[];
@@ -195,6 +202,8 @@ export interface DealPublicState {
   readonly rails: readonly string[];
   readonly rail?: string;
   readonly railRef?: string;
+  readonly provenance?: NetworkProvenance;
+  readonly verificationStatus?: "VERIFIED" | "UNVERIFIED" | "REJECTED";
   readonly claimByMs: number;
   readonly refundAfterMs: number;
   readonly expiresMs: number;

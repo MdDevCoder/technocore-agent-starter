@@ -6,11 +6,11 @@ import { useEffect, useRef, useState } from "react";
  * Custom interactive cyber cursor.
  *
  * Implements a dual-layer hardware-accelerated cursor:
- * 1. Inner precision dot (instant response with active pulse).
+ * 1. Inner precision dot (instant response with zero transform latency).
  * 2. Outer follower ring with fluid linear interpolation (LERP) physics.
- * 3. Interactive state transitions (expands & magnetizes over interactive targets, contracts on click).
+ * 3. Interactive state transitions (expands & magnetizes over interactive targets, contracts cleanly on click).
  *
- * Automatically disabled on touch screens and when reduced motion is preferred.
+ * Guaranteed zero offset drift on click by synchronizing center coordinates and removing CSS transform transitions.
  */
 export function CustomCursor() {
   const [mounted, setMounted] = useState(false);
@@ -42,7 +42,7 @@ export function CustomCursor() {
 
     const onMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY };
-      if (!visible) setVisible(true);
+      setVisible(true);
 
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
@@ -54,14 +54,25 @@ export function CustomCursor() {
         const isInteractive = Boolean(
           target.closest("a, button, [role='button'], .clickable, .cyber-card, summary, input[type='submit'], input[type='button']")
         );
-        const isTextEntry = Boolean(target.closest("input[type='text'], input[type='url'], input[type='password'], input[type='email'], textarea, select"));
+        const isTextEntry = Boolean(
+          target.closest("input[type='text'], input[type='url'], input[type='password'], input[type='email'], textarea, select")
+        );
 
         setIsHovered(isInteractive);
         setIsInput(isTextEntry);
       }
     };
 
-    const onMouseDown = () => setIsClicking(true);
+    const onMouseDown = () => {
+      setIsClicking(true);
+      // Instantly snap follower ring to mouse center on click to eliminate offset drift
+      followerPos.current.x = mousePos.current.x;
+      followerPos.current.y = mousePos.current.y;
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${mousePos.current.x}px, ${mousePos.current.y}px, 0) translate(-50%, -50%)`;
+      }
+    };
+
     const onMouseUp = () => setIsClicking(false);
 
     const onMouseEnter = () => setVisible(true);
@@ -79,7 +90,7 @@ export function CustomCursor() {
 
     // Smooth LERP animation loop for outer ring
     const renderLoop = () => {
-      const ease = 0.18; // smoothness factor
+      const ease = 0.25; // responsive smoothness factor
       followerPos.current.x += (mousePos.current.x - followerPos.current.x) * ease;
       followerPos.current.y += (mousePos.current.y - followerPos.current.y) * ease;
 
@@ -100,44 +111,44 @@ export function CustomCursor() {
       document.removeEventListener("mouseleave", onMouseLeave);
       if (animFrameId.current) cancelAnimationFrame(animFrameId.current);
     };
-  }, [visible]);
+  }, []);
 
   if (!mounted) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden">
-      {/* Precision Inner Dot */}
+    <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden select-none">
+      {/* Precision Inner Dot (zero transform transition to maintain perfect pointer tracking) */}
       <div
         ref={dotRef}
         aria-hidden="true"
         style={{ willChange: "transform" }}
-        className={`fixed top-0 left-0 size-2 rounded-full transition-[width,height,background-color,opacity,transform] duration-150 ease-out ${
+        className={`pointer-events-none fixed top-0 left-0 rounded-full transition-[width,height,background-color,opacity,box-shadow] duration-100 ease-out ${
           visible ? "opacity-100" : "opacity-0"
         } ${
           isClicking
-            ? "scale-75 bg-signal"
+            ? "size-2 bg-signal shadow-[0_0_10px_rgba(79,227,193,1)]"
             : isHovered
-              ? "size-3 bg-signal shadow-[0_0_12px_rgba(79,227,193,0.9)]"
+              ? "size-3 bg-signal shadow-[0_0_14px_rgba(79,227,193,0.9)]"
               : isInput
                 ? "h-4 w-1 rounded-xs bg-signal"
-                : "bg-signal shadow-[0_0_8px_rgba(79,227,193,0.6)]"
+                : "size-2 bg-signal shadow-[0_0_8px_rgba(79,227,193,0.7)]"
         }`}
       />
 
-      {/* Trailing Outer Ring */}
+      {/* Trailing Outer Ring (centered on followerPos) */}
       <div
         ref={ringRef}
         aria-hidden="true"
         style={{ willChange: "transform" }}
-        className={`fixed top-0 left-0 rounded-full border transition-[width,height,border-color,background-color,opacity,box-shadow] duration-200 ease-out ${
+        className={`pointer-events-none fixed top-0 left-0 rounded-full border transition-[width,height,border-color,background-color,opacity,box-shadow] duration-150 ease-out ${
           visible ? "opacity-100" : "opacity-0"
         } ${
           isClicking
-            ? "size-9 border-signal bg-signal/20 scale-90"
+            ? "size-7 border-signal bg-signal/30 shadow-[0_0_15px_rgba(79,227,193,0.4)]"
             : isHovered
-              ? "size-12 border-signal/80 bg-signal/10 shadow-[0_0_20px_rgba(79,227,193,0.25)] backdrop-blur-[0.5px]"
+              ? "size-11 border-signal/90 bg-signal/15 shadow-[0_0_20px_rgba(79,227,193,0.25)]"
               : isInput
-                ? "size-8 border-hairline-bright bg-transparent opacity-40"
+                ? "size-7 border-hairline-bright bg-transparent opacity-40"
                 : "size-8 border-signal/40 bg-signal/5"
         }`}
       />

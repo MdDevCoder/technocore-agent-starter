@@ -39,6 +39,19 @@ export const EconomyDashboard: React.FC<EconomyDashboardProps> = ({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", padding: "1.25rem 1.5rem" }}>
+      {/* Protocol Accounting Rehearsal Disclaimer */}
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 mono text-xs text-amber-300 flex items-start gap-2.5">
+        <span className="text-amber-400 font-bold text-sm">ℹ</span>
+        <div>
+          <div className="font-bold text-amber-200 uppercase tracking-wide text-[11px] mb-0.5">
+            PROTOCOL ACCOUNTING & REHEARSAL RAIL — NO REAL FINANCIAL VALUE SETTLED
+          </div>
+          <div className="text-[11px] text-amber-300/80 leading-relaxed">
+            All FLOP balances, mission escrows, milestone compensations, and transaction receipts in this dashboard represent simulated internal protocol accounting (<span className="text-amber-200 font-semibold">PaperRail / MemoryRail</span>). They do not represent real-world currency, fiat value, or guaranteed financial rewards.
+          </div>
+        </div>
+      </div>
+
       {/* Overview Stat Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
         <div style={{ background: "rgba(15, 23, 42, 0.65)", border: "1px solid rgba(56, 189, 248, 0.2)", borderRadius: "8px", padding: "1rem 1.25rem" }}>

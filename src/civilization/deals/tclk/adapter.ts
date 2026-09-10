@@ -31,6 +31,7 @@ import type {
   IssueDealReceiptOptions,
   LocalSecretVault,
   LockDealFundsOptions,
+  NetworkProvenance,
   RefundDealOptions,
   RevealDealSecretOptions,
   TclkDealRecord,
@@ -52,6 +53,7 @@ export interface TclkAdapterOptions {
   readonly signer?: FrameSigner;
   readonly secretVault?: LocalSecretVault;
   readonly defaultRoom?: string;
+  readonly defaultProvenance?: NetworkProvenance;
   readonly settlementRails?: ReadonlyMap<string, SettlementRail>;
   readonly clock?: () => number;
 }
@@ -61,6 +63,7 @@ export class TclkDealAdapter {
   private readonly signer?: FrameSigner;
   readonly secretVault: LocalSecretVault;
   private readonly defaultRoom: string;
+  readonly defaultProvenance: NetworkProvenance;
   private readonly rails = new Map<string, SettlementRail>();
   private readonly deals = new Map<string, TclkDealRecord>();
   private readonly offerToContract = new Map<string, string>();
@@ -71,6 +74,7 @@ export class TclkDealAdapter {
     this.signer = options.signer;
     this.secretVault = options.secretVault ?? new InMemorySecretVault();
     this.defaultRoom = options.defaultRoom ?? "technocore";
+    this.defaultProvenance = options.defaultProvenance ?? "LOCAL_DEMO";
     this.clock = options.clock ?? (() => Date.now());
 
     if (options.settlementRails) {
@@ -132,6 +136,7 @@ export class TclkDealAdapter {
       state,
       room,
       missionId: options.missionId,
+      provenance: this.defaultProvenance,
       frames: [offer],
       signedMessages: [signedMessage],
       createdAt: now,
@@ -204,6 +209,7 @@ export class TclkDealAdapter {
       state,
       room,
       missionId: options.missionId ?? existing?.missionId,
+      provenance: existing?.provenance ?? this.defaultProvenance,
       frames: [...(existing?.frames ?? [offer]), accept],
       signedMessages: [...(existing?.signedMessages ?? []), signedMessage],
       createdAt: existing?.createdAt ?? nowIso,
@@ -233,11 +239,17 @@ export class TclkDealAdapter {
     const room = options.room ?? deal.room;
     let railRef = options.ref;
 
-    // If a settlement rail is available and ref not pre-settled, invoke rail.lock
+    // If a settlement rail is available, invoke rail.lock or verify pre-existing record
     const rail = this.rails.get(options.rail);
-    if (rail && !railRef) {
+    if (rail) {
       const terms = lockTerms(deal.state);
-      railRef = await rail.lock(terms);
+      if (!railRef) {
+        railRef = await rail.lock(terms);
+      }
+      const verified = await rail.verifyLock(terms, railRef);
+      if (!verified) {
+        throw new Error(`Settlement rail "${options.rail}" verification failed for ref "${railRef}"`);
+      }
     }
 
     if (!railRef) {
@@ -507,6 +519,7 @@ export class TclkDealAdapter {
         status: state.status,
         state,
         room,
+        provenance: this.defaultProvenance,
         frames: [frame],
         signedMessages: signedMessage ? [signedMessage] : [],
         createdAt: nowIso,

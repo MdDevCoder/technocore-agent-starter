@@ -21,6 +21,11 @@ import { defaultAgentReputation, type AgentCapability } from "../types/agent.ts"
 import type { AgentDaemonConfig, DaemonMetrics, DaemonState } from "./types.ts";
 import { TclkDealEngine } from "../deals/tclk/deal-engine.ts";
 import { TclkDealCapability } from "./deal-capability.ts";
+import { aggregateAgentReputations } from "../reputation/projection.ts";
+import type { AgentReputationSummary } from "../reputation/types.ts";
+import { aggregateMarketplaceFromEvents } from "../market/aggregation.ts";
+import { revalidateWinnerBeforeTclk } from "../market/arbitration.ts";
+import type { CounterpartyRankingPolicy, MarketplaceState, ProcurementArbitrationResult } from "../market/types.ts";
 
 export class AgentDaemon {
   private readonly config: AgentDaemonConfig;
@@ -41,6 +46,14 @@ export class AgentDaemon {
   constructor(config: AgentDaemonConfig) {
     this.config = config;
     this.capabilities = config.capabilities ? [...config.capabilities] : [{ name: "typescript", proficiency: 85 }];
+    if (config.identity) {
+      this.identity = config.identity;
+      this.dealEngine = new TclkDealEngine({
+        did: config.identity.did,
+        signer: config.identity.signingHandle,
+        ...config.dealConfig,
+      });
+    }
   }
 
   /**
@@ -117,6 +130,7 @@ export class AgentDaemon {
       defaultRail:
         this.config.dealConfig?.settlementRails?.get("memory") ??
         this.config.dealConfig?.settlementRails?.get("paper"),
+      reputationResolver: (targetDid: string) => this.resolveReputation(targetDid),
       clock: this.config.dealConfig?.clock,
     });
 
@@ -427,6 +441,28 @@ export class AgentDaemon {
     return this.identity;
   }
 
+  /**
+   * Directly ingests an event into the daemon's synced events and deal capability.
+   */
+  async ingestEvent(event: CivilizationEvent | StoredCivilizationEvent): Promise<void> {
+    const stored: StoredCivilizationEvent = "sequenceNum" in event && "persistedAt" in event
+      ? (event as StoredCivilizationEvent)
+      : {
+          ...event,
+          sequenceNum: this.syncedEvents.length + 1,
+          persistedAt: new Date().toISOString(),
+          eventHash: `hash_${event.eventId}`,
+        };
+    this.syncedEvents.push(stored);
+    if (this.dealCapability) {
+      try {
+        await this.dealCapability.ingestEvent(stored);
+      } catch (err) {
+        console.warn(`[AgentDaemon] Error ingesting event ${stored.eventId}:`, err);
+      }
+    }
+  }
+
   getState(): DaemonState {
     return this.state;
   }
@@ -445,5 +481,133 @@ export class AgentDaemon {
 
   getDealCapability(): TclkDealCapability | null {
     return this.dealCapability;
+  }
+
+  /**
+   * Resolves the deterministic reputation summary for an agent from synced events.
+   */
+  resolveReputation(targetDid: string, evalTime?: string): AgentReputationSummary | undefined {
+    const summaries = aggregateAgentReputations(this.syncedEvents, evalTime);
+    return summaries.find((s) => s.did === targetDid);
+  }
+
+  /**
+   * Computes the map of reputation summaries for all known agents from synced events.
+   */
+  getReputationSummaries(evalTime?: string): Map<string, AgentReputationSummary> {
+    const summaries = aggregateAgentReputations(this.syncedEvents, evalTime);
+    const map = new Map<string, AgentReputationSummary>();
+    for (const s of summaries) {
+      map.set(s.did, s);
+    }
+    return map;
+  }
+
+  /**
+   * Projects current marketplace state and candidate rankings from synced events.
+   */
+  getMarketplaceState(evalTime?: string, policy?: CounterpartyRankingPolicy): MarketplaceState {
+    return aggregateMarketplaceFromEvents(
+      this.syncedEvents,
+      evalTime,
+      policy ?? this.config.dealPolicy?.procurementPolicy ?? this.config.dealPolicy?.rankingPolicy,
+    );
+  }
+
+  /**
+   * Arbitrates a specific opportunity by evaluating all submitted proposals deterministically.
+   */
+  arbitrateOpportunity(
+    opportunityId: string,
+    evalTime?: string,
+    policy?: CounterpartyRankingPolicy,
+  ): ProcurementArbitrationResult | undefined {
+    const marketState = this.getMarketplaceState(evalTime, policy);
+    return marketState.arbitrationResults.get(opportunityId);
+  }
+
+  /**
+   * Executes a TCLK deal for the winning proposal of a procurement opportunity.
+   * Re-evaluates the winning candidate fail-closed immediately before creating the TCLK offer.
+   */
+  async executeProcurementDeal(
+    opportunityId: string,
+    options: {
+      readonly evalTime?: string;
+      readonly policy?: CounterpartyRankingPolicy;
+    } = {},
+  ): Promise<{
+    readonly ok: boolean;
+    readonly reason?: string;
+    readonly offerResult?: Awaited<ReturnType<TclkDealEngine["createOffer"]>>;
+  }> {
+    if (!this.dealEngine || !this.identity) {
+      return { ok: false, reason: "AgentDaemon DealEngine is not initialized" };
+    }
+
+    const marketState = this.getMarketplaceState(options.evalTime, options.policy);
+    const opp = marketState.opportunities.find((o) => o.opportunityId === opportunityId);
+    if (!opp) {
+      return { ok: false, reason: `Opportunity "${opportunityId}" not found in marketplace` };
+    }
+
+    const arbResult = marketState.arbitrationResults.get(opportunityId);
+    if (!arbResult || !arbResult.winningProposalId || !arbResult.winningProposerDid) {
+      return { ok: false, reason: `No valid winning proposal found for opportunity "${opportunityId}"` };
+    }
+
+    const winnerEval = arbResult.rankedEvaluations.find((e) => e.isWinner);
+    if (!winnerEval) {
+      return { ok: false, reason: "Winning proposal evaluation is missing" };
+    }
+
+    const winnerRep = this.resolveReputation(arbResult.winningProposerDid, options.evalTime);
+
+    // Pre-TCLK winner revalidation
+    const reval = revalidateWinnerBeforeTclk(
+      opp,
+      winnerEval,
+      winnerRep,
+      options.evalTime ? new Date(options.evalTime).getTime() : Date.now(),
+      options.policy ?? this.config.dealPolicy?.procurementPolicy,
+    );
+
+    if (!reval.ok) {
+      return { ok: false, reason: `Winner pre-TCLK revalidation failed: ${reval.reason}` };
+    }
+
+    const winningProp = (marketState.proposals.get(opportunityId) || []).find(
+      (p) => p.proposalId === arbResult.winningProposalId,
+    );
+
+    const price = winningProp?.proposedPrice || opp.budget;
+    const asset = winningProp?.proposedAsset || opp.asset;
+
+    const claimByMs = winningProp?.estimatedCompletionTimeMs ?? (Date.now() + 60000);
+    const refundAfterMs = claimByMs + 60000;
+    const expiresMs = refundAfterMs + 60000;
+
+    // Create autonomous TCLK deal offer to the winning candidate
+    const offerResult = await this.dealEngine.createOffer({
+      role: "payer",
+      amount: price,
+      asset,
+      lock: "hash",
+      rails: ["memory", "paper"],
+      claimByMs,
+      refundAfterMs,
+      expiresMs,
+      missionId: opp.missionId ?? opp.opportunityId,
+      job: {
+        proto: "a2a",
+        id: opp.taskId ?? opp.opportunityId,
+        context: opp.description,
+      },
+    });
+
+    return {
+      ok: true,
+      offerResult,
+    };
   }
 }

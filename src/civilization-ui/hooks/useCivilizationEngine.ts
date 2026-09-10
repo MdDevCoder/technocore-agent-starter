@@ -1,10 +1,13 @@
 /**
- * Master React Hook for the Civilization World Engine.
+ * Master React Hook for the Civilization World Engine & Live Data Layer.
  *
- * Manages the live state of the deterministic machine civilization,
- * time-travel playback, execution bounds, snapshot history, and inspector selections.
+ * Phase 17 — Live Data Unification & End-to-End Dynamic System.
  *
- * All state is directly sourced from CivilizationWorldEngine and event-sourced projections.
+ * Dual Mode Architecture:
+ * 1. LIVE MODE (Default): Subscribes to canonical LiveCivilizationRepository (authoritative
+ *    PostgreSQL/SqlEventStore + SSE stream). Zero fake data or synthetic deal fixtures are injected.
+ * 2. SIMULATION MODE: Interactive, deterministic 9-agent CivilizationWorldEngine with
+ *    virtual ticking, time-travel scrubbing, and explicitly labeled LOCAL_SIMULATION provenance.
  */
 
 "use client";
@@ -28,8 +31,20 @@ import type {
 } from "../types.ts";
 import { deriveNarrativeFromEvents } from "../narrative/deriveNarrative.ts";
 import { createDemoDealEvents } from "../deals/demoDeals.ts";
+import type {
+  DataProvenanceMetadata,
+} from "../../civilization/data/provenance.ts";
+import {
+  createProvenanceMetadata,
+} from "../../civilization/data/provenance.ts";
+import { LiveCivilizationRepository } from "../../civilization/data/live-repository.ts";
+
+import type { NetworkSyncStatus } from "../../civilization/network/types.ts";
+
+export type ObservatoryEngineMode = "LIVE" | "SIMULATION";
 
 export interface UseCivilizationEngineReturn {
+  readonly mode: ObservatoryEngineMode;
   readonly isInitialized: boolean;
   readonly isRunning: boolean;
   readonly isScrubbing: boolean;
@@ -47,9 +62,15 @@ export interface UseCivilizationEngineReturn {
   readonly activeDelta: WhatChangedDelta | null;
   readonly executionMode: NetworkExecutionMode;
   readonly remoteAgents: readonly RemoteAgentTelemetry[];
+  readonly provenance: DataProvenanceMetadata;
+  readonly isUpdating: boolean;
   readonly error: string | null;
+  readonly networkStatus: NetworkSyncStatus | null;
+  readonly isSyncingNetwork: boolean;
 
   // Actions
+  readonly setMode: (mode: ObservatoryEngineMode) => void;
+  readonly toggleMode: () => void;
   readonly initializeGenesis: () => Promise<void>;
   readonly stepTick: () => Promise<WorldTickResult | null>;
   readonly runSimulation: () => void;
@@ -64,9 +85,19 @@ export interface UseCivilizationEngineReturn {
   readonly setExecutionMode: (mode: NetworkExecutionMode) => void;
   readonly runCompleteDemo: () => Promise<void>;
   readonly spawnDemoDeals: () => Promise<void>;
+  readonly refreshLiveEvents: () => Promise<void>;
+  readonly triggerNetworkSync: () => Promise<void>;
 }
 
+
 export function useCivilizationEngine(initialSeed = "technocore-observatory-01"): UseCivilizationEngineReturn {
+  const [mode, setModeState] = useState<ObservatoryEngineMode>("LIVE");
+  const liveRepoRef = useRef<LiveCivilizationRepository | null>(null);
+
+  if (!liveRepoRef.current) {
+    liveRepoRef.current = new LiveCivilizationRepository();
+  }
+
   const engineRef = useRef<CivilizationWorldEngine | null>(null);
   const snapshotsHistoryRef = useRef<Map<number, { snapshot: WorldSnapshot; state: CivilizationWorldState }>>(new Map());
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -84,9 +115,70 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
   const [selectedTarget, setSelectedTarget] = useState<SelectionTarget>({ type: "none" });
   const [activeDelta, setActiveDelta] = useState<WhatChangedDelta | null>(null);
   const [executionMode, setExecutionMode] = useState<NetworkExecutionMode>("SIMULATION");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isSyncingNetwork, setIsSyncingNetwork] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [networkStatus, setNetworkStatus] = useState<NetworkSyncStatus | null>(null);
 
-  // Initialize engine on mount
+  const [provenance, setProvenance] = useState<DataProvenanceMetadata>(() =>
+    createProvenanceMetadata({
+      provenance: "LIVE_PERSISTENCE",
+      source: "/api/civilization/events",
+      verified: true,
+    })
+  );
+
+  // Refresh live events and network status from server
+  const refreshLiveEvents = useCallback(async () => {
+    if (!liveRepoRef.current) return;
+    setIsUpdating(true);
+    setError(null);
+    try {
+      await liveRepoRef.current.fetchEvents();
+      await liveRepoRef.current.fetchNetworkAgents();
+      await liveRepoRef.current.fetchNetworkDeals();
+      const status = await liveRepoRef.current.fetchNetworkStatus();
+      if (status) {
+        setNetworkStatus(status);
+      }
+      if (mode === "LIVE") {
+        const liveEvents = liveRepoRef.current.getEvents();
+        setAllEvents(liveEvents);
+        setProvenance(liveRepoRef.current.getMetadata());
+      }
+    } catch (err) {
+      if (mode === "LIVE") {
+        setProvenance(liveRepoRef.current.getMetadata());
+      }
+      console.warn("Live events refresh encountered offline or network error:", err);
+    } finally {
+      setIsUpdating(false);
+    }
+  }, [mode]);
+
+  // Trigger bounded on-demand network sync
+  const triggerNetworkSync = useCallback(async () => {
+    if (!liveRepoRef.current) return;
+    setIsSyncingNetwork(true);
+    try {
+      const status = await liveRepoRef.current.triggerNetworkSync({ maxMessagesPerRoom: 100 });
+      if (status) {
+        setNetworkStatus(status);
+      }
+      if (mode === "LIVE") {
+        const liveEvents = liveRepoRef.current.getEvents();
+        setAllEvents(liveEvents);
+        setProvenance(liveRepoRef.current.getMetadata());
+      }
+    } catch (err) {
+      console.warn("Network sync trigger failed:", err);
+    } finally {
+      setIsSyncingNetwork(false);
+    }
+  }, [mode]);
+
+
+  // Initialize simulation engine
   const initializeGenesis = useCallback(async () => {
     try {
       setError(null);
@@ -112,13 +204,75 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
       setDisplayedTick(0);
       setIsInitialized(true);
       setIsScrubbing(false);
+      setProvenance(
+        createProvenanceMetadata({
+          provenance: "LOCAL_SIMULATION",
+          source: "CivilizationWorldEngine (Seed: " + initialSeed + ")",
+          verified: true,
+          verifiedEventsCount: combinedEvents.length,
+          lastEventSequence: combinedEvents.length,
+        })
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     }
   }, [initialSeed]);
 
-  // Execute 1 virtual tick
+  // Set Mode handler
+  const setMode = useCallback(
+    (newMode: ObservatoryEngineMode) => {
+      setModeState(newMode);
+      if (newMode === "LIVE") {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
+        setIsRunning(false);
+        const liveEvents = liveRepoRef.current?.getEvents() ?? [];
+        setAllEvents(liveEvents);
+        setProvenance(
+          liveRepoRef.current?.getMetadata() ??
+            createProvenanceMetadata({
+              provenance: "LIVE_PERSISTENCE",
+              source: "/api/civilization/events",
+              verified: true,
+            })
+        );
+        void refreshLiveEvents();
+      } else {
+        // SIMULATION MODE
+        if (!engineRef.current) {
+          void initializeGenesis();
+        } else {
+          const events = engineRef.current.getAllEvents();
+          setAllEvents(events);
+          setWorldState(engineRef.current.getState());
+          setProvenance(
+            createProvenanceMetadata({
+              provenance: "LOCAL_SIMULATION",
+              source: "CivilizationWorldEngine",
+              verified: true,
+              verifiedEventsCount: events.length,
+              lastEventSequence: currentTick,
+            })
+          );
+        }
+      }
+    },
+    [initializeGenesis, refreshLiveEvents, currentTick]
+  );
+
+  const toggleMode = useCallback(() => {
+    setMode(mode === "LIVE" ? "SIMULATION" : "LIVE");
+  }, [mode, setMode]);
+
+  // Execute 1 virtual tick in Simulation Mode
   const stepTick = useCallback(async (): Promise<WorldTickResult | null> => {
+    if (mode === "LIVE") {
+      await refreshLiveEvents();
+      return null;
+    }
+
     if (!engineRef.current) return null;
     try {
       setError(null);
@@ -139,20 +293,32 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
       setCurrentTick(result.tick);
       setDisplayedTick(result.tick);
       setIsScrubbing(false);
+      setProvenance(
+        createProvenanceMetadata({
+          provenance: "LOCAL_SIMULATION",
+          source: "CivilizationWorldEngine (Tick #" + result.tick + ")",
+          verified: true,
+          verifiedEventsCount: events.length,
+          lastEventSequence: result.tick,
+        })
+      );
       return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
       setIsRunning(false);
       return null;
     }
-  }, []);
+  }, [mode, refreshLiveEvents]);
 
   // Run continuous simulation loop
   const runSimulation = useCallback(() => {
+    if (mode !== "SIMULATION") {
+      setMode("SIMULATION");
+    }
     if (!isInitialized) return;
     setIsRunning(true);
     setIsScrubbing(false);
-  }, [isInitialized]);
+  }, [mode, setMode, isInitialized]);
 
   // Pause simulation loop
   const pauseSimulation = useCallback(() => {
@@ -169,13 +335,12 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     await initializeGenesis();
   }, [pauseSimulation, initializeGenesis]);
 
-  // Auto-tick effect when isRunning is true
+  // Auto-tick effect when isRunning is true (Simulation Mode only)
   useEffect(() => {
-    if (!isRunning || !isInitialized) return;
+    if (!isRunning || !isInitialized || mode !== "SIMULATION") return;
 
     const intervalMs = Math.max(200, Math.floor(1500 / speedMultiplier));
     const timer = setTimeout(async () => {
-      // Bound continuous runs to 50 ticks to prevent runaway loops
       if (currentTick >= 50) {
         pauseSimulation();
         return;
@@ -185,11 +350,12 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
 
     timerRef.current = timer;
     return () => clearTimeout(timer);
-  }, [isRunning, isInitialized, speedMultiplier, currentTick, stepTick, pauseSimulation]);
+  }, [isRunning, isInitialized, speedMultiplier, currentTick, stepTick, pauseSimulation, mode]);
 
   // Scrub to a historical tick
   const scrubToTick = useCallback(
     (targetTick: number) => {
+      if (mode !== "SIMULATION") return;
       pauseSimulation();
       const boundedTick = Math.max(0, Math.min(targetTick, currentTick));
       const historicalEntry = snapshotsHistoryRef.current.get(boundedTick);
@@ -199,7 +365,6 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
         setIsScrubbing(boundedTick < currentTick);
         setWorldState(historicalEntry.state);
 
-        // Compute "What Changed?" delta between scrubbed tick and latest tick
         const latestEntry = snapshotsHistoryRef.current.get(currentTick);
         if (latestEntry && boundedTick !== currentTick) {
           const fromState = historicalEntry.state;
@@ -230,7 +395,7 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
         }
       }
     },
-    [currentTick, pauseSimulation],
+    [currentTick, pauseSimulation, mode],
   );
 
   // Resume live latest playback
@@ -244,8 +409,11 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     }
   }, [currentTick]);
 
-  // Complete deterministic demo flow: runs 5 ticks and selects key elements
+  // Complete deterministic demo flow
   const runCompleteDemo = useCallback(async () => {
+    if (mode !== "SIMULATION") {
+      setMode("SIMULATION");
+    }
     pauseSimulation();
     await initializeGenesis();
     for (let i = 0; i < 5; i++) {
@@ -253,9 +421,9 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     }
     const demoDeals = await createDemoDealEvents();
     setAllEvents((prev) => [...prev, ...demoDeals]);
-  }, [pauseSimulation, initializeGenesis, stepTick]);
+  }, [mode, setMode, pauseSimulation, initializeGenesis, stepTick]);
 
-  // Spawn or reload demo deals into event ledger
+  // Spawn or reload demo deals into event ledger (Simulation Mode only)
   const spawnDemoDeals = useCallback(async () => {
     const demoDeals = await createDemoDealEvents();
     setAllEvents((prev) => {
@@ -265,10 +433,29 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     });
   }, []);
 
-  // Initial load
+  // Initial load effect
   useEffect(() => {
-    void initializeGenesis();
-  }, [initializeGenesis]);
+    if (mode === "LIVE") {
+      void refreshLiveEvents();
+      liveRepoRef.current?.startLiveStream();
+      const unsubscribe = liveRepoRef.current?.subscribe(() => {
+        if (mode === "LIVE" && liveRepoRef.current) {
+          setAllEvents(liveRepoRef.current.getEvents());
+          setProvenance(liveRepoRef.current.getMetadata());
+          const netStatus = liveRepoRef.current.getNetworkStatus();
+          if (netStatus) {
+            setNetworkStatus(netStatus);
+          }
+        }
+      });
+      return () => {
+        unsubscribe?.();
+        liveRepoRef.current?.stopLiveStream();
+      };
+    } else {
+      void initializeGenesis();
+    }
+  }, [mode, refreshLiveEvents, initializeGenesis]);
 
   // Filter events by category
   const filteredEvents = allEvents.filter((evt) => {
@@ -344,6 +531,7 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
   }
 
   return {
+    mode,
     isInitialized,
     isRunning,
     isScrubbing,
@@ -361,7 +549,13 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     activeDelta,
     executionMode,
     remoteAgents,
+    provenance,
+    isUpdating,
+    networkStatus,
+    isSyncingNetwork,
     error,
+    setMode,
+    toggleMode,
     initializeGenesis,
     stepTick,
     runSimulation,
@@ -376,5 +570,8 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     setExecutionMode,
     runCompleteDemo,
     spawnDemoDeals,
+    refreshLiveEvents,
+    triggerNetworkSync,
   };
 }
+

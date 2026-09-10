@@ -14,13 +14,17 @@ import type { CivilizationMission } from "../civilization/types/mission.ts";
 import type { DynamicTeamState } from "../civilization/world/types.ts";
 
 export type ObservatoryViewMode =
+  | "NETWORK"
   | "MAP"
+  | "AGENTS"
+  | "MARKET"
   | "TRUST_GRAPH"
   | "CAPABILITY_MARKET"
   | "MACHINE_ECONOMY"
   | "DEALS"
   | "EVOLUTION"
   | "GENERATIONS";
+
 
 export type EventCategoryFilter =
   | "ALL"
@@ -47,6 +51,7 @@ export type SelectionTarget =
   | { readonly type: "proof"; readonly proofId: string }
   | { readonly type: "attestation"; readonly attestationId: string }
   | { readonly type: "deal"; readonly contractId: string }
+  | { readonly type: "opportunity"; readonly opportunityId: string }
   | {
       readonly type: "lineage";
       readonly entityType: "agent" | "capability" | "dispute" | "mission";

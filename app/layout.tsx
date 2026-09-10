@@ -86,7 +86,10 @@ export default function RootLayout({ children }: { readonly children: React.Reac
           }}
         />
       </head>
-      <body className="bg-void text-ink min-h-dvh antialiased transition-colors duration-200">
+      <body
+        suppressHydrationWarning
+        className="bg-void text-ink min-h-dvh antialiased transition-colors duration-200"
+      >
         {/*
           The skip link is the first focusable thing on every page. The onboarding flow puts a step
           rail and an egress ledger around the workspace, so without this a keyboard user would tab

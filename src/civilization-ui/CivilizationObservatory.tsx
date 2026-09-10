@@ -21,6 +21,7 @@ import { EvolutionChronicle } from "./evolution/EvolutionChronicle.tsx";
 import { AttestationDrawer } from "./evolution/AttestationDrawer.tsx";
 import { GenerationsTimeline } from "./evolution/GenerationsTimeline.tsx";
 import { CausalityInspector } from "./causality/CausalityInspector.tsx";
+import { AgentDirectory } from "./agents/AgentDirectory.tsx";
 import { AgentInspector } from "./agents/AgentInspector.tsx";
 import { MissionInspector } from "./missions/MissionInspector.tsx";
 import { CourtInspector } from "./court/CourtInspector.tsx";
@@ -34,9 +35,14 @@ import { RemoteAgentStatusPanel } from "./controls/RemoteAgentStatusPanel.tsx";
 import { DealObservatory } from "./deals/DealObservatory.tsx";
 import { DealInspector } from "./deals/DealInspector.tsx";
 import { aggregateDealsFromEvents } from "./deals/aggregateDeals.ts";
+import { MarketplaceView } from "./market/MarketplaceView.tsx";
+import { OpportunityInspector } from "./market/OpportunityInspector.tsx";
+import { FreshnessBanner } from "./controls/ProvenanceBadge.tsx";
+import { NetworkStatusPanel } from "./network/NetworkStatusPanel.tsx";
 
 export function CivilizationObservatory() {
   const {
+    mode,
     isRunning,
     isInitialized,
     isScrubbing,
@@ -54,7 +60,14 @@ export function CivilizationObservatory() {
     activeDelta,
     executionMode,
     remoteAgents,
+    provenance,
+    isUpdating,
+    networkStatus,
+    isSyncingNetwork,
     error,
+    toggleMode,
+    refreshLiveEvents,
+    triggerNetworkSync,
     stepTick,
     runSimulation,
     pauseSimulation,
@@ -79,7 +92,7 @@ export function CivilizationObservatory() {
   const selectedMission =
     selectedTarget.type === "mission" && worldState
       ? worldState.activeMissions.get(selectedTarget.missionId) ||
-        worldState.completedMissions.find((m) => m.missionId === selectedTarget.missionId)
+      worldState.completedMissions.find((m) => m.missionId === selectedTarget.missionId)
       : null;
 
   const selectedTeam =
@@ -90,7 +103,7 @@ export function CivilizationObservatory() {
   const selectedDispute =
     selectedTarget.type === "court" && worldState
       ? worldState.activeDisputes.get(selectedTarget.disputeId) ||
-        worldState.resolvedDisputes.find((d) => d.disputeId === selectedTarget.disputeId)
+      worldState.resolvedDisputes.find((d) => d.disputeId === selectedTarget.disputeId)
       : null;
 
   const selectedEvent =
@@ -101,10 +114,10 @@ export function CivilizationObservatory() {
   const selectedProof: VerifiedWorkProof | null =
     selectedTarget.type === "proof"
       ? (((allEvents.find(
-          (e) =>
-            e.eventType === "VERIFIED_WORK_PROOF_PUBLISHED" &&
-            (e.payload as { proofId?: string }).proofId === selectedTarget.proofId,
-        )?.payload as unknown as VerifiedWorkProof)) ?? null)
+        (e) =>
+          e.eventType === "VERIFIED_WORK_PROOF_PUBLISHED" &&
+          (e.payload as { proofId?: string }).proofId === selectedTarget.proofId,
+      )?.payload as unknown as VerifiedWorkProof)) ?? null)
       : null;
 
   const selectedAttestation =
@@ -127,6 +140,24 @@ export function CivilizationObservatory() {
         displayedTick={displayedTick}
       />
 
+      {/* Freshness & Provenance Banner */}
+      <FreshnessBanner
+        metadata={provenance}
+        isUpdating={isUpdating}
+        onRefresh={refreshLiveEvents}
+        onToggleMode={toggleMode}
+        isLiveMode={mode === "LIVE"}
+      />
+
+      {/* Public Network Indexer Live Status Panel in LIVE Mode */}
+      {mode === "LIVE" && (
+        <NetworkStatusPanel
+          status={networkStatus}
+          onTriggerSync={triggerNetworkSync}
+          isSyncing={isSyncingNetwork}
+        />
+      )}
+
       {/* Error Alert if any */}
       {error && (
         <div className="rounded-lg border border-fault/50 bg-fault/10 p-3 mono text-xs text-fault">
@@ -142,15 +173,14 @@ export function CivilizationObservatory() {
           <div className="flex items-center justify-between rounded-lg border border-hairline bg-panel px-3 py-2 mono text-xs shrink-0 shadow-sm">
             <div className="flex items-center gap-1">
               <span className="text-muted font-semibold text-xs mr-2">VIEW_SURFACE:</span>
-              {(["MAP", "CAPABILITY_MARKET", "MACHINE_ECONOMY", "DEALS", "EVOLUTION", "GENERATIONS"] as const).map((mode) => (
+              {(["NETWORK", "MAP", "AGENTS", "MARKET", "CAPABILITY_MARKET", "MACHINE_ECONOMY", "DEALS", "EVOLUTION", "GENERATIONS"] as const).map((mode) => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
-                    viewMode === mode
+                  className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${viewMode === mode
                       ? "bg-signal/20 text-signal border border-signal/40 font-bold"
                       : "text-muted hover:bg-panel-high hover:text-ink border border-transparent"
-                  }`}
+                    }`}
                 >
                   {mode.replace("_", " ")}
                 </button>
@@ -164,6 +194,19 @@ export function CivilizationObservatory() {
 
           {/* Surface View Content */}
           <div className="flex-1 min-h-0 overflow-y-auto">
+            {viewMode === "NETWORK" && (
+              <div className="p-4 rounded-xl border border-hairline bg-panel space-y-4">
+                <h3 className="text-sm font-semibold tracking-wide uppercase text-ink">
+                  Technocore Public Network Synchronization Telemetry
+                </h3>
+                <NetworkStatusPanel
+                  status={networkStatus}
+                  onTriggerSync={triggerNetworkSync}
+                  isSyncing={isSyncingNetwork}
+                />
+              </div>
+            )}
+
             {viewMode === "MAP" && (
               <CivilizationMap
                 worldState={worldState}
@@ -172,16 +215,43 @@ export function CivilizationObservatory() {
               />
             )}
 
-            {viewMode === "CAPABILITY_MARKET" && worldState && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-                <CapabilityMarket
-                  capabilities={worldState.metrics.capabilityEconomy}
-                />
-                <CivilizationHealth
-                  health={worldState.metrics.health}
-                />
-              </div>
+            {viewMode === "AGENTS" && (
+              <AgentDirectory
+                events={allEvents}
+                selectedDid={selectedTarget.type === "agent" ? selectedTarget.did : undefined}
+                onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+              />
             )}
+
+            {viewMode === "MARKET" && (
+              <MarketplaceView
+                events={allEvents}
+                selectedOpportunityId={selectedTarget.type === "opportunity" ? selectedTarget.opportunityId : undefined}
+                onSelectOpportunity={(opportunityId) => setSelectedTarget({ type: "opportunity", opportunityId })}
+                onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+                provenance={provenance}
+                isLiveMode={mode === "LIVE"}
+              />
+            )}
+
+            {viewMode === "CAPABILITY_MARKET" && (
+              worldState ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
+                  <CapabilityMarket
+                    capabilities={worldState.metrics.capabilityEconomy}
+                  />
+                  <CivilizationHealth
+                    health={worldState.metrics.health}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center text-muted border border-dashed border-hairline rounded-lg">
+                  <p className="font-semibold text-sm">INSUFFICIENT PUBLIC DATA</p>
+                  <p className="text-xs mt-1">Autonomous capabilities and machine health metrics require active network telemetry.</p>
+                </div>
+              )
+            )}
+
 
             {viewMode === "MACHINE_ECONOMY" && worldState && (
               <EconomyDashboard
@@ -234,13 +304,16 @@ export function CivilizationObservatory() {
 
         {/* Right Column: Contextual Inspector or Live Event Stream (5 Cols) */}
         <div className="lg:col-span-5 flex flex-col gap-3 h-full min-h-0 overflow-hidden">
-          {selectedAgent && (
+          {selectedTarget.type === "agent" && (
             <AgentInspector
-              profile={selectedAgent.profile}
-              reputation={worldState?.reputations.get(selectedAgent.identity.did)}
+              did={selectedTarget.did}
+              profile={selectedAgent?.profile}
+              reputation={worldState?.reputations.get(selectedTarget.did)}
               allEvents={allEvents}
               onClose={() => setSelectedTarget({ type: "none" })}
               onSelectEvent={(eventId) => setSelectedTarget({ type: "event", eventId })}
+              onSelectDeal={(contractId) => setSelectedTarget({ type: "deal", contractId })}
+              onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
             />
           )}
 
@@ -271,6 +344,17 @@ export function CivilizationObservatory() {
               onClose={() => setSelectedTarget({ type: "none" })}
               onSelectEvent={(eventId) => setSelectedTarget({ type: "event", eventId })}
               onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+            />
+          )}
+
+          {selectedTarget.type === "opportunity" && (
+            <OpportunityInspector
+              opportunityId={selectedTarget.opportunityId}
+              events={allEvents}
+              onClose={() => setSelectedTarget({ type: "none" })}
+              onSelectAgent={(did) => setSelectedTarget({ type: "agent", did })}
+              onSelectEvent={(eventId) => setSelectedTarget({ type: "event", eventId })}
+              onSelectDeal={(contractId) => setSelectedTarget({ type: "deal", contractId })}
             />
           )}
 
@@ -308,7 +392,8 @@ export function CivilizationObservatory() {
             />
           )}
 
-          {!selectedAgent &&
+          {selectedTarget.type !== "agent" &&
+            selectedTarget.type !== "opportunity" &&
             !selectedMission &&
             !selectedDispute &&
             !selectedDeal &&
@@ -373,6 +458,8 @@ export function CivilizationObservatory() {
         onSetSpeed={setSpeed}
         onSetMode={setExecutionMode}
         onRunDemo={runCompleteDemo}
+        isLiveMode={mode === "LIVE"}
+        onToggleMode={toggleMode}
       />
     </div>
   );

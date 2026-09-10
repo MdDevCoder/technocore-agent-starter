@@ -11,6 +11,8 @@
 import type { CivilizationEvent } from "../../civilization/types/events.ts";
 
 export type DealStatus = "proposed" | "accepted" | "locked" | "claimed" | "refunded" | "cancelled";
+export type DealProvenance = "LOCAL_DEMO" | "NETWORK_OBSERVED" | "NETWORK_EXECUTED";
+export type DealVerificationStatus = "VERIFIED" | "UNVERIFIED" | "REJECTED";
 
 export interface ObservatoryDealView {
   readonly contractId: string;
@@ -18,6 +20,8 @@ export interface ObservatoryDealView {
   readonly payerDid: string;
   readonly payeeDid: string;
   readonly status: DealStatus;
+  readonly provenance?: DealProvenance;
+  readonly verificationStatus?: DealVerificationStatus;
   readonly amount: string;
   readonly asset: string;
   readonly lockKind: "hash" | "point";
@@ -42,3 +46,4 @@ export interface ObservatoryDealView {
 export type DealFilterStatus = "ALL" | "proposed" | "accepted" | "locked" | "claimed" | "refunded" | "cancelled";
 export type DealRoleFilter = "ALL" | "PAYER" | "PAYEE";
 export type DealRailFilter = "ALL" | "paper" | "memory";
+export type DealProvenanceFilter = "ALL" | "LOCAL_DEMO" | "NETWORK_OBSERVED" | "NETWORK_EXECUTED";

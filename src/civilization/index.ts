@@ -105,3 +105,6 @@ export * from "./runtime/llm-config.ts";
 // Phase 13: Technocore Lock Protocol (tclk/1) Deals
 export * from "./deals/tclk/index.ts";
 
+// Phase 14B: Reputation-Aware Agent Marketplace & Counterparty Selection
+export * from "./market/index.ts";
+

@@ -125,6 +125,28 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, Math.trunc(value)));
 }
 
+export function kvReadPath(ns: string, key: string): string {
+  return `/kv/${encodeURIComponent(ns)}/${encodeURIComponent(key)}`;
+}
+
+export function kvSetPath(
+  ns: string,
+  key: string,
+  value: string,
+  condition?: { ifAbsent?: boolean; if?: string },
+): string {
+  const base = `/kv/${encodeURIComponent(ns)}/${encodeURIComponent(key)}/set/${encodeURIComponent(value)}`;
+  if (!condition) return base;
+  const params = new URLSearchParams();
+  if (condition.ifAbsent) {
+    params.set("ifAbsent", "true");
+  } else if (condition.if !== undefined) {
+    params.set("if", condition.if);
+  }
+  const query = params.toString();
+  return query ? `${base}?${query}` : base;
+}
+
 /**
  * Allow-list of request paths the app may ever produce.
  *
@@ -135,6 +157,8 @@ function clamp(value: number, min: number, max: number): number {
 export const ALLOWED_PATHS: readonly RegExp[] = [
   /^\/kv\/did\/[0-9a-f]{16}\/set\/[A-Za-z0-9%._~-]+$/,
   /^\/kv\/did\/[0-9a-f]{16}$/,
+  /^\/kv\/tclk-paper-[0-9a-f]{2}\/[0-9a-f]{14}$/,
+  /^\/kv\/tclk-paper-[0-9a-f]{2}\/[0-9a-f]{14}\/set\/[A-Za-z0-9%._~+ -]+(?:\?(?:if|ifAbsent)=[A-Za-z0-9%._~+ -]+)?$/,
   /^\/r\/[a-z0-9][a-z0-9_-]{0,47}\?format=json$/,
   /^\/r\/[a-z0-9][a-z0-9_-]{0,47}\?format=json(?:&limit=\d+)?(?:&since=\d+)?(?:&wait=\d+)?$/,
 ];
@@ -142,3 +166,4 @@ export const ALLOWED_PATHS: readonly RegExp[] = [
 export function isAllowedPath(path: string): boolean {
   return ALLOWED_PATHS.some((pattern) => pattern.test(path));
 }
+

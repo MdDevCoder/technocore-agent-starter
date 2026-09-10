@@ -22,6 +22,8 @@ interface SimulationControlsProps {
   readonly onSetSpeed: (speed: number) => void;
   readonly onSetMode: (mode: NetworkExecutionMode) => void;
   readonly onRunDemo: () => void;
+  readonly isLiveMode?: boolean;
+  readonly onToggleMode?: () => void;
 }
 
 export const SimulationControls: React.FC<SimulationControlsProps> = ({
@@ -36,7 +38,31 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
   onSetSpeed,
   onSetMode,
   onRunDemo,
+  isLiveMode = false,
+  onToggleMode,
 }) => {
+  if (isLiveMode) {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-panel p-3.5 shadow-xl backdrop-blur-md mono text-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="font-bold text-emerald-400">LIVE OBSERVATORY ACTIVE:</span>
+          <span className="text-muted text-[11px] hidden sm:inline">
+            Rendering authentic persisted event ledger and derived trust projections. Synthetic world ticks are in standby.
+          </span>
+        </div>
+        {onToggleMode && (
+          <button
+            onClick={onToggleMode}
+            className="flex items-center gap-1.5 rounded-md bg-amber-500/20 border border-amber-500/40 px-3.5 py-1.5 font-bold text-amber-400 hover:bg-amber-500/30 transition-colors cursor-pointer"
+          >
+            <span>⚙</span>
+            <span>ENTER SIMULATION MODE</span>
+          </button>
+        )}
+      </div>
+    );
+  }
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-hairline bg-panel p-3.5 shadow-xl backdrop-blur-md mono text-xs">
       {/* Primary Actions */}
@@ -93,11 +119,10 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
             <button
               key={s}
               onClick={() => onSetSpeed(s)}
-              className={`rounded px-2.5 py-1 text-xs border transition-colors ${
-                speedMultiplier === s
+              className={`rounded px-2.5 py-1 text-xs border transition-colors ${speedMultiplier === s
                   ? "bg-signal/20 text-signal border-signal/40 font-bold"
                   : "bg-graphite text-muted border-hairline hover:text-ink font-medium"
-              }`}
+                }`}
             >
               {s}x
             </button>
@@ -109,32 +134,29 @@ export const SimulationControls: React.FC<SimulationControlsProps> = ({
           <span className="text-muted font-semibold text-xs mr-1">MODE:</span>
           <button
             onClick={() => onSetMode("SIMULATION")}
-            className={`rounded px-2.5 py-1 text-xs border transition-colors ${
-              executionMode === "SIMULATION"
+            className={`rounded px-2.5 py-1 text-xs border transition-colors ${executionMode === "SIMULATION"
                 ? "bg-signal/20 text-signal border-signal/40 font-bold"
                 : "bg-graphite text-muted border-hairline hover:text-ink font-medium"
-            }`}
+              }`}
           >
             SIMULATION
           </button>
           <button
             onClick={() => onSetMode("REMOTE_AGENT")}
-            className={`rounded px-2.5 py-1 text-xs border transition-colors ${
-              executionMode === "REMOTE_AGENT"
+            className={`rounded px-2.5 py-1 text-xs border transition-colors ${executionMode === "REMOTE_AGENT"
                 ? "bg-signal/20 text-signal border-signal/40 font-bold"
                 : "bg-graphite text-muted border-hairline hover:text-ink font-medium"
-            }`}
+              }`}
             title="Independent Agent Daemon"
           >
             REMOTE DAEMON
           </button>
           <button
             onClick={() => onSetMode("PERSISTENT_NETWORK")}
-            className={`rounded px-2.5 py-1 text-xs border transition-colors ${
-              executionMode === "PERSISTENT_NETWORK"
+            className={`rounded px-2.5 py-1 text-xs border transition-colors ${executionMode === "PERSISTENT_NETWORK"
                 ? "bg-signal/20 text-signal border-signal/40 font-bold"
                 : "bg-graphite text-muted border-hairline hover:text-ink font-medium"
-            }`}
+              }`}
             title="SQL Persistent Ledger"
           >
             PERSISTENT SQL

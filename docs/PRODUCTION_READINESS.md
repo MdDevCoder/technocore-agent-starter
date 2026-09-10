@@ -48,3 +48,7 @@ This document establishes the definitive production readiness status for the **T
 2. **PostgreSQL Production Invariant**: When `NODE_ENV=production`, the application refuses to boot if `DATABASE_URL` is missing or not a valid PostgreSQL URI. SQLite is strictly confined to local development and reference testing.
 3. **Deterministic State Invariant**: Rebuilding civilization projections from event sequence `#0` to `#N` produces identical state hashes on every node.
 4. **Rate Limit & Denial of Service Invariant**: Every public entrypoint enforces token-bucket rate limits per DID/IP and caps JSON payloads to 256 KB.
+5. **Universal Data Provenance Invariant (Phase 17)**: Every displayed value must have an explicit provenance (`LIVE_NETWORK`, `LIVE_PERSISTENCE`, `DERIVED_FROM_LIVE_EVENTS`, `LOCAL_SIMULATION`, `LOCAL_DEMO`, `REHEARSAL`). Live mode must never silently substitute synthetic fixtures.
+6. **Protocol Accounting vs Real Money Invariant (Phase 17)**: Simulated PaperRail and MemoryRail balances are strictly disclosed as rehearsal protocol accounting with zero fiat or real cryptocurrency settlement.
+7. **Graceful Offline Degradation Invariant (Phase 17)**: Network outages preserve the last known verified sequence and display `STATUS: OFFLINE` without falling back to mock fixtures.
+

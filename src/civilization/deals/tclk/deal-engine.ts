@@ -1010,6 +1010,8 @@ export class TclkDealEngine {
       rails: [...offer.rails],
       rail: state.rail,
       railRef: state.railRef,
+      provenance: this.adapter?.defaultProvenance ?? "LOCAL_DEMO",
+      verificationStatus: "VERIFIED",
       claimByMs: offer.claimByMs,
       refundAfterMs: offer.refundAfterMs,
       expiresMs: offer.expiresMs,

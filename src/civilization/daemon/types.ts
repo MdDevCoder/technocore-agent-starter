@@ -16,6 +16,8 @@ import type { LLMProvider } from "../runtime/providers/types.ts";
 import type { DealPublicState } from "../deals/tclk/types.ts";
 import type { DealEngineConfig } from "../deals/tclk/deal-engine.ts";
 import type { OfferFrame } from "@flop-labs/tclk";
+import type { CounterpartyRankingPolicy, ProcurementRankingPolicy } from "../market/types.ts";
+import type { AgentReputationSummary, ConfidenceLevel } from "../reputation/types.ts";
 
 export type DaemonState =
   | "UNINITIALIZED"
@@ -46,11 +48,16 @@ export interface DealPolicy {
   readonly allowedLockKinds?: readonly ("hash" | "point")[];
   readonly allowedCounterparties?: readonly string[];
   readonly disallowedCounterparties?: readonly string[];
+  readonly minReputationScore?: number;
+  readonly minConfidenceLevel?: ConfidenceLevel;
   readonly minClaimBufferMs?: number;
   readonly maxExpirationBufferMs?: number;
+  readonly rankingPolicy?: CounterpartyRankingPolicy;
+  readonly procurementPolicy?: ProcurementRankingPolicy;
   readonly evaluateOffer?: (
     offer: OfferFrame,
     publicState?: DealPublicState,
+    counterpartyReputation?: AgentReputationSummary,
   ) => boolean | { accept: boolean; reason?: string };
 }
 

@@ -17,3 +17,4 @@ agent_key.json
 *.technocore-identity.json
 *.key
 *.pem
+.technocore/
