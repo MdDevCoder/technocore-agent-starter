@@ -149,17 +149,23 @@ export const FreshnessBanner: React.FC<FreshnessBannerProps> = ({
         {/* Freshness Status */}
         <div className="flex items-center gap-1.5 text-muted text-[11px]">
           <span>STATUS:</span>
-          {metadata.freshness === "LIVE" && (
-            <span className="text-emerald-400 font-bold">ONLINE & SYNCED</span>
-          )}
-          {metadata.freshness === "UPDATING" && (
-            <span className="text-sky-400 font-bold animate-pulse">UPDATING...</span>
-          )}
-          {metadata.freshness === "STALE" && (
-            <span className="text-amber-400 font-bold">STALE (Auto-refresh recommended)</span>
-          )}
-          {metadata.freshness === "OFFLINE" && (
-            <span className="text-rose-400 font-bold">OFFLINE (Showing last verified state)</span>
+          {isLiveMode ? (
+            <>
+              {metadata.freshness === "LIVE" && (
+                <span className="text-emerald-400 font-bold">● LIVE / SYNCED</span>
+              )}
+              {metadata.freshness === "UPDATING" && (
+                <span className="text-sky-400 font-bold animate-pulse">SYNCING / CONNECTING...</span>
+              )}
+              {metadata.freshness === "STALE" && (
+                <span className="text-amber-400 font-bold">NETWORK STALE</span>
+              )}
+              {metadata.freshness === "OFFLINE" && (
+                <span className="text-rose-400 font-bold">OFFLINE (Showing last verified state)</span>
+              )}
+            </>
+          ) : (
+            <span className="text-amber-400 font-bold">⚙ SIMULATION ACTIVE</span>
           )}
         </div>
 

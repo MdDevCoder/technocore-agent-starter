@@ -124,6 +124,7 @@ export function useCivilizationEngine(initialSeed = "technocore-observatory-01")
     createProvenanceMetadata({
       provenance: "LIVE_PERSISTENCE",
       source: "/api/civilization/events",
+      freshness: "UPDATING",
       verified: true,
     })
   );

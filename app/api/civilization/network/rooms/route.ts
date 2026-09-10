@@ -22,7 +22,13 @@ export async function OPTIONS() {
 export async function GET() {
   try {
     const store = getServerObservationStore();
-    const cursors = await store.getAllCursors();
+    let cursors = await store.getAllCursors();
+    if (cursors.length === 0) {
+      const { getServerNetworkIndexer } = await import("../../../../../src/civilization/gateway/server.ts");
+      const indexer = getServerNetworkIndexer();
+      const status = await indexer.syncOnce({ discoverPublicRooms: true, maxMessagesPerRoom: 50, timeoutMs: 5000 });
+      cursors = status.trackedRooms;
+    }
 
     return NextResponse.json(
       {

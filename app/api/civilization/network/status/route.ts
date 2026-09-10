@@ -24,7 +24,10 @@ export async function OPTIONS() {
 export async function GET() {
   try {
     const indexer = getServerNetworkIndexer();
-    const status = await indexer.getStatus();
+    let status = await indexer.getStatus();
+    if (status.trackedRooms.length === 0) {
+      status = await indexer.syncOnce({ discoverPublicRooms: true, maxMessagesPerRoom: 50, timeoutMs: 5000 });
+    }
 
     return NextResponse.json(
       {

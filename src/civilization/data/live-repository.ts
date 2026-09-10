@@ -10,6 +10,7 @@
 import type { CivilizationEvent } from "../types/events.ts";
 import {
   type DataProvenanceMetadata,
+  type DataFreshness,
   createProvenanceMetadata,
   evaluateFreshness,
 } from "./provenance.ts";
@@ -95,7 +96,21 @@ export class LiveCivilizationRepository {
       });
     }
 
-    const freshness = this.isOffline ? "OFFLINE" : evaluateFreshness(this.lastFetchedAt);
+    let freshness: DataFreshness = "OFFLINE";
+    if (this.isOffline) {
+      freshness = "OFFLINE";
+    } else if (this.networkStatus !== null) {
+      if (!this.networkStatus.isOnline) {
+        freshness = "OFFLINE";
+      } else if (this.networkStatus.syncLagMs !== null && this.networkStatus.syncLagMs >= 35000) {
+        freshness = "STALE";
+      } else {
+        freshness = "LIVE";
+      }
+    } else {
+      freshness = evaluateFreshness(this.lastFetchedAt);
+    }
+
     return createProvenanceMetadata({
       provenance: "LIVE_PERSISTENCE",
       source: this.apiBase,
