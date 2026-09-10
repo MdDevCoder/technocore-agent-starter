@@ -170,14 +170,14 @@ export function CivilizationObservatory() {
         {/* Left Column: Visual Map / Market / Economy / Evolution Views (7 Cols on large screen) */}
         <div className="lg:col-span-7 flex flex-col gap-3 h-full min-h-0 overflow-hidden">
           {/* View Mode Switcher */}
-          <div className="flex items-center justify-between rounded-lg border border-hairline bg-panel px-3 py-2 mono text-xs shrink-0 shadow-sm">
-            <div className="flex items-center gap-1">
-              <span className="text-muted font-semibold text-xs mr-2">VIEW_SURFACE:</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-hairline bg-panel p-2 px-3 mono text-xs shrink-0 shadow-sm">
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto min-w-0">
+              <span className="text-muted font-semibold text-xs mr-1 shrink-0">VIEW_SURFACE:</span>
               {(["NETWORK", "MAP", "AGENTS", "MARKET", "CAPABILITY_MARKET", "MACHINE_ECONOMY", "DEALS", "EVOLUTION", "GENERATIONS"] as const).map((mode) => (
                 <button
                   key={mode}
                   onClick={() => setViewMode(mode)}
-                  className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${viewMode === mode
+                  className={`rounded px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors shrink-0 ${viewMode === mode
                       ? "bg-signal/20 text-signal border border-signal/40 font-bold"
                       : "text-muted hover:bg-panel-high hover:text-ink border border-transparent"
                     }`}
@@ -187,8 +187,9 @@ export function CivilizationObservatory() {
               ))}
             </div>
 
-            <div className="mono text-xs text-muted font-medium">
-              ENGINE SEED: <span className="text-signal font-bold">technocore-observatory-01</span>
+            <div className="mono text-[11px] text-muted font-medium whitespace-nowrap shrink-0 hidden sm:inline-flex items-center gap-1">
+              <span>ENGINE SEED:</span>
+              <span className="text-signal font-bold">technocore-observatory-01</span>
             </div>
           </div>
 
