@@ -1,8 +1,8 @@
 # Phase 20: Production Deployment & Live-Site Verification Report
 
-**Canonical Checkpoint:** Commit `ecab017` on branch `main`  
+**Canonical Checkpoint:** Commit `f0c9849` on branch `main` (Fixes Vercel build `eqeqeq` lint blocker in `ecab017`)  
 **Repository:** [https://github.com/MdDevCoder/technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)  
-**Date & Timestamp:** 2026-09-10T17:06:00Z  
+**Date & Timestamp:** 2026-09-10T17:07:00Z  
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Category | Status | Details |
 | :--- | :--- | :--- |
-| **CODE PUSHED** | **YES** | Commit `ecab017` confirmed present on `origin/main` ([technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)). Working tree is clean and aligned. |
+| **CODE PUSHED** | **YES** | Commit `f0c9849` confirmed present on `origin/main` ([technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)). Working tree is clean and aligned. |
 | **DEPLOYED** | **READY / HOSTING DEPENDENCY** | Local production build (`npm run build`) succeeded with 0 errors. App runs production runtime bundle with verified server & API routes. External cloud hosting (e.g. Vercel/Fly.io/VPS) requires provisioning user API keys/credentials if deploying beyond existing infrastructure. |
 | **LIVE NETWORK VERIFIED** | **YES** | Continuous background indexer actively reads `https://technocore.chat`, persists sequence cursors, feeds SQLite/PostgreSQL, evaluates cryptographic verification, and streams live telemetry via REST and SSE to the Observatory UI. |
 
