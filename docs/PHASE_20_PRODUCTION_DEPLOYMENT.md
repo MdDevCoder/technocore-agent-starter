@@ -1,8 +1,8 @@
 # Phase 20: Production Deployment & Live-Site Verification Report
 
-**Canonical Checkpoint:** Commit `f76c9db` on branch `main` (Fixes live-data status consistency & cold-start discovery)  
+**Canonical Checkpoint:** Commit `15c827e` on branch `main` (Fixes serverless/cold-start observation store schema auto-init)  
 **Repository:** [https://github.com/MdDevCoder/technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)  
-**Date & Timestamp:** 2026-09-10T18:30:00Z  
+**Date & Timestamp:** 2026-09-10T18:50:00Z  
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Category | Status | Details |
 | :--- | :--- | :--- |
-| **CODE PUSHED** | **YES** | Commit `f76c9db` confirmed present on `origin/main` ([technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)). Working tree is clean and aligned. |
+| **CODE PUSHED** | **YES** | Commit `15c827e` confirmed present on `origin/main` ([technocore-agent-starter](https://github.com/MdDevCoder/technocore-agent-starter)). Working tree is clean and aligned. |
 | **DEPLOYED** | **READY / HOSTING DEPENDENCY** | Local production build (`npm run build`) succeeded with 0 errors. App runs production runtime bundle with verified server & API routes. External cloud hosting (e.g. Vercel/Fly.io/VPS) requires provisioning user API keys/credentials if deploying beyond existing infrastructure. |
 | **LIVE NETWORK VERIFIED** | **YES** | Continuous background indexer actively reads `https://technocore.chat`, persists sequence cursors, feeds SQLite/PostgreSQL, evaluates cryptographic verification, and streams live telemetry via REST and SSE to the Observatory UI. |
 
