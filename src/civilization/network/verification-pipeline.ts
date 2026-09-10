@@ -28,10 +28,10 @@ import type {
  */
 export function computeRawHash(rawMsg: RawPublicWireMessage): string {
   const hash = createHash("sha256");
-  hash.update(rawMsg.text != null ? String(rawMsg.text) : "");
-  hash.update(rawMsg.nonce != null ? String(rawMsg.nonce) : "");
-  hash.update(rawMsg.did != null ? String(rawMsg.did) : "");
-  hash.update(rawMsg.sig != null ? String(rawMsg.sig) : "");
+  hash.update(rawMsg.text !== undefined && rawMsg.text !== null ? String(rawMsg.text) : "");
+  hash.update(rawMsg.nonce !== undefined && rawMsg.nonce !== null ? String(rawMsg.nonce) : "");
+  hash.update(rawMsg.did !== undefined && rawMsg.did !== null ? String(rawMsg.did) : "");
+  hash.update(rawMsg.sig !== undefined && rawMsg.sig !== null ? String(rawMsg.sig) : "");
   return hash.digest("hex");
 }
 
@@ -46,8 +46,8 @@ export class VerificationPipeline {
     const rawHash = computeRawHash(rawMsg);
     const did = rawMsg.did ? String(rawMsg.did).trim() : null;
     const sig = rawMsg.sig ? String(rawMsg.sig).trim() : null;
-    const nonce = rawMsg.nonce != null ? String(rawMsg.nonce).trim() : "";
-    const text = rawMsg.text != null ? String(rawMsg.text) : "";
+    const nonce = rawMsg.nonce !== undefined && rawMsg.nonce !== null ? String(rawMsg.nonce).trim() : "";
+    const text = rawMsg.text !== undefined && rawMsg.text !== null ? String(rawMsg.text) : "";
 
     // 1. Signature Verification
     let status: VerificationStatus = "UNVERIFIABLE_UNSIGNED";
