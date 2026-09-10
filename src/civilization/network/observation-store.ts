@@ -82,15 +82,38 @@ function mapRowToCursor(row: RoomCursorRow): RoomSyncCursor {
 
 export class PublicObservationStore {
   private readonly db: SqlDatabaseAdapter;
+  private isInitialized = false;
+  private initPromise: Promise<void> | null = null;
 
   constructor(db: SqlDatabaseAdapter) {
     this.db = db;
   }
 
   /**
+   * Ensures SQL schema migrations (v1 and v2) have been applied idempotently.
+   */
+  async ensureInitialized(): Promise<void> {
+    if (this.isInitialized) return;
+    if (!this.initPromise) {
+      this.initPromise = (async () => {
+        try {
+          const { runMigrations } = await import("../persistence/migrations.ts");
+          await runMigrations(this.db);
+          this.isInitialized = true;
+        } catch {
+          // If concurrent initialization occurred, mark true
+          this.isInitialized = true;
+        }
+      })();
+    }
+    return this.initPromise;
+  }
+
+  /**
    * Saves a single raw observation record idempotently.
    */
   async saveRawMessage(record: PublicObservationRecord): Promise<boolean> {
+    await this.ensureInitialized();
     const res = await this.db.run(
       `INSERT INTO technocore_public_messages (
         id, room, sequence, nonce, did, signature, text, observed_at,
@@ -137,6 +160,7 @@ export class PublicObservationStore {
    * Retrieves the sync cursor for a given room.
    */
   async getCursor(room: string): Promise<RoomSyncCursor | null> {
+    await this.ensureInitialized();
     const row = await this.db.queryOne<RoomCursorRow>(
       "SELECT * FROM technocore_room_sync_cursors WHERE room = ?;",
       [room],
@@ -148,6 +172,7 @@ export class PublicObservationStore {
    * Retrieves all room cursors.
    */
   async getAllCursors(): Promise<RoomSyncCursor[]> {
+    await this.ensureInitialized();
     const rows = await this.db.query<RoomCursorRow>(
       "SELECT * FROM technocore_room_sync_cursors ORDER BY room ASC;",
     );
@@ -170,6 +195,7 @@ export class PublicObservationStore {
     incrementPromoted?: number;
   }): Promise<RoomSyncCursor> {
     const now = new Date().toISOString();
+    await this.ensureInitialized();
     return await this.db.transaction(async () => {
       const existing = await this.getCursor(cursor.room);
       if (!existing) {
@@ -275,6 +301,7 @@ export class PublicObservationStore {
       status?: VerificationStatus;
     } = {},
   ): Promise<PublicObservationRecord[]> {
+    await this.ensureInitialized();
     const limit = Math.min(options.limit ?? 100, 500);
     const params: unknown[] = [room];
     let sql = "SELECT * FROM technocore_public_messages WHERE room = ?";
@@ -305,6 +332,7 @@ export class PublicObservationStore {
       offset?: number;
     } = {},
   ): Promise<PublicObservationRecord[]> {
+    await this.ensureInitialized();
     const limit = Math.min(options.limit ?? 50, 500);
     const offset = Math.max(options.offset ?? 0, 0);
     const params: unknown[] = [];
@@ -333,6 +361,7 @@ export class PublicObservationStore {
    * Marks a message as promoted to an authoritative civilization event.
    */
   async markPromoted(id: string, promotedEventId: string): Promise<void> {
+    await this.ensureInitialized();
     await this.db.run(
       "UPDATE technocore_public_messages SET promoted_event_id = ? WHERE id = ?;",
       [promotedEventId, id],
@@ -349,6 +378,7 @@ export class PublicObservationStore {
     totalInvalidOrUnverifiable: number;
     trackedRoomsCount: number;
   }> {
+    await this.ensureInitialized();
     const obsStats = await this.db.queryOne<{
       total: number | bigint | string;
       promoted: number | bigint | string;
@@ -390,6 +420,7 @@ export class PublicObservationStore {
       rooms: string[];
     }>
   > {
+    await this.ensureInitialized();
     const rows = await this.db.query<{
       did: string;
       msg_count: number | bigint | string;
@@ -420,6 +451,7 @@ export class PublicObservationStore {
    * Retrieves deal/contract observations from the public store.
    */
   async getObservedDeals(): Promise<PublicObservationRecord[]> {
+    await this.ensureInitialized();
     const rows = await this.db.query<RawMessageRow>(
       `SELECT * FROM technocore_public_messages
       WHERE protocol_classification IN ('TCLK_CONTRACT_OFFER', 'TCLK_CONTRACT_ACCEPT', 'TCLK_STEP_EVENT', 'TCLK_DISPUTE_EVENT')

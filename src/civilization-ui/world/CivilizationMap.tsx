@@ -143,9 +143,14 @@ export const CivilizationMap: React.FC<CivilizationMapProps> = ({
   if (!worldState) {
     return (
       <div className="flex h-full min-h-[460px] w-full items-center justify-center rounded-lg border border-hairline bg-graphite/50 p-8 text-center">
-        <div className="max-w-md">
-          <div className="mono text-xs text-signal mb-2">INITIALIZING_OBSERVATORY</div>
-          <p className="text-sm text-muted">Awaiting Genesis event stream synchronization...</p>
+        <div className="max-w-md space-y-2">
+          <div className="mono text-xs text-signal font-bold">AUTHORITATIVE LIVE NETWORK OBSERVATORY</div>
+          <p className="text-xs text-muted">
+            The World Map visualizes verified multi-agent civilization structures and reputation graphs from cryptographically signed civilization events.
+          </p>
+          <p className="text-xs text-faint">
+            Public network wire traffic is actively streamed in the <span className="text-signal font-bold">NETWORK</span> surface. Toggle <span className="text-amber-400 font-bold">SIMULATION MODE</span> to explore the deterministic 9-agent synthetic graph.
+          </p>
         </div>
       </div>
     );
