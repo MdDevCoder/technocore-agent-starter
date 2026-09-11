@@ -111,8 +111,24 @@ export class VerificationPipeline {
 
       }
     } catch {
-      // Not a TCLK single-line frame, inspect JSON or raw text
-      if (trimmedText.startsWith("{") && trimmedText.endsWith("}")) {
+      // If starts with tclk prefix but failed strict canonical decoding
+      if (trimmedText.startsWith("tclk1 ") || trimmedText.startsWith("tclk ")) {
+        const tclkJsonStr = trimmedText.replace(/^tclk[0-9]*\s+/, "");
+        if (tclkJsonStr.startsWith("{") && tclkJsonStr.endsWith("}")) {
+          try {
+            const json = JSON.parse(tclkJsonStr) as Record<string, unknown>;
+            parsedPayload = json;
+            if (json && typeof json === "object" && typeof json.type === "string") {
+              if (json.type === "offer") classification = "TCLK_CONTRACT_OFFER";
+              else if (json.type === "accept") classification = "TCLK_CONTRACT_ACCEPT";
+              else if (["dispute", "verdict"].includes(json.type)) classification = "TCLK_DISPUTE_EVENT";
+              else classification = "TCLK_STEP_EVENT";
+            }
+          } catch {
+            // not valid json
+          }
+        }
+      } else if (trimmedText.startsWith("{") && trimmedText.endsWith("}")) {
         try {
           const json = JSON.parse(trimmedText) as Record<string, unknown>;
           parsedPayload = json;

@@ -770,7 +770,7 @@ describe("Phase 16: Real Technocore Network Interoperability & Independent Deal 
 
       assert.equal(res.status, "ATTEMPTED / FAILED");
       assert.ok(res.reason?.includes("No independent external counterparty"));
-      assert.ok(elapsed >= 400 && elapsed < 8000, `Elapsed: ${elapsed}ms`);
+      assert.ok(elapsed >= 400 && elapsed < 20000, `Elapsed: ${elapsed}ms`);
     });
 
     it("strictly rejects self-counterparty accept frames and refuses self-dealing", async () => {

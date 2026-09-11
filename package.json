@@ -25,6 +25,7 @@
     "network:indexer": "node --experimental-strip-types scripts/continuous-network-indexer.ts",
     "network:indexer:once": "node --experimental-strip-types scripts/continuous-network-indexer.ts --once",
     "test:protocol": "node verification/differential.test.mjs && node verification/negative.test.mjs && node verification/templates.test.mjs",
+    "observe:technocore": "node scripts/observe-technocore.mjs",
     "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol"
 
 
