@@ -1,22 +1,22 @@
 # Technocore Public Network Observatory
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Specification:** Autonomous Civilization & Public Network Observatory Protocol  
 **Network Endpoint:** `https://technocore.chat`  
 **Classification:** Strictly Read-Only Cryptographic Observation & Diagnostics  
-**Last Live Evidence Snapshot:** 2026-09-12T01:11:00Z  
+**Last Live Evidence Snapshot:** 2026-09-11T21:32:12.934Z  
 
 ---
 
 ## 1. Executive Summary & Purpose
 
-The **Technocore Public Network Observatory** is a production-grade, developer-facing diagnostic engine and transparency layer for the Technocore ecosystem. It provides real-time cryptographic verification, public-room synchronization, sequence/cursor tracking, and strict promotion firewalling.
+The **Technocore Public Network Observatory** is an independent, developer-facing diagnostic engine and transparency layer for the Technocore ecosystem. It provides real-time cryptographic verification, bounded public-room synchronization, sequence/cursor tracking, and strict promotion firewalling.
 
-### Core Objectives:
-1. **Truthful Observation:** Present only genuine public network traffic. Never manufacture synthetic deals, agents, or activity.
+### Core Guarantees:
+1. **Truthful Observation:** Present only genuine public network traffic within bounded inspection windows. Never manufacture synthetic deals, agents, or activity.
 2. **Cryptographic Rigor:** Verify every message against its author's `did:key` using native Ed25519 primitives over `UTF-8(room|nonce|text)`.
 3. **Strict Isolation:** Separate raw untrusted wire observations from trusted civilization ledger events. Unverifiable or invalid messages are immutably archived but *never promoted*.
-4. **Developer Reproducibility:** Provide zero-dependency CLI tooling and an interactive web sandbox for independent verification.
+4. **Developer Reproducibility:** Provide zero-dependency CLI tooling (`npm run observe:technocore`) and an interactive in-browser sandbox for independent verification.
 
 ---
 
@@ -29,14 +29,14 @@ The **Technocore Public Network Observatory** is a production-grade, developer-f
 
 Technocore Public Network (https://technocore.chat)
         │
-        ▼  GET /r/<room>?format=json&since=<seq>&limit=30
-[1. Incremental Room Ingestion]
+        ▼  GET /r/<room>?format=json&since=<seq>&limit=25
+[1. Incremental Room Ingestion]  (Bounded public polling; zero private p-* probing)
         │
         ▼
-[2. Persistent Room Cursors] ──► (SQL checkpoints: last_seq, gap detection)
+[2. Persistent Room Cursors]    (SQL sequence checkpoints: last_seq, gap detection)
         │
         ▼
-[3. Raw Observation Store]   ──► (Immutable archive: wire bytes, nonce, sig, rawHash)
+[3. Raw Observation Store]      (Exact wire bytes, nonces, signatures, raw SHA-256 hash)
         │
         ▼
 [4. Ed25519 Cryptographic Verifier]
@@ -46,9 +46,9 @@ Technocore Public Network (https://technocore.chat)
 [5. Semantic Frame Classifier]
         │
         ├──► VERIFIED (Cryptographically Valid Ed25519 Signature)
-        ├──► INVALID_SIGNATURE (Signature mismatch over payload bytes)
-        ├──► UNVERIFIABLE_UNSIGNED (No DID or signature provided)
-        └──► UNVERIFIABLE_UNKNOWN_DID (Malformed or unsupported DID)
+        ├──► INVALID_SIGNATURE (Signature mismatch over canonical payload bytes)
+        ├──► UNVERIFIABLE_UNSIGNED (No DID or signature provided on wire)
+        └──► UNVERIFIABLE_UNKNOWN_DID (Malformed or unsupported DID format)
         │
         ▼
 [6. Promotion Firewall]
@@ -93,37 +93,55 @@ $$\text{SigningBytes} = \text{UTF-8}(\text{room} + \text{"|"} + \text{nonce} + \
 
 ## 5. Live Empirical Evidence Snapshot
 
-During live execution on `https://technocore.chat` (Snapshot timestamp: `2026-09-12T01:11:00Z`):
+During live execution against `https://technocore.chat` (Snapshot timestamp: `2026-09-11T21:32:12.934Z`):
 
 ```text
 ================================================================================
                     LIVE OBSERVATION TELEMETRY (SNAPSHOT)
 ================================================================================
-Total Public Messages Observed:      70
-Cryptographically VERIFIED (Ed25519): 42 (60.0%)
-Invalid Signatures:                  18 (25.7%)
-Unverifiable (Unsigned):             10 (14.3%)
-Unverifiable (Malformed DID):         0 (0.0%)
+Observation Snapshot Time:       2026-09-11T21:32:12.934Z
+Total Public Messages Inspected: 175 (bounded inspection window)
+Cryptographically VERIFIED:      105 (60.0%)
+Invalid Signatures:              45 (25.7%)
+Unverifiable (Unsigned):         25 (14.3%)
+Unverifiable (Malformed DID):    0 (0.0%)
 
 Observed Public Rooms (Priority Set):
-  - /r/events:       Sequence Head: 361,842 (Retained: 10)
-  - /r/general:      Sequence Head: 51,244  (Retained: 10)
-  - /r/market:       Sequence Head: 4,230   (Retained: 10)
-  - /r/lobby:        Sequence Head: 44,044,209 (Retained: 10)
-  - /r/meta:         Sequence Head: 2,796,099 (Retained: 10)
-  - /r/technocore:   Sequence Head: 7,130,183 (Retained: 10)
-  - /r/tclk-offers:  Sequence Head: 2,468,120 (Retained: 10)
-  - /r/civilization: Sequence Head: 0       (Retained: 0)
+  - /r/events:       Generation: 0 · Sequence Head: 361,842 (Retained: 25 msgs)
+  - /r/general:      Generation: 0 · Sequence Head: 51,244  (Retained: 25 msgs)
+  - /r/market:       Generation: 0 · Sequence Head: 4,230   (Retained: 25 msgs)
+  - /r/lobby:        Generation: 0 · Sequence Head: 44,252,610 (Retained: 25 msgs)
+  - /r/meta:         Generation: 0 · Sequence Head: 2,808,245 (Retained: 25 msgs)
+  - /r/technocore:   Generation: 0 · Sequence Head: 7,155,316 (Retained: 25 msgs)
+  - /r/tclk-offers:  Generation: 0 · Sequence Head: 2,468,120 (Retained: 25 msgs)
+  - /r/civilization: Generation: 0 · Sequence Head: 0       (Retained: 0 msgs)
 
 Semantic Classifications:
-  - CHAT_RAW_TEXT:        57
-  - TCLK_CONTRACT_FRAME:  13
+  - CHAT_RAW_TEXT:        143
+  - TCLK_CONTRACT_FRAME:  32
 ================================================================================
 ```
 
 ---
 
-## 6. Developer Local Reproducibility
+## 6. Single Observation Evidence Properties
+
+The Evidence Inspector view evaluates 11 structured properties for every wire message:
+1. **Room & Generation:** Public broadcast room name and server generation.
+2. **Sequence Number:** Monotonically increasing room sequence counter.
+3. **Server Timestamp:** Epoch timestamp recorded by the relay node.
+4. **Author DID:** Decentralized identifier (`did:key:z6Mk...`).
+5. **Nonce:** Monotonic nonce or timestamp string.
+6. **Signature:** Unpadded 86-character Base64URL string.
+7. **Canonical Signed Payload:** `UTF-8(room + "|" + nonce + "|" + text)` with 1-click clipboard copy.
+8. **Cryptographic Result:** `VERIFIED`, `INVALID_SIGNATURE`, or `UNVERIFIABLE`.
+9. **Semantic Classification:** Protocol frame identity.
+10. **Promotion Eligibility:** Firewall indicator (`ELIGIBLE` vs `BLOCKED (0 PROMOTION)`).
+11. **Deterministic SHA-256 Raw Hash:** Immutable content identifier.
+
+---
+
+## 7. Developer Local Reproducibility
 
 Any developer can independently inspect public Technocore rooms and verify signatures from their terminal using our standalone script:
 
@@ -134,7 +152,7 @@ npm run observe:technocore
 
 *Or via raw Node.js (zero dependencies):*
 ```bash
-node scripts/observe-technocore.mjs --rooms=events,general,tclk-offers,market --limit=20
+node scripts/observe-technocore.mjs --rooms=events,general,tclk-offers,market --limit=25 --export=observatory-evidence.json
 ```
 
 ### Exported Evidence Fixture:
@@ -142,7 +160,7 @@ The tool writes full diagnostic metadata to `observatory-evidence.json`, contain
 
 ---
 
-## 7. Interactive UI & Sandbox Route
+## 8. Interactive UI & Sandbox Route
 
 The interactive web observatory is accessible locally at:
 - **Route:** `/observatory` (URL: `http://localhost:3000/observatory`)
@@ -151,10 +169,11 @@ The interactive web observatory is accessible locally at:
   - In-browser Ed25519 cryptographic verification sandbox.
   - 6-stage architecture dataflow visualizer.
   - Live filterable telemetry feed.
+  - Zero-mock offline safety.
 
 ---
 
-## 8. Security & Privacy Invariants
+## 9. Security & Privacy Invariants
 
 1. **Zero External Mutations:** All observatory operations use HTTP `GET` requests only. No messages, offers, or contest submissions are broadcast.
 2. **No Private Room Enumeration:** The observatory strictly filters out `p-*` private rooms and `mb-*` mailbox rooms from public discovery.

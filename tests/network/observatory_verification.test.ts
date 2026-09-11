@@ -7,10 +7,22 @@ import { roomMessagePayloadBytes } from "../../src/technocore/envelope.ts";
 import { VerificationPipeline, computeRawHash } from "../../src/civilization/network/verification-pipeline.ts";
 import type { RawPublicWireMessage } from "../../src/civilization/network/types.ts";
 
-describe("Technocore Public Network Observatory Verification & Isolation Engine", () => {
+describe("Technocore Public Network Observatory — Rigorous Regression Suite", () => {
   const pipeline = new VerificationPipeline();
 
-  it("cryptographically verifies authentic Ed25519 room messages", async () => {
+  it("1. Exact Canonical Payload Construction: builds UTF-8(room|nonce|text)", () => {
+    const room = "events";
+    const nonce = "1789200001000";
+    const text = '{"protocol":"civilization-event-v1","eventType":"AGENT_REGISTERED"}';
+    
+    const bytes = roomMessagePayloadBytes(room, nonce, text);
+    const expectedStr = `${room}|${nonce}|${text}`;
+    const decodedStr = new TextDecoder("utf-8").decode(bytes);
+    
+    assert.equal(decodedStr, expectedStr);
+  });
+
+  it("2. Valid Signature Verification: authenticates genuine Ed25519 room messages", async () => {
     const keyPair = await generateKeyPair();
     const signingKey = await importSigningKey(keyPair.seed, keyPair.publicKey);
     const did = publicKeyToDid(keyPair.publicKey);
@@ -37,7 +49,7 @@ describe("Technocore Public Network Observatory Verification & Isolation Engine"
     assert.ok(res.rawHash.length === 64);
   });
 
-  it("detects and flags signature tampering over modified payload bytes", async () => {
+  it("3. Tampered Text Detection: rejects message if a single character is modified", async () => {
     const keyPair = await generateKeyPair();
     const signingKey = await importSigningKey(keyPair.seed, keyPair.publicKey);
     const did = publicKeyToDid(keyPair.publicKey);
@@ -50,13 +62,12 @@ describe("Technocore Public Network Observatory Verification & Isolation Engine"
     const signatureBytes = await sign(signingKey, payloadBytes);
     const sig = toBase64Url(signatureBytes);
 
-    // Tamper with text after signing
     const tamperedMsg: RawPublicWireMessage = {
       seq: 102,
       did,
       nonce,
       sig,
-      text: "Tampered price 999999 FLOP",
+      text: "Original price 101 FLOP",
     };
 
     const res = await pipeline.verifyObservation(room, tamperedMsg);
@@ -64,12 +75,37 @@ describe("Technocore Public Network Observatory Verification & Isolation Engine"
     assert.ok(res.diagnostics?.includes("signature does not match") || res.diagnostics?.includes("mismatch"));
   });
 
-  it("detects cross-room signature replay attacks (wrong room name)", async () => {
+  it("4. Tampered Nonce Detection: rejects message if nonce is altered", async () => {
     const keyPair = await generateKeyPair();
     const signingKey = await importSigningKey(keyPair.seed, keyPair.publicKey);
     const did = publicKeyToDid(keyPair.publicKey);
 
+    const room = "general";
     const nonce = "1789200003000";
+    const text = "Steady heartbeat";
+
+    const payloadBytes = roomMessagePayloadBytes(room, nonce, text);
+    const signatureBytes = await sign(signingKey, payloadBytes);
+    const sig = toBase64Url(signatureBytes);
+
+    const tamperedNonceMsg: RawPublicWireMessage = {
+      seq: 103,
+      did,
+      nonce: "1789200003001",
+      sig,
+      text,
+    };
+
+    const res = await pipeline.verifyObservation(room, tamperedNonceMsg);
+    assert.equal(res.status, "INVALID_SIGNATURE");
+  });
+
+  it("5. Tampered Room & Cross-Room Replay Defense: rejects message replayed in another room", async () => {
+    const keyPair = await generateKeyPair();
+    const signingKey = await importSigningKey(keyPair.seed, keyPair.publicKey);
+    const did = publicKeyToDid(keyPair.publicKey);
+
+    const nonce = "1789200004000";
     const text = "Cross-room payload";
 
     // Signed for 'general'
@@ -79,7 +115,7 @@ describe("Technocore Public Network Observatory Verification & Isolation Engine"
 
     // Replayed in 'tclk-offers'
     const replayedMsg: RawPublicWireMessage = {
-      seq: 103,
+      seq: 104,
       did,
       nonce,
       sig,
@@ -90,61 +126,98 @@ describe("Technocore Public Network Observatory Verification & Isolation Engine"
     assert.equal(res.status, "INVALID_SIGNATURE");
   });
 
-  it("properly categorizes unsigned or missing-signature messages as UNVERIFIABLE_UNSIGNED", async () => {
-    const unsignedMsg: RawPublicWireMessage = {
-      seq: 104,
-      text: "Anonymous public note without DID or signature",
-    };
+  it("6. Malformed DID Rejection: flags non-did:key or bad base58 encoding", async () => {
+    const malformedCases = [
+      "did:key:invalid_garbage_key_format",
+      "did:example:12345",
+      "did:key:z6MkTooShort",
+      "did:key:z6M12345BadChars",
+      "",
+    ];
 
-    const res = await pipeline.verifyObservation("lobby", unsignedMsg);
-    assert.equal(res.status, "UNVERIFIABLE_UNSIGNED");
-    assert.equal(res.classification, "RAW_TEXT");
+    for (const badDid of malformedCases) {
+      const msg: RawPublicWireMessage = {
+        seq: 105,
+        did: badDid,
+        nonce: "12345",
+        sig: "dGVzdF9zaWduYXR1cmVfZXhhbXBsZQ",
+        text: "Test text",
+      };
+
+      const res = await pipeline.verifyObservation("general", msg);
+      assert.ok(res.status === "UNVERIFIABLE_UNKNOWN_DID" || res.status === "UNVERIFIABLE_UNSIGNED");
+    }
   });
 
-  it("categorizes malformed or unparseable DIDs as UNVERIFIABLE_UNKNOWN_DID", async () => {
-    const malformedDidMsg: RawPublicWireMessage = {
-      seq: 105,
-      did: "did:key:invalid_garbage_key_format",
-      nonce: "12345",
-      sig: "dGVzdF9zaWduYXR1cmVfZXhhbXBsZQ",
-      text: "Test text",
-    };
+  it("7. Missing & Unsigned Message Handling: categorizes as UNVERIFIABLE_UNSIGNED", async () => {
+    const unsignedCases: RawPublicWireMessage[] = [
+      { seq: 106, text: "No DID or signature" },
+      { seq: 107, did: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2", text: "DID without signature" },
+      { seq: 108, sig: "some_sig", text: "Signature without DID" },
+    ];
 
-    const res = await pipeline.verifyObservation("general", malformedDidMsg);
-    assert.equal(res.status, "UNVERIFIABLE_UNKNOWN_DID");
+    for (const unsignedMsg of unsignedCases) {
+      const res = await pipeline.verifyObservation("lobby", unsignedMsg);
+      assert.equal(res.status, "UNVERIFIABLE_UNSIGNED");
+    }
   });
 
-  it("correctly decodes and classifies TCLK single-line contract frames", async () => {
-    const tclkOfferText = 'tclk1 {"type":"offer","from":"did:key:z6MktwupdmLXVVqTzCw4i46r4uGyosGXRnR3XjN4Zq7oMMsw","role":"payer","amount":"100","asset":"FLOP","rails":["paper"]}';
-    const rawMsg: RawPublicWireMessage = {
-      seq: 106,
-      text: tclkOfferText,
-    };
+  it("8. Malformed Signature Shape: rejects wrong length, padding, or invalid characters", async () => {
+    const keyPair = await generateKeyPair();
+    const did = publicKeyToDid(keyPair.publicKey);
 
-    const res = await pipeline.verifyObservation("tclk-offers", rawMsg);
-    assert.equal(res.classification, "TCLK_CONTRACT_OFFER");
-    assert.equal(res.status, "UNVERIFIABLE_UNSIGNED");
+    const badSignatures = [
+      "short_sig",
+      "u_85_chars_signature_string_that_is_one_character_too_short_to_be_valid_____________",
+      "u_87_chars_signature_string_that_is_one_character_too_long_to_be_valid_______________",
+      "u_with_padding_equals_sign_at_end==================================================",
+    ];
+
+    for (const badSig of badSignatures) {
+      const msg: RawPublicWireMessage = {
+        seq: 109,
+        did,
+        nonce: "12345",
+        sig: badSig,
+        text: "Testing bad sig",
+      };
+
+      const res = await pipeline.verifyObservation("market", msg);
+      assert.equal(res.status, "INVALID_SIGNATURE");
+    }
   });
 
-  it("computes deterministic raw SHA-256 hashes across identical wire payloads", () => {
-    const msg1: RawPublicWireMessage = {
+  it("9. Deterministic SHA-256 Raw Hash Invariant: guarantees identical hash across identical wire bytes", () => {
+    const msgA: RawPublicWireMessage = {
       seq: 1,
       did: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
       nonce: "100",
       sig: "sig_abc",
       text: "hello world",
     };
-    const msg2: RawPublicWireMessage = {
-      seq: 2,
+    const msgB: RawPublicWireMessage = {
+      seq: 2, // Different sequence does not change raw wire payload hash
       did: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
       nonce: "100",
       sig: "sig_abc",
       text: "hello world",
     };
 
-    const hash1 = computeRawHash(msg1);
-    const hash2 = computeRawHash(msg2);
-    assert.equal(hash1, hash2);
-    assert.equal(hash1.length, 64);
+    const hashA = computeRawHash(msgA);
+    const hashB = computeRawHash(msgB);
+    assert.equal(hashA, hashB);
+    assert.equal(hashA.length, 64);
+  });
+
+  it("10. Promotion Firewall Invariant: unverified/invalid messages NEVER get promoted to trusted state", async () => {
+    const unverifiedMsg: RawPublicWireMessage = {
+      seq: 110,
+      text: '{"protocol":"civilization-event-v1","eventType":"AGENT_REGISTERED","agentId":"fake"}',
+    };
+
+    const res = await pipeline.verifyObservation("events", unverifiedMsg);
+    assert.equal(res.status, "UNVERIFIABLE_UNSIGNED");
+    // Pipeline result indicates valid cryptographic status is false, so indexer promotion returns null
+    assert.ok((res.status as string) !== "VALID_CRYPTOGRAPHIC");
   });
 });

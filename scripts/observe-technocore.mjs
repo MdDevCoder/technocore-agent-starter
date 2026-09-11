@@ -17,7 +17,7 @@
  *   --quiet              Suppress per-message terminal output
  */
 
-import { verify, createPublicKey } from "node:crypto";
+import { verify, createPublicKey, createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 
 // Base58 Bitcoin Alphabet
@@ -91,6 +91,18 @@ function createEd25519KeyObject(rawPublicKey32) {
   const derHeader = Buffer.from("302a300506032b6570032100", "hex");
   const der = Buffer.concat([derHeader, rawPublicKey32]);
   return createPublicKey({ key: der, format: "der", type: "spki" });
+}
+
+/**
+ * Computes deterministic SHA-256 hash of raw wire message.
+ */
+function computeRawHash(msg) {
+  const hash = createHash("sha256");
+  hash.update(msg.text !== undefined && msg.text !== null ? String(msg.text) : "");
+  hash.update(msg.nonce !== undefined && msg.nonce !== null ? String(msg.nonce) : "");
+  hash.update(msg.did !== undefined && msg.did !== null ? String(msg.did) : "");
+  hash.update(msg.sig !== undefined && msg.sig !== null ? String(msg.sig) : "");
+  return hash.digest("hex");
 }
 
 /**
@@ -209,13 +221,15 @@ async function main() {
     else if (arg === "--quiet") quiet = true;
   }
 
+  const runTimestamp = new Date().toISOString();
+
   console.log("================================================================================");
   console.log("             TECHNOCORE PUBLIC NETWORK OBSERVATORY (READ-ONLY)                  ");
   console.log("================================================================================");
-  console.log(`Endpoint:       ${endpoint}`);
-  console.log(`Inspection Limit: ${limit} messages / room`);
-  console.log(`Export Fixture: ${exportPath}`);
-  console.log(`Timestamp:      ${new Date().toISOString()}`);
+  console.log(`Endpoint:         ${endpoint}`);
+  console.log(`Inspection Limit: ${limit} messages / room (bounded observation window)`);
+  console.log(`Export Fixture:   ${exportPath}`);
+  console.log(`Timestamp:        ${runTimestamp}`);
   console.log("--------------------------------------------------------------------------------\n");
 
   // 1. Discover Public Rooms
@@ -260,6 +274,7 @@ async function main() {
   console.log("[2/3] Fetching public messages and verifying Ed25519 signatures ...");
 
   const allObservations = [];
+  const roomGenerations = {};
   const stats = {
     totalObserved: 0,
     verifiedValid: 0,
@@ -279,15 +294,24 @@ async function main() {
       }
       const data = await res.json();
       const messages = Array.isArray(data.messages) ? data.messages : [];
+      const generation = typeof data.generation === "number" ? data.generation : 0;
+      roomGenerations[room] = generation;
 
       if (!quiet) {
-        console.log(`\n  ┌── [Room: /r/${room}] (Head: ${data.last_seq ?? data.head ?? "N/A"} · Retained: ${messages.length} msgs)`);
+        console.log(`\n  ┌── [Room: /r/${room}] (Gen: ${generation} · Head: ${data.last_seq ?? data.head ?? "N/A"} · Retained: ${messages.length} msgs)`);
       }
 
       for (const msg of messages) {
         const authorDid = msg.did || msg.from || null;
         const verif = verifyTechnocoreMessage(room, msg);
         const classification = classifySemanticType(msg.text);
+        const rawHash = computeRawHash(msg);
+        const nonce = msg.nonce !== undefined && msg.nonce !== null ? String(msg.nonce) : null;
+        const text = typeof msg.text === "string" ? msg.text : JSON.stringify(msg.text || {});
+        const canonicalPayload = `${room}|${nonce || ""}|${text}`;
+
+        const isProtocolFrame = classification.startsWith("TCLK_") || classification === "CIVILIZATION_EVENT";
+        const eligibleForPromotion = verif.status === "VERIFIED" && isProtocolFrame;
 
         stats.totalObserved++;
         if (verif.status === "VERIFIED") stats.verifiedValid++;
@@ -299,17 +323,20 @@ async function main() {
 
         const record = {
           room,
+          generation,
           sequence: msg.seq,
           serverTimestamp: msg.ts || null,
           authorDid,
-          nonce: msg.nonce ?? null,
+          nonce,
           hasSignature: Boolean(msg.sig || msg.signature),
           signature: msg.sig || msg.signature || null,
+          canonicalPayload,
           verificationStatus: verif.status,
           verificationReason: verif.reason,
           classification,
-          textLength: typeof msg.text === "string" ? msg.text.length : 0,
-          rawTextSample: typeof msg.text === "string" ? msg.text.slice(0, 120) : "",
+          eligibleForPromotion,
+          rawHash,
+          text,
         };
 
         allObservations.push(record);
@@ -320,7 +347,7 @@ async function main() {
                              "\x1b[33m[UNVERIFIABLE]\x1b[0m";
           const didShort = authorDid ? `${authorDid.slice(0, 14)}...${authorDid.slice(-6)}` : "anonymous";
           console.log(`  │  #${msg.seq} ${statusColor} <${didShort}> [${classification}]`);
-          console.log(`  │     "${typeof msg.text === "string" ? msg.text.slice(0, 90) : ""}"`);
+          console.log(`  │     "${text.slice(0, 90)}"`);
         }
       }
       if (!quiet) console.log("  └──");
@@ -330,10 +357,12 @@ async function main() {
   }
 
   // 3. Print Summary & Export Fixture
-  console.log("\n[3/3] Observatory Summary & Verification Metrics:");
+  console.log("\n[3/3] Observatory Summary & Verification Metrics (Bounded Snapshot):");
   console.log("================================================================================");
-  console.log(`Total Public Messages Observed:  ${stats.totalObserved}`);
-  console.log(`Cryptographically VERIFIED (Ed25519): ${stats.verifiedValid} (${Math.round((stats.verifiedValid / (stats.totalObserved || 1)) * 100)}%)`);
+  console.log(`Observation Snapshot Time:       ${runTimestamp}`);
+  console.log(`Public Rooms Inspected:          ${prioritizedRooms.length}`);
+  console.log(`Total Public Messages Inspected: ${stats.totalObserved}`);
+  console.log(`Cryptographically VERIFIED:      ${stats.verifiedValid} (${Math.round((stats.verifiedValid / (stats.totalObserved || 1)) * 100)}%)`);
   console.log(`Invalid Signatures:              ${stats.invalidSignature}`);
   console.log(`Unverifiable (Unsigned/No Sig):  ${stats.unverifiableUnsigned}`);
   console.log(`Unverifiable (Malformed DID):    ${stats.unverifiableUnknownDid}`);
@@ -344,12 +373,13 @@ async function main() {
   console.log("================================================================================");
 
   const evidenceFixture = {
-    observatoryVersion: "1.0.0",
-    generatedAt: new Date().toISOString(),
+    observatoryVersion: "1.1.0",
+    generatedAt: runTimestamp,
     endpoint,
     inspectedRooms: prioritizedRooms,
+    roomGenerations,
     statistics: stats,
-    sampleObservations: allObservations.slice(0, 100),
+    sampleObservations: allObservations,
   };
 
   writeFileSync(exportPath, JSON.stringify(evidenceFixture, null, 2), "utf8");
