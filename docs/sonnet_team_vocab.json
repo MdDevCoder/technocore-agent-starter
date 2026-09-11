@@ -1,0 +1,2847 @@
+{
+  "teamSize": 5,
+  "generatedAt": "2026-09-11T15:21:06.265Z",
+  "unionVocabularySize": 88265,
+  "intersectionVocabularySize": 1895,
+  "combinedAlphabet": "abcdefghijklmnopqrstuvwxyz",
+  "profiles": [
+    {
+      "agentId": "Agent_1",
+      "did": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+      "allowedAlphabet": "abcdefghikmnopqrtvwxyz",
+      "letterCount": 22,
+      "vowels": [
+        "a",
+        "e",
+        "i",
+        "o"
+      ],
+      "vowelCount": 4,
+      "missingLetters": "jlsu",
+      "totalLegalWords": 32660,
+      "sylDist": {
+        "1": 5038,
+        "2": 15817,
+        "3": 8498,
+        "4": 2587,
+        "5": 630,
+        "6+": 90
+      },
+      "uniqueRhymeFamilies": 1069,
+      "topRhymes": [
+        [
+          "IY0",
+          3469
+        ],
+        [
+          "ER0",
+          3292
+        ],
+        [
+          "AH0 N",
+          3229
+        ],
+        [
+          "AH0",
+          2345
+        ],
+        [
+          "IH0 NG",
+          1750
+        ],
+        [
+          "OW0",
+          1651
+        ],
+        [
+          "IH0 K",
+          758
+        ],
+        [
+          "IH0 D",
+          488
+        ],
+        [
+          "IH0 N",
+          428
+        ],
+        [
+          "AH0 N T",
+          366
+        ]
+      ],
+      "sampleWords": [
+        {
+          "word": "a",
+          "syllables": 1,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "aaa",
+          "syllables": 3,
+          "rhymeKey": "EY1"
+        },
+        {
+          "word": "aaberg",
+          "syllables": 2,
+          "rhymeKey": "ER0 G"
+        },
+        {
+          "word": "aachen",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "aachener",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "aaker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "aamodt",
+          "syllables": 2,
+          "rhymeKey": "AH0 T"
+        },
+        {
+          "word": "aancor",
+          "syllables": 2,
+          "rhymeKey": "AO2 R"
+        },
+        {
+          "word": "aardema",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "aardvark",
+          "syllables": 2,
+          "rhymeKey": "AA2 R K"
+        },
+        {
+          "word": "aargh",
+          "syllables": 1,
+          "rhymeKey": "AA1 R G"
+        },
+        {
+          "word": "aaron",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "aarti",
+          "syllables": 2,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "ab",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "aba",
+          "syllables": 3,
+          "rhymeKey": "EY1"
+        },
+        {
+          "word": "ababa",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abacha",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "aback",
+          "syllables": 2,
+          "rhymeKey": "AE1 K"
+        },
+        {
+          "word": "abaco",
+          "syllables": 3,
+          "rhymeKey": "OW2"
+        },
+        {
+          "word": "abad",
+          "syllables": 2,
+          "rhymeKey": "AA1 D"
+        },
+        {
+          "word": "abadaka",
+          "syllables": 4,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abadi",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abadie",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abair",
+          "syllables": 2,
+          "rhymeKey": "EH1 R"
+        },
+        {
+          "word": "abandon",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abandoned",
+          "syllables": 3,
+          "rhymeKey": "AH0 N D"
+        },
+        {
+          "word": "abandoning",
+          "syllables": 4,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abandonment",
+          "syllables": 4,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "abanto",
+          "syllables": 3,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "abarca",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abare",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abate",
+          "syllables": 2,
+          "rhymeKey": "EY1 T"
+        },
+        {
+          "word": "abated",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abatement",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "abating",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abattoir",
+          "syllables": 3,
+          "rhymeKey": "AA1 R"
+        },
+        {
+          "word": "abba",
+          "syllables": 2,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abbado",
+          "syllables": 3,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "abbate",
+          "syllables": 2,
+          "rhymeKey": "EY0 T"
+        },
+        {
+          "word": "abbe",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbett",
+          "syllables": 2,
+          "rhymeKey": "EH1 T"
+        },
+        {
+          "word": "abbey",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbitt",
+          "syllables": 2,
+          "rhymeKey": "IH0 T"
+        },
+        {
+          "word": "abbot",
+          "syllables": 2,
+          "rhymeKey": "AH0 T"
+        },
+        {
+          "word": "abbott",
+          "syllables": 2,
+          "rhymeKey": "AH0 T"
+        },
+        {
+          "word": "abbreviate",
+          "syllables": 4,
+          "rhymeKey": "EY2 T"
+        },
+        {
+          "word": "abbreviated",
+          "syllables": 5,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abbreviating",
+          "syllables": 5,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abbreviation",
+          "syllables": 5,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abby",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abc",
+          "syllables": 3,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "abco",
+          "syllables": 2,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "abcotek",
+          "syllables": 3,
+          "rhymeKey": "EH2 K"
+        },
+        {
+          "word": "abd",
+          "syllables": 3,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "abdicate",
+          "syllables": 3,
+          "rhymeKey": "EY2 T"
+        },
+        {
+          "word": "abdicated",
+          "syllables": 4,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abdicating",
+          "syllables": 4,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abdication",
+          "syllables": 4,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abdnor",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "abdo",
+          "syllables": 2,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "abdomen",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abe",
+          "syllables": 1,
+          "rhymeKey": "EY1 B"
+        },
+        {
+          "word": "abed",
+          "syllables": 2,
+          "rhymeKey": "EH1 D"
+        },
+        {
+          "word": "abedi",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abee",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "abend",
+          "syllables": 2,
+          "rhymeKey": "EH0 N D"
+        },
+        {
+          "word": "abendroth",
+          "syllables": 3,
+          "rhymeKey": "AO0 TH"
+        },
+        {
+          "word": "aber",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "abercrombie",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "aberdeen",
+          "syllables": 3,
+          "rhymeKey": "IY2 N"
+        },
+        {
+          "word": "aberford",
+          "syllables": 3,
+          "rhymeKey": "ER0 D"
+        },
+        {
+          "word": "aberg",
+          "syllables": 2,
+          "rhymeKey": "ER0 G"
+        },
+        {
+          "word": "abermin",
+          "syllables": 3,
+          "rhymeKey": "IH0 N"
+        },
+        {
+          "word": "abernathy",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abernethy",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "aberrant",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "aberration",
+          "syllables": 4,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abert",
+          "syllables": 2,
+          "rhymeKey": "ER0 T"
+        },
+        {
+          "word": "abet",
+          "syllables": 2,
+          "rhymeKey": "EH1 T"
+        },
+        {
+          "word": "abetted",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abetting",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abex",
+          "syllables": 2,
+          "rhymeKey": "EH0 K S"
+        },
+        {
+          "word": "abeyance",
+          "syllables": 3,
+          "rhymeKey": "AH0 N S"
+        },
+        {
+          "word": "abeyta",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abhor",
+          "syllables": 2,
+          "rhymeKey": "AO1 R"
+        },
+        {
+          "word": "abhorred",
+          "syllables": 2,
+          "rhymeKey": "AO1 R D"
+        },
+        {
+          "word": "abhorrence",
+          "syllables": 3,
+          "rhymeKey": "AH0 N S"
+        },
+        {
+          "word": "abhorrent",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "abiam",
+          "syllables": 3,
+          "rhymeKey": "AH0 M"
+        },
+        {
+          "word": "abid",
+          "syllables": 2,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abide",
+          "syllables": 2,
+          "rhymeKey": "AY1 D"
+        },
+        {
+          "word": "abided",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abiding",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abingdon",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abington",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abio",
+          "syllables": 3,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "abiomed",
+          "syllables": 4,
+          "rhymeKey": "EH0 D"
+        },
+        {
+          "word": "abitibi",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        }
+      ]
+    },
+    {
+      "agentId": "Agent_2",
+      "did": "did:key:z6Mkexnu9EeeRC6epkNxBd2wzkTtYzGDgB2LqFcQRyK7LY1m",
+      "allowedAlphabet": "bcdefgiklmnpqrtuwxyz",
+      "letterCount": 20,
+      "vowels": [
+        "e",
+        "i",
+        "u"
+      ],
+      "vowelCount": 3,
+      "missingLetters": "ahjosv",
+      "totalLegalWords": 12475,
+      "sylDist": {
+        "1": 2773,
+        "2": 6896,
+        "3": 2257,
+        "4": 471,
+        "5": 71,
+        "6+": 7
+      },
+      "uniqueRhymeFamilies": 567,
+      "topRhymes": [
+        [
+          "IY0",
+          1912
+        ],
+        [
+          "ER0",
+          1863
+        ],
+        [
+          "IH0 NG",
+          883
+        ],
+        [
+          "AH0 L",
+          786
+        ],
+        [
+          "AH0 N",
+          351
+        ],
+        [
+          "IH0 N",
+          281
+        ],
+        [
+          "IH0 K",
+          280
+        ],
+        [
+          "IH0 D",
+          184
+        ],
+        [
+          "IH0 T",
+          172
+        ],
+        [
+          "IY1",
+          160
+        ]
+      ],
+      "sampleWords": [
+        {
+          "word": "b",
+          "syllables": 1,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "bbc",
+          "syllables": 3,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "bbq",
+          "syllables": 3,
+          "rhymeKey": "UW2"
+        },
+        {
+          "word": "bc",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "be",
+          "syllables": 1,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "bebb",
+          "syllables": 1,
+          "rhymeKey": "EH1 B"
+        },
+        {
+          "word": "bebber",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bebe",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "bebee",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beber",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bec",
+          "syllables": 1,
+          "rhymeKey": "EH1 K"
+        },
+        {
+          "word": "becerril",
+          "syllables": 3,
+          "rhymeKey": "IY1 L"
+        },
+        {
+          "word": "beck",
+          "syllables": 1,
+          "rhymeKey": "EH1 K"
+        },
+        {
+          "word": "beckel",
+          "syllables": 2,
+          "rhymeKey": "EH0 L"
+        },
+        {
+          "word": "becker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beckert",
+          "syllables": 2,
+          "rhymeKey": "ER0 T"
+        },
+        {
+          "word": "becket",
+          "syllables": 2,
+          "rhymeKey": "AH0 T"
+        },
+        {
+          "word": "beckett",
+          "syllables": 2,
+          "rhymeKey": "IH0 T"
+        },
+        {
+          "word": "becki",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beckie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beckler",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beckley",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "becklund",
+          "syllables": 2,
+          "rhymeKey": "AH0 N D"
+        },
+        {
+          "word": "beckmeyer",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "becknell",
+          "syllables": 2,
+          "rhymeKey": "EH2 L"
+        },
+        {
+          "word": "beckner",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beckum",
+          "syllables": 2,
+          "rhymeKey": "AH0 M"
+        },
+        {
+          "word": "beckwitt",
+          "syllables": 2,
+          "rhymeKey": "IH2 T"
+        },
+        {
+          "word": "becky",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "becnel",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "bed",
+          "syllables": 1,
+          "rhymeKey": "EH1 D"
+        },
+        {
+          "word": "bedbug",
+          "syllables": 2,
+          "rhymeKey": "AH0 G"
+        },
+        {
+          "word": "bedded",
+          "syllables": 2,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "bedding",
+          "syllables": 2,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "beddingfield",
+          "syllables": 3,
+          "rhymeKey": "IY2 L D"
+        },
+        {
+          "word": "bede",
+          "syllables": 1,
+          "rhymeKey": "IY1 D"
+        },
+        {
+          "word": "bedeck",
+          "syllables": 2,
+          "rhymeKey": "EH1 K"
+        },
+        {
+          "word": "bedecked",
+          "syllables": 2,
+          "rhymeKey": "EH1 K T"
+        },
+        {
+          "word": "bedel",
+          "syllables": 2,
+          "rhymeKey": "EH1 L"
+        },
+        {
+          "word": "bedell",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "bedient",
+          "syllables": 2,
+          "rhymeKey": "IH0 N T"
+        },
+        {
+          "word": "bedinger",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bedingfield",
+          "syllables": 3,
+          "rhymeKey": "IY2 L D"
+        },
+        {
+          "word": "bedizen",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "bedke",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "bedner",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bedridden",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "bedtime",
+          "syllables": 2,
+          "rhymeKey": "AY2 M"
+        },
+        {
+          "word": "bedwell",
+          "syllables": 2,
+          "rhymeKey": "EH2 L"
+        },
+        {
+          "word": "bee",
+          "syllables": 1,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "beebe",
+          "syllables": 2,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "beeby",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beeck",
+          "syllables": 1,
+          "rhymeKey": "IY1 K"
+        },
+        {
+          "word": "beede",
+          "syllables": 1,
+          "rhymeKey": "IY1 D"
+        },
+        {
+          "word": "beedie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beedle",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "beedy",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beef",
+          "syllables": 1,
+          "rhymeKey": "IY1 F"
+        },
+        {
+          "word": "beefed",
+          "syllables": 1,
+          "rhymeKey": "IY1 F T"
+        },
+        {
+          "word": "beefing",
+          "syllables": 2,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "beefy",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beegle",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "beek",
+          "syllables": 1,
+          "rhymeKey": "IY1 K"
+        },
+        {
+          "word": "beekeeper",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beekeeping",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "beeker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beel",
+          "syllables": 1,
+          "rhymeKey": "IY1 L"
+        },
+        {
+          "word": "beeler",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beem",
+          "syllables": 1,
+          "rhymeKey": "IY1 M"
+        },
+        {
+          "word": "beemer",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "been",
+          "syllables": 1,
+          "rhymeKey": "IH1 N"
+        },
+        {
+          "word": "beene",
+          "syllables": 1,
+          "rhymeKey": "IY1 N"
+        },
+        {
+          "word": "beeney",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beenken",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "beep",
+          "syllables": 1,
+          "rhymeKey": "IY1 P"
+        },
+        {
+          "word": "beeped",
+          "syllables": 1,
+          "rhymeKey": "IY1 P T"
+        },
+        {
+          "word": "beeper",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beeping",
+          "syllables": 2,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "beer",
+          "syllables": 1,
+          "rhymeKey": "IH1 R"
+        },
+        {
+          "word": "beery",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beet",
+          "syllables": 1,
+          "rhymeKey": "IY1 T"
+        },
+        {
+          "word": "beetle",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "beezley",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "befell",
+          "syllables": 2,
+          "rhymeKey": "EH1 L"
+        },
+        {
+          "word": "befit",
+          "syllables": 2,
+          "rhymeKey": "IH1 T"
+        },
+        {
+          "word": "befitting",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "befriend",
+          "syllables": 2,
+          "rhymeKey": "EH1 N D"
+        },
+        {
+          "word": "befriended",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "befriending",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "befuddle",
+          "syllables": 3,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "befuddled",
+          "syllables": 3,
+          "rhymeKey": "AH0 L D"
+        },
+        {
+          "word": "beg",
+          "syllables": 1,
+          "rhymeKey": "EH1 G"
+        },
+        {
+          "word": "begel",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "beger",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beget",
+          "syllables": 2,
+          "rhymeKey": "EH1 T"
+        },
+        {
+          "word": "begetting",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "begg",
+          "syllables": 1,
+          "rhymeKey": "EH1 G"
+        },
+        {
+          "word": "begged",
+          "syllables": 1,
+          "rhymeKey": "EH1 G D"
+        },
+        {
+          "word": "begging",
+          "syllables": 2,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "begin",
+          "syllables": 2,
+          "rhymeKey": "IH1 N"
+        }
+      ]
+    },
+    {
+      "agentId": "Agent_3",
+      "did": "did:key:z6MksaSkEjx9k6fE79nhjX2QMkNRNETVKioV9PowELQojvwe",
+      "allowedAlphabet": "adefhijklmnopqrstvwxyz",
+      "letterCount": 22,
+      "vowels": [
+        "a",
+        "e",
+        "i",
+        "o"
+      ],
+      "vowelCount": 4,
+      "missingLetters": "bcgu",
+      "totalLegalWords": 48775,
+      "sylDist": {
+        "1": 8178,
+        "2": 24346,
+        "3": 11915,
+        "4": 3469,
+        "5": 716,
+        "6+": 151
+      },
+      "uniqueRhymeFamilies": 1551,
+      "topRhymes": [
+        [
+          "IY0",
+          4903
+        ],
+        [
+          "AH0 N",
+          4078
+        ],
+        [
+          "ER0",
+          4003
+        ],
+        [
+          "AH0",
+          3138
+        ],
+        [
+          "OW0",
+          1695
+        ],
+        [
+          "AH0 L",
+          1472
+        ],
+        [
+          "ER0 Z",
+          1326
+        ],
+        [
+          "AH0 N Z",
+          855
+        ],
+        [
+          "IY0 Z",
+          644
+        ],
+        [
+          "IH0 N",
+          634
+        ]
+      ],
+      "sampleWords": [
+        {
+          "word": "a",
+          "syllables": 1,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "a's",
+          "syllables": 1,
+          "rhymeKey": "EY1 Z"
+        },
+        {
+          "word": "aaa",
+          "syllables": 3,
+          "rhymeKey": "EY1"
+        },
+        {
+          "word": "aaker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "aalen",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "aaliyah",
+          "syllables": 3,
+          "rhymeKey": "AA2"
+        },
+        {
+          "word": "aalseth",
+          "syllables": 2,
+          "rhymeKey": "EH0 TH"
+        },
+        {
+          "word": "aalsmeer",
+          "syllables": 2,
+          "rhymeKey": "IH0 R"
+        },
+        {
+          "word": "aalto",
+          "syllables": 2,
+          "rhymeKey": "OW2"
+        },
+        {
+          "word": "aamodt",
+          "syllables": 2,
+          "rhymeKey": "AH0 T"
+        },
+        {
+          "word": "aardema",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "aardvark",
+          "syllables": 2,
+          "rhymeKey": "AA2 R K"
+        },
+        {
+          "word": "aardvarks",
+          "syllables": 2,
+          "rhymeKey": "AA2 R K S"
+        },
+        {
+          "word": "aaron",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "aaron's",
+          "syllables": 2,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "aarons",
+          "syllables": 2,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "aaronson",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "aaronson's",
+          "syllables": 3,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "aarti",
+          "syllables": 2,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "aase",
+          "syllables": 1,
+          "rhymeKey": "AA1 S"
+        },
+        {
+          "word": "aasen",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "ad",
+          "syllables": 1,
+          "rhymeKey": "AE1 D"
+        },
+        {
+          "word": "ad's",
+          "syllables": 1,
+          "rhymeKey": "AE1 D Z"
+        },
+        {
+          "word": "ada",
+          "syllables": 2,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "ada's",
+          "syllables": 2,
+          "rhymeKey": "AH0 Z"
+        },
+        {
+          "word": "adah",
+          "syllables": 2,
+          "rhymeKey": "AA0"
+        },
+        {
+          "word": "adair",
+          "syllables": 2,
+          "rhymeKey": "EH1 R"
+        },
+        {
+          "word": "adaire",
+          "syllables": 2,
+          "rhymeKey": "EH1 R"
+        },
+        {
+          "word": "adak",
+          "syllables": 2,
+          "rhymeKey": "AE1 K"
+        },
+        {
+          "word": "adalah",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "adalia",
+          "syllables": 4,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "adam",
+          "syllables": 2,
+          "rhymeKey": "AH0 M"
+        },
+        {
+          "word": "adam's",
+          "syllables": 2,
+          "rhymeKey": "AH0 M Z"
+        },
+        {
+          "word": "adamant",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "adamantly",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "adame",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "adamek",
+          "syllables": 3,
+          "rhymeKey": "EH0 K"
+        },
+        {
+          "word": "adames",
+          "syllables": 2,
+          "rhymeKey": "EY1 M Z"
+        },
+        {
+          "word": "adami",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "adamik",
+          "syllables": 3,
+          "rhymeKey": "IH0 K"
+        },
+        {
+          "word": "adamina",
+          "syllables": 4,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "adamo",
+          "syllables": 3,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "adams",
+          "syllables": 2,
+          "rhymeKey": "AH0 M Z"
+        },
+        {
+          "word": "adams's",
+          "syllables": 3,
+          "rhymeKey": "IH0 Z"
+        },
+        {
+          "word": "adamski",
+          "syllables": 3,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "adamson",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "adamstown",
+          "syllables": 3,
+          "rhymeKey": "AW2 N"
+        },
+        {
+          "word": "adan",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "adapso",
+          "syllables": 3,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "adapt",
+          "syllables": 2,
+          "rhymeKey": "AE1 P T"
+        },
+        {
+          "word": "adaptaplex",
+          "syllables": 4,
+          "rhymeKey": "EH2 K S"
+        },
+        {
+          "word": "adaptation",
+          "syllables": 4,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "adaptations",
+          "syllables": 4,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "adapted",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "adapter",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "adapters",
+          "syllables": 3,
+          "rhymeKey": "ER0 Z"
+        },
+        {
+          "word": "adaptive",
+          "syllables": 3,
+          "rhymeKey": "IH0 V"
+        },
+        {
+          "word": "adaptor",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "adaptors",
+          "syllables": 3,
+          "rhymeKey": "ER0 Z"
+        },
+        {
+          "word": "adapts",
+          "syllables": 2,
+          "rhymeKey": "AE1 P T S"
+        },
+        {
+          "word": "adar",
+          "syllables": 2,
+          "rhymeKey": "AA1 R"
+        },
+        {
+          "word": "adarand",
+          "syllables": 3,
+          "rhymeKey": "AE2 N D"
+        },
+        {
+          "word": "adare",
+          "syllables": 2,
+          "rhymeKey": "EH1 R"
+        },
+        {
+          "word": "adas",
+          "syllables": 2,
+          "rhymeKey": "AH0 Z"
+        },
+        {
+          "word": "aday",
+          "syllables": 2,
+          "rhymeKey": "EY1"
+        },
+        {
+          "word": "adaza",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "add",
+          "syllables": 1,
+          "rhymeKey": "AE1 D"
+        },
+        {
+          "word": "addair",
+          "syllables": 2,
+          "rhymeKey": "EH1 R"
+        },
+        {
+          "word": "addams",
+          "syllables": 2,
+          "rhymeKey": "AH0 M Z"
+        },
+        {
+          "word": "added",
+          "syllables": 2,
+          "rhymeKey": "AH0 D"
+        },
+        {
+          "word": "addeo",
+          "syllables": 3,
+          "rhymeKey": "OW0"
+        },
+        {
+          "word": "adder",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "adderley",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "addidas",
+          "syllables": 3,
+          "rhymeKey": "AH0 S"
+        },
+        {
+          "word": "addidas's",
+          "syllables": 4,
+          "rhymeKey": "IH0 Z"
+        },
+        {
+          "word": "addidases",
+          "syllables": 4,
+          "rhymeKey": "IH0 Z"
+        },
+        {
+          "word": "addie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "addis",
+          "syllables": 2,
+          "rhymeKey": "IH0 S"
+        },
+        {
+          "word": "addison",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "addison's",
+          "syllables": 3,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "addition",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "additional",
+          "syllables": 4,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "additionally",
+          "syllables": 5,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "additions",
+          "syllables": 3,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "additive",
+          "syllables": 3,
+          "rhymeKey": "IH0 V"
+        },
+        {
+          "word": "additives",
+          "syllables": 3,
+          "rhymeKey": "IH0 V Z"
+        },
+        {
+          "word": "addle",
+          "syllables": 2,
+          "rhymeKey": "AH0 L"
+        },
+        {
+          "word": "addled",
+          "syllables": 2,
+          "rhymeKey": "AH0 L D"
+        },
+        {
+          "word": "addleman",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "address",
+          "syllables": 2,
+          "rhymeKey": "EH2 S"
+        },
+        {
+          "word": "addressed",
+          "syllables": 2,
+          "rhymeKey": "EH1 S T"
+        },
+        {
+          "word": "addressee",
+          "syllables": 3,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "addresses",
+          "syllables": 3,
+          "rhymeKey": "IH0 Z"
+        },
+        {
+          "word": "adds",
+          "syllables": 1,
+          "rhymeKey": "AE1 D Z"
+        },
+        {
+          "word": "addwest",
+          "syllables": 2,
+          "rhymeKey": "EH1 S T"
+        },
+        {
+          "word": "addy",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "addyston",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "ade",
+          "syllables": 1,
+          "rhymeKey": "EY1 D"
+        },
+        {
+          "word": "adee",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "adel",
+          "syllables": 2,
+          "rhymeKey": "EH1 L"
+        }
+      ]
+    },
+    {
+      "agentId": "Agent_4",
+      "did": "did:key:z6MkmhPc35JEQWyugrMbq8AheAP1ZnabAS2NQwecsysatFKG",
+      "allowedAlphabet": "abcdefghijkmnpqrstuwyz",
+      "letterCount": 22,
+      "vowels": [
+        "a",
+        "e",
+        "i",
+        "u"
+      ],
+      "vowelCount": 4,
+      "missingLetters": "lovx",
+      "totalLegalWords": 43967,
+      "sylDist": {
+        "1": 8950,
+        "2": 21932,
+        "3": 10060,
+        "4": 2557,
+        "5": 420,
+        "6+": 48
+      },
+      "uniqueRhymeFamilies": 1494,
+      "topRhymes": [
+        [
+          "ER0",
+          4137
+        ],
+        [
+          "IY0",
+          3988
+        ],
+        [
+          "AH0",
+          2593
+        ],
+        [
+          "AH0 N",
+          2441
+        ],
+        [
+          "IH0 NG",
+          2049
+        ],
+        [
+          "ER0 Z",
+          1198
+        ],
+        [
+          "IH0 K",
+          760
+        ],
+        [
+          "IY0 Z",
+          669
+        ],
+        [
+          "AH0 Z",
+          641
+        ],
+        [
+          "IH0 D",
+          601
+        ]
+      ],
+      "sampleWords": [
+        {
+          "word": "a",
+          "syllables": 1,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "a's",
+          "syllables": 1,
+          "rhymeKey": "EY1 Z"
+        },
+        {
+          "word": "aaa",
+          "syllables": 3,
+          "rhymeKey": "EY1"
+        },
+        {
+          "word": "aaberg",
+          "syllables": 2,
+          "rhymeKey": "ER0 G"
+        },
+        {
+          "word": "aachen",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "aachener",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "aaker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "aardema",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "aargh",
+          "syllables": 1,
+          "rhymeKey": "AA1 R G"
+        },
+        {
+          "word": "aarhus",
+          "syllables": 2,
+          "rhymeKey": "UW1 S"
+        },
+        {
+          "word": "aarti",
+          "syllables": 2,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "aase",
+          "syllables": 1,
+          "rhymeKey": "AA1 S"
+        },
+        {
+          "word": "aasen",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "ab",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "aba",
+          "syllables": 3,
+          "rhymeKey": "EY1"
+        },
+        {
+          "word": "ababa",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abacha",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "aback",
+          "syllables": 2,
+          "rhymeKey": "AE1 K"
+        },
+        {
+          "word": "abacus",
+          "syllables": 3,
+          "rhymeKey": "AH0 S"
+        },
+        {
+          "word": "abad",
+          "syllables": 2,
+          "rhymeKey": "AA1 D"
+        },
+        {
+          "word": "abadaka",
+          "syllables": 4,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abadi",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abadie",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abair",
+          "syllables": 2,
+          "rhymeKey": "EH1 R"
+        },
+        {
+          "word": "abarca",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abare",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abash",
+          "syllables": 2,
+          "rhymeKey": "AE1 SH"
+        },
+        {
+          "word": "abashed",
+          "syllables": 2,
+          "rhymeKey": "AE1 SH T"
+        },
+        {
+          "word": "abasia",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abate",
+          "syllables": 2,
+          "rhymeKey": "EY1 T"
+        },
+        {
+          "word": "abated",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abatement",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "abatements",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T S"
+        },
+        {
+          "word": "abates",
+          "syllables": 2,
+          "rhymeKey": "EY1 T S"
+        },
+        {
+          "word": "abating",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abba",
+          "syllables": 2,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abbas",
+          "syllables": 2,
+          "rhymeKey": "AA1 S"
+        },
+        {
+          "word": "abbasi",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbate",
+          "syllables": 2,
+          "rhymeKey": "EY0 T"
+        },
+        {
+          "word": "abbe",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbenhaus",
+          "syllables": 3,
+          "rhymeKey": "AW2 S"
+        },
+        {
+          "word": "abbett",
+          "syllables": 2,
+          "rhymeKey": "EH1 T"
+        },
+        {
+          "word": "abbey",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbey's",
+          "syllables": 2,
+          "rhymeKey": "IY0 Z"
+        },
+        {
+          "word": "abbie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbitt",
+          "syllables": 2,
+          "rhymeKey": "IH0 T"
+        },
+        {
+          "word": "abbruzzese",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abbs",
+          "syllables": 1,
+          "rhymeKey": "AE1 B Z"
+        },
+        {
+          "word": "abby",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abc",
+          "syllables": 3,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "abc's",
+          "syllables": 3,
+          "rhymeKey": "IY2 Z"
+        },
+        {
+          "word": "abcs",
+          "syllables": 3,
+          "rhymeKey": "IY2 Z"
+        },
+        {
+          "word": "abd",
+          "syllables": 3,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "abdicate",
+          "syllables": 3,
+          "rhymeKey": "EY2 T"
+        },
+        {
+          "word": "abdicated",
+          "syllables": 4,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abdicates",
+          "syllables": 3,
+          "rhymeKey": "EY2 T S"
+        },
+        {
+          "word": "abdicating",
+          "syllables": 4,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abduct",
+          "syllables": 2,
+          "rhymeKey": "AH1 K T"
+        },
+        {
+          "word": "abducted",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abductee",
+          "syllables": 3,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "abductees",
+          "syllables": 3,
+          "rhymeKey": "IY1 Z"
+        },
+        {
+          "word": "abducting",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abducts",
+          "syllables": 2,
+          "rhymeKey": "AH1 K T S"
+        },
+        {
+          "word": "abe",
+          "syllables": 1,
+          "rhymeKey": "EY1 B"
+        },
+        {
+          "word": "abed",
+          "syllables": 2,
+          "rhymeKey": "EH1 D"
+        },
+        {
+          "word": "abedi",
+          "syllables": 3,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abee",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "abend",
+          "syllables": 2,
+          "rhymeKey": "EH0 N D"
+        },
+        {
+          "word": "aber",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "aberdeen",
+          "syllables": 3,
+          "rhymeKey": "IY2 N"
+        },
+        {
+          "word": "aberg",
+          "syllables": 2,
+          "rhymeKey": "ER0 G"
+        },
+        {
+          "word": "abermin",
+          "syllables": 3,
+          "rhymeKey": "IH0 N"
+        },
+        {
+          "word": "abernathy",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abernethy",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "aberrant",
+          "syllables": 3,
+          "rhymeKey": "AH0 N T"
+        },
+        {
+          "word": "abert",
+          "syllables": 2,
+          "rhymeKey": "ER0 T"
+        },
+        {
+          "word": "abet",
+          "syllables": 2,
+          "rhymeKey": "EH1 T"
+        },
+        {
+          "word": "abetted",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abetting",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abeyance",
+          "syllables": 3,
+          "rhymeKey": "AH0 N S"
+        },
+        {
+          "word": "abeyta",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abiam",
+          "syllables": 3,
+          "rhymeKey": "AH0 M"
+        },
+        {
+          "word": "abiam's",
+          "syllables": 3,
+          "rhymeKey": "AH0 M Z"
+        },
+        {
+          "word": "abid",
+          "syllables": 2,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abide",
+          "syllables": 2,
+          "rhymeKey": "AY1 D"
+        },
+        {
+          "word": "abided",
+          "syllables": 3,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "abides",
+          "syllables": 2,
+          "rhymeKey": "AY1 D Z"
+        },
+        {
+          "word": "abiding",
+          "syllables": 3,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "abidjan",
+          "syllables": 3,
+          "rhymeKey": "AA1 N"
+        },
+        {
+          "word": "abie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abiquiu",
+          "syllables": 3,
+          "rhymeKey": "UW0"
+        },
+        {
+          "word": "abitibi",
+          "syllables": 4,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abitz",
+          "syllables": 2,
+          "rhymeKey": "IH0 T S"
+        },
+        {
+          "word": "abject",
+          "syllables": 2,
+          "rhymeKey": "EH0 K T"
+        },
+        {
+          "word": "abkhazia",
+          "syllables": 3,
+          "rhymeKey": "AH0"
+        },
+        {
+          "word": "abkhazian",
+          "syllables": 4,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "abkhazians",
+          "syllables": 4,
+          "rhymeKey": "AH0 N Z"
+        },
+        {
+          "word": "abner",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "abney",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "abra",
+          "syllables": 2,
+          "rhymeKey": "AH0"
+        }
+      ]
+    },
+    {
+      "agentId": "Agent_5",
+      "did": "did:key:z6MktxnssqwUv4tRs9Dvc72DfczbDfYQHs31kdYZNbmZDGHW",
+      "allowedAlphabet": "bcdefghikmnqrstuvwxyz",
+      "letterCount": 21,
+      "vowels": [
+        "e",
+        "i",
+        "u"
+      ],
+      "vowelCount": 3,
+      "missingLetters": "ajlop",
+      "totalLegalWords": 17281,
+      "sylDist": {
+        "1": 4735,
+        "2": 8788,
+        "3": 3090,
+        "4": 601,
+        "5": 63,
+        "6+": 4
+      },
+      "uniqueRhymeFamilies": 804,
+      "topRhymes": [
+        [
+          "ER0",
+          2249
+        ],
+        [
+          "IY0",
+          1779
+        ],
+        [
+          "IH0 NG",
+          924
+        ],
+        [
+          "ER0 Z",
+          555
+        ],
+        [
+          "AH0 N",
+          457
+        ],
+        [
+          "IH0 K",
+          378
+        ],
+        [
+          "IY0 Z",
+          287
+        ],
+        [
+          "IH0 Z",
+          251
+        ],
+        [
+          "IH0 N",
+          241
+        ],
+        [
+          "IH0 D",
+          211
+        ]
+      ],
+      "sampleWords": [
+        {
+          "word": "b",
+          "syllables": 1,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "b'rith",
+          "syllables": 1,
+          "rhymeKey": "IH1 TH"
+        },
+        {
+          "word": "b's",
+          "syllables": 1,
+          "rhymeKey": "IY1 Z"
+        },
+        {
+          "word": "bbc",
+          "syllables": 3,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "bbc's",
+          "syllables": 3,
+          "rhymeKey": "IY1 S"
+        },
+        {
+          "word": "bbq",
+          "syllables": 3,
+          "rhymeKey": "UW2"
+        },
+        {
+          "word": "bc",
+          "syllables": 2,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "be",
+          "syllables": 1,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "be's",
+          "syllables": 1,
+          "rhymeKey": "IY1 Z"
+        },
+        {
+          "word": "bebb",
+          "syllables": 1,
+          "rhymeKey": "EH1 B"
+        },
+        {
+          "word": "bebber",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bebbits",
+          "syllables": 2,
+          "rhymeKey": "AH0 T S"
+        },
+        {
+          "word": "bebe",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "bebe's",
+          "syllables": 2,
+          "rhymeKey": "IY0 Z"
+        },
+        {
+          "word": "bebee",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beber",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bebitch",
+          "syllables": 2,
+          "rhymeKey": "IH0 CH"
+        },
+        {
+          "word": "bec",
+          "syllables": 1,
+          "rhymeKey": "EH1 K"
+        },
+        {
+          "word": "becher",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "becherer",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "becht",
+          "syllables": 1,
+          "rhymeKey": "EH1 K T"
+        },
+        {
+          "word": "beck",
+          "syllables": 1,
+          "rhymeKey": "EH1 K"
+        },
+        {
+          "word": "beck's",
+          "syllables": 1,
+          "rhymeKey": "EH1 K S"
+        },
+        {
+          "word": "becker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "becker's",
+          "syllables": 2,
+          "rhymeKey": "ER0 Z"
+        },
+        {
+          "word": "beckers",
+          "syllables": 2,
+          "rhymeKey": "ER0 Z"
+        },
+        {
+          "word": "beckert",
+          "syllables": 2,
+          "rhymeKey": "ER0 T"
+        },
+        {
+          "word": "becket",
+          "syllables": 2,
+          "rhymeKey": "AH0 T"
+        },
+        {
+          "word": "beckett",
+          "syllables": 2,
+          "rhymeKey": "IH0 T"
+        },
+        {
+          "word": "becki",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beckie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beckius",
+          "syllables": 3,
+          "rhymeKey": "IH0 S"
+        },
+        {
+          "word": "beckmeyer",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beckner",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "becks",
+          "syllables": 1,
+          "rhymeKey": "EH1 K S"
+        },
+        {
+          "word": "beckum",
+          "syllables": 2,
+          "rhymeKey": "AH0 M"
+        },
+        {
+          "word": "beckwith",
+          "syllables": 2,
+          "rhymeKey": "IH2 TH"
+        },
+        {
+          "word": "beckwith's",
+          "syllables": 2,
+          "rhymeKey": "IH2 TH S"
+        },
+        {
+          "word": "beckwitt",
+          "syllables": 2,
+          "rhymeKey": "IH2 T"
+        },
+        {
+          "word": "becky",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "bed",
+          "syllables": 1,
+          "rhymeKey": "EH1 D"
+        },
+        {
+          "word": "bedbug",
+          "syllables": 2,
+          "rhymeKey": "AH0 G"
+        },
+        {
+          "word": "bedbugs",
+          "syllables": 2,
+          "rhymeKey": "AH0 G Z"
+        },
+        {
+          "word": "bedded",
+          "syllables": 2,
+          "rhymeKey": "IH0 D"
+        },
+        {
+          "word": "bedding",
+          "syllables": 2,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "bede",
+          "syllables": 1,
+          "rhymeKey": "IY1 D"
+        },
+        {
+          "word": "bedeck",
+          "syllables": 2,
+          "rhymeKey": "EH1 K"
+        },
+        {
+          "word": "bedecked",
+          "syllables": 2,
+          "rhymeKey": "EH1 K T"
+        },
+        {
+          "word": "bedient",
+          "syllables": 2,
+          "rhymeKey": "IH0 N T"
+        },
+        {
+          "word": "bedinger",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bedizen",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "bedke",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "bedminster",
+          "syllables": 3,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bedner",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "bedridden",
+          "syllables": 3,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "beds",
+          "syllables": 1,
+          "rhymeKey": "EH1 D Z"
+        },
+        {
+          "word": "bedside",
+          "syllables": 2,
+          "rhymeKey": "AY2 D"
+        },
+        {
+          "word": "bedtime",
+          "syllables": 2,
+          "rhymeKey": "AY2 M"
+        },
+        {
+          "word": "bee",
+          "syllables": 1,
+          "rhymeKey": "IY1"
+        },
+        {
+          "word": "bee's",
+          "syllables": 1,
+          "rhymeKey": "IY1 Z"
+        },
+        {
+          "word": "beebe",
+          "syllables": 2,
+          "rhymeKey": "IY2"
+        },
+        {
+          "word": "beebe's",
+          "syllables": 2,
+          "rhymeKey": "IY2 Z"
+        },
+        {
+          "word": "beebes",
+          "syllables": 2,
+          "rhymeKey": "IY2 Z"
+        },
+        {
+          "word": "beeby",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beech",
+          "syllables": 1,
+          "rhymeKey": "IY1 CH"
+        },
+        {
+          "word": "beecher",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beechy",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beeck",
+          "syllables": 1,
+          "rhymeKey": "IY1 K"
+        },
+        {
+          "word": "beede",
+          "syllables": 1,
+          "rhymeKey": "IY1 D"
+        },
+        {
+          "word": "beedie",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beedy",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beef",
+          "syllables": 1,
+          "rhymeKey": "IY1 F"
+        },
+        {
+          "word": "beefed",
+          "syllables": 1,
+          "rhymeKey": "IY1 F T"
+        },
+        {
+          "word": "beefing",
+          "syllables": 2,
+          "rhymeKey": "IH0 NG"
+        },
+        {
+          "word": "beefs",
+          "syllables": 1,
+          "rhymeKey": "IY1 F S"
+        },
+        {
+          "word": "beefy",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beehive",
+          "syllables": 2,
+          "rhymeKey": "AY2 V"
+        },
+        {
+          "word": "beek",
+          "syllables": 1,
+          "rhymeKey": "IY1 K"
+        },
+        {
+          "word": "beeker",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beeks",
+          "syllables": 1,
+          "rhymeKey": "IY1 K S"
+        },
+        {
+          "word": "beem",
+          "syllables": 1,
+          "rhymeKey": "IY1 M"
+        },
+        {
+          "word": "beemer",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "been",
+          "syllables": 1,
+          "rhymeKey": "IH1 N"
+        },
+        {
+          "word": "beene",
+          "syllables": 1,
+          "rhymeKey": "IY1 N"
+        },
+        {
+          "word": "beeney",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "beenken",
+          "syllables": 2,
+          "rhymeKey": "AH0 N"
+        },
+        {
+          "word": "beens",
+          "syllables": 1,
+          "rhymeKey": "IH1 N Z"
+        },
+        {
+          "word": "beer",
+          "syllables": 1,
+          "rhymeKey": "IH1 R"
+        },
+        {
+          "word": "beer's",
+          "syllables": 1,
+          "rhymeKey": "IY1 R Z"
+        },
+        {
+          "word": "beers",
+          "syllables": 1,
+          "rhymeKey": "IH1 R Z"
+        },
+        {
+          "word": "beers's",
+          "syllables": 2,
+          "rhymeKey": "IH0 Z"
+        },
+        {
+          "word": "beery",
+          "syllables": 2,
+          "rhymeKey": "IY0"
+        },
+        {
+          "word": "bees",
+          "syllables": 1,
+          "rhymeKey": "IY1 Z"
+        },
+        {
+          "word": "beese",
+          "syllables": 1,
+          "rhymeKey": "IY1 Z"
+        },
+        {
+          "word": "beet",
+          "syllables": 1,
+          "rhymeKey": "IY1 T"
+        },
+        {
+          "word": "beets",
+          "syllables": 1,
+          "rhymeKey": "IY1 T S"
+        },
+        {
+          "word": "beever",
+          "syllables": 2,
+          "rhymeKey": "ER0"
+        },
+        {
+          "word": "beevers",
+          "syllables": 2,
+          "rhymeKey": "ER0 Z"
+        },
+        {
+          "word": "befit",
+          "syllables": 2,
+          "rhymeKey": "IH1 T"
+        },
+        {
+          "word": "befits",
+          "syllables": 2,
+          "rhymeKey": "IH1 T S"
+        }
+      ]
+    }
+  ]
+}
