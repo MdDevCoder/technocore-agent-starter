@@ -554,14 +554,20 @@ export const TechnocoreObservatoryView: React.FC = () => {
                 Evidence Inspector (Single Observation)
               </h2>
               {selectedMessage && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <a
+                    href={`/doctor?source=observatory&room=${encodeURIComponent(selectedMessage.room)}&did=${encodeURIComponent(selectedMessage.authorDid || "")}&nonce=${encodeURIComponent(selectedMessage.nonce || "")}&text=${encodeURIComponent(selectedMessage.text)}&sig=${encodeURIComponent(selectedMessage.signature || "")}`}
+                    className="rounded bg-signal/15 border border-signal/30 px-2 py-0.5 text-[11px] font-bold text-signal hover:bg-signal/25 transition-colors mono"
+                  >
+                    ↗ Open in Signature Doctor
+                  </a>
                   <button
                     onClick={() => loadMessageIntoSandbox(selectedMessage)}
                     className="rounded bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 text-[11px] font-bold text-sky-400 hover:bg-sky-500/25 transition-colors mono"
                   >
                     ↗ Load into Sandbox
                   </button>
-                  <span className="mono text-xs text-signal font-bold">
+                  <span className="mono text-xs text-muted font-bold">
                     /r/{selectedMessage.room} · #{selectedMessage.sequence}
                   </span>
                 </div>
