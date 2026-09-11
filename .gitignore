@@ -18,3 +18,5 @@ agent_key.json
 *.key
 *.pem
 .technocore/
+PRIVATE_*.md
+private/
