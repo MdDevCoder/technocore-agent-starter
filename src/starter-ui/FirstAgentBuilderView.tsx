@@ -10,7 +10,7 @@ import { generateKeyPair } from "../crypto/ed25519.ts";
 import { publicKeyToDid } from "../identity/did.ts";
 import { wipe } from "../crypto/bytes.ts";
 import { executeEphemeralSigningDryRun } from "../crypto/dryRun.ts";
-import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { extractSafeHandoffParams, buildHandoffUrl } from "../workspace/handoff.ts";
 import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 export const FirstAgentBuilderView: React.FC = () => {
@@ -137,6 +137,17 @@ export const FirstAgentBuilderView: React.FC = () => {
       sampleMessageText: messageText,
     });
   }, [selectedArchetypeId, selectedLanguage, agentName, targetRoom, publicDid, messageText]);
+
+  // Safe Workspace Handoff URL (contains ONLY safe public parameters: project, lang, archetype, did, room)
+  const workspaceHandoffUrl = useMemo(() => {
+    return buildHandoffUrl("workspace", {
+      project: agentName,
+      lang: selectedLanguage,
+      archetype: selectedArchetypeId,
+      did: publicDid,
+      room: targetRoom,
+    });
+  }, [agentName, selectedLanguage, selectedArchetypeId, publicDid, targetRoom]);
 
   // Active File content in tree viewer
   const activeFile = useMemo(() => {
@@ -614,6 +625,12 @@ export const FirstAgentBuilderView: React.FC = () => {
             >
               ⬇ Download Starter ZIP (.zip)
             </button>
+            <Link
+              href={workspaceHandoffUrl}
+              className="rounded-lg bg-panel-high border border-signal/40 px-3.5 py-1 text-xs mono font-bold text-signal hover:bg-signal hover:text-void transition-colors shadow-sm flex items-center gap-1.5"
+            >
+              Open in Workspace →
+            </Link>
           </div>
         </div>
 
@@ -681,6 +698,29 @@ export const FirstAgentBuilderView: React.FC = () => {
           <p className="text-xs text-muted">
             Once your agent is running locally, use the ecosystem tools to observe, debug, and test live protocol frames.
           </p>
+        </div>
+
+        {/* Recommended Next Step: Agent Workspace & Readiness */}
+        <div className="p-4 rounded-xl border border-signal/40 bg-signal/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="mono text-[10px] font-bold text-signal px-2 py-0.5 rounded bg-signal/20 border border-signal/30 uppercase">
+                Recommended Next Step
+              </span>
+              <span className="text-xs font-bold text-ink">Agent Workspace Handoff</span>
+            </div>
+            <p className="text-xs text-muted">
+              Carry your generated project context (<code className="text-ink font-mono">{agentName}</code>, <code className="text-ink font-mono">{selectedLanguage}</code>, <code className="text-ink font-mono">{selectedArchetype.name}</code>) into your developer cockpit.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href={workspaceHandoffUrl}
+              className="rounded-lg bg-signal px-4 py-2 text-xs mono font-bold text-void hover:bg-signal/90 transition-colors shadow-sm"
+            >
+              Open in Workspace →
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

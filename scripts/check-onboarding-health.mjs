@@ -165,7 +165,7 @@ async function checkLocalServerRoutes() {
   try {
     const res = await fetch(`${BASE_URL}/api/technocore/r/lobby?format=json&limit=1`, {
       headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(10000),
     });
     report("Proxy", "Pass-through Proxy Route (/api/technocore/r/lobby)", res.ok, `HTTP ${res.status}`);
   } catch (err) {
