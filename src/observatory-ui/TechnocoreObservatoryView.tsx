@@ -420,8 +420,8 @@ export const TechnocoreObservatoryView: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-3 rounded-lg border border-emerald-500/40 bg-emerald-950/20 space-y-1.5">
-            <div className="text-emerald-400 font-bold">6. Promotion Gate</div>
+          <div className="p-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/30 space-y-1.5">
+            <div className="text-emerald-700 dark:text-emerald-400 font-bold">6. Promotion Gate</div>
             <div className="text-muted text-[11px]">
               Firewall rule: ONLY verified valid protocol events can become trusted state. Unverified = 0 promotion.
             </div>
@@ -483,7 +483,7 @@ export const TechnocoreObservatoryView: React.FC = () => {
 
             {/* Error Notice */}
             {fetchError && (
-              <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-950/20 text-rose-300 text-xs mono">
+              <div className="p-3 rounded-lg border border-rose-500/30 bg-rose-500/10 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs mono">
                 ⚠️ Fetch Notice: {fetchError}. Showing cached observations if available.
               </div>
             )}
@@ -588,9 +588,9 @@ export const TechnocoreObservatoryView: React.FC = () => {
                 <div
                   className={`p-3 rounded-lg border ${
                     selectedMessage.verificationStatus === "VERIFIED"
-                      ? "bg-emerald-950/30 border-emerald-500/40 text-emerald-300"
+                      ? "bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
                       : selectedMessage.verificationStatus === "INVALID_SIGNATURE"
-                      ? "bg-rose-950/30 border-rose-500/40 text-rose-300"
+                      ? "bg-rose-500/10 dark:bg-rose-950/30 border-rose-500/30 text-rose-800 dark:text-rose-300"
                       : "bg-void border-hairline text-muted"
                   }`}
                 >
@@ -601,7 +601,7 @@ export const TechnocoreObservatoryView: React.FC = () => {
                     <span
                       className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
                         selectedMessage.eligibleForPromotion
-                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30"
                           : "bg-void border border-hairline text-faint"
                       }`}
                     >
@@ -827,8 +827,8 @@ export const TechnocoreObservatoryView: React.FC = () => {
                   <div
                     className={`p-2.5 rounded-lg border font-bold ${
                       sandboxResult.verified
-                        ? "bg-emerald-950/30 border-emerald-500/40 text-emerald-300"
-                        : "bg-rose-950/30 border-rose-500/40 text-rose-300"
+                        ? "bg-emerald-500/10 dark:bg-emerald-950/30 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
+                        : "bg-rose-500/10 dark:bg-rose-950/30 border-rose-500/30 text-rose-800 dark:text-rose-300"
                     }`}
                   >
                     RESULT: {sandboxResult.status}

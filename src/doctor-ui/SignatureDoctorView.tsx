@@ -311,9 +311,9 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
           <div
             className={`p-4 rounded-xl border shadow-sm ${
               report?.canonicalVerification.verified
-                ? "bg-emerald-950/25 border-emerald-500/40 text-emerald-300"
+                ? "bg-emerald-500/10 dark:bg-emerald-950/25 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
                 : report?.canonicalVerification.status === "INVALID_SIGNATURE"
-                ? "bg-rose-950/25 border-rose-500/40 text-rose-300"
+                ? "bg-rose-500/10 dark:bg-rose-950/25 border-rose-500/30 text-rose-800 dark:text-rose-300"
                 : "bg-panel border-hairline text-muted"
             }`}
           >
@@ -324,8 +324,8 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
               <span
                 className={`rounded px-2 py-0.5 text-[10px] font-bold ${
                   report?.canonicalVerification.verified
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                    : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                    ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
+                    : "bg-rose-500/20 text-rose-800 dark:text-rose-300 border border-rose-500/30"
                 }`}
               >
                 {report?.canonicalVerification.verified ? "CANONICAL PASS" : "CANONICAL FAIL"}

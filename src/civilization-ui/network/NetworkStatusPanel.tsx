@@ -111,7 +111,7 @@ export const NetworkStatusPanel: React.FC<NetworkStatusPanelProps> = ({
       </div>
 
       {syncError && (
-        <div className="p-2 rounded bg-rose-950/40 border border-rose-500/30 text-rose-300 text-xs font-mono">
+        <div className="p-2 rounded bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-mono">
           Sync Error: {syncError}
         </div>
       )}

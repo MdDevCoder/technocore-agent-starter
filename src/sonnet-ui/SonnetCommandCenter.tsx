@@ -461,7 +461,7 @@ export const SonnetCommandCenter: React.FC = () => {
             </form>
 
             {validationError && (
-              <div className="p-2.5 rounded-lg border border-rose-500/40 bg-rose-950/40 text-rose-300 text-xs mono">
+              <div className="p-2.5 rounded-lg border border-rose-500/40 bg-rose-500/10 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs mono">
                 ⚠ {validationError}
               </div>
             )}
@@ -533,7 +533,7 @@ export const SonnetCommandCenter: React.FC = () => {
                 </button>
                 <button
                   onClick={handleResetPoem}
-                  className="rounded px-2.5 py-1 text-xs mono font-semibold text-rose-400 hover:bg-rose-950/40 border border-rose-500/30"
+                  className="rounded px-2.5 py-1 text-xs mono font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/15 border border-rose-500/30"
                 >
                   Reset Poem
                 </button>
@@ -591,7 +591,7 @@ export const SonnetCommandCenter: React.FC = () => {
                             isLineActive
                               ? "border-signal/60 bg-signal/10 shadow-sm"
                               : isComplete
-                              ? "border-emerald-500/30 bg-emerald-950/10"
+                              ? "border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/10"
                               : "border-hairline bg-void/60 hover:border-hairline-high"
                           }`}
                         >
