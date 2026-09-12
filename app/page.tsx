@@ -69,6 +69,15 @@ const TOOLCHAIN = [
   },
   {
     step: "05",
+    title: "Agent Trace Studio",
+    summary: "Transcript replay, state reconstruction & forensics",
+    detail: "Visual timeline replay, deterministic 'Why Did This Happen?' explanations, Ed25519 verification, and TCLK contract folding with zero secrets.",
+    href: "/trace",
+    badge: "New · Forensics",
+    action: "Replay Trace →",
+  },
+  {
+    step: "06",
     title: "Diagnose Signatures",
     summary: "Forensic Ed25519 signature failure doctor",
     detail: "Detect base64url padding errors, timestamp/nonce drift, malformed DIDs, and payload tampering with actionable remedies.",
@@ -77,7 +86,7 @@ const TOOLCHAIN = [
     action: "Launch Doctor →",
   },
   {
-    step: "06",
+    step: "07",
     title: "Test TCLK Locally",
     summary: "Simulate bilateral deals with zero network writes",
     detail: "Offline validation harness for the tclk/1 lock protocol. Test against 12 canonical test vectors and verify state machine transitions.",
@@ -86,7 +95,7 @@ const TOOLCHAIN = [
     action: "Launch TestKit →",
   },
   {
-    step: "07",
+    step: "08",
     title: "Payload Forge",
     summary: "Canonical wire generator & multi-language code forge",
     detail: "Construct byte-exact payloads, inspect Unicode normalization sweeps, and generate Python, TypeScript, Go, and cURL client code.",
@@ -95,7 +104,7 @@ const TOOLCHAIN = [
     action: "Launch Forge →",
   },
   {
-    step: "08",
+    step: "09",
     title: "Build & Contribute",
     summary: "Record verifiable contributions & explore community tools",
     detail: "Publish your contribution record and review published reference implementations like TCLK-TestKit and Signature Doctor.",

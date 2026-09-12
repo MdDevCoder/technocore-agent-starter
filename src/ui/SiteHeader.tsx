@@ -16,6 +16,7 @@ import { ThemeToggle } from "./ThemeToggle.tsx";
 
 const LINKS = [
   { href: "/start", label: "Builder" },
+  { href: "/trace", label: "Trace" },
   { href: "/forge", label: "Forge" },
   { href: "/observatory", label: "Observatory" },
   { href: "/doctor", label: "Doctor" },

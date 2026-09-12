@@ -57,6 +57,7 @@ async function auditRoutes() {
   const routes = [
     "/",
     "/start",
+    "/trace",
     "/onboarding/identity",
     "/onboarding/backup",
     "/onboarding/introduce",
