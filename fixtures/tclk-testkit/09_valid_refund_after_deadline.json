@@ -1,0 +1,19 @@
+{
+  "name": "09_valid_refund_after_deadline",
+  "description": "A valid refund frame issued by payer after refundAfterMs deadline has elapsed.",
+  "frame": {
+    "type": "refund",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "contract": "f5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "reason": "Claim deadline expired without secret revelation"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "refund"
+  },
+  "expectedTransition": {
+    "accepted": true,
+    "fromStatus": "locked",
+    "toStatus": "refunded"
+  }
+}

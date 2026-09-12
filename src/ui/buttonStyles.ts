@@ -32,7 +32,7 @@ const BASE =
   "ease-out-quint disabled:pointer-events-none disabled:opacity-40 aria-busy:pointer-events-none";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "shimmer-btn border-transparent bg-ink text-void hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] active:scale-[0.98]",
+  primary: "shimmer-btn border-transparent bg-ink text-void hover:opacity-90 hover:shadow-[0_4px_16px_rgba(0,0,0,0.15)] active:scale-[0.98]",
   secondary: "border-hairline bg-panel text-ink hover:border-hairline-bright hover:bg-panel-high hover:shadow-[0_4px_16px_rgba(0,0,0,0.3)] active:scale-[0.98]",
   ghost: "border-transparent bg-transparent text-muted hover:bg-panel hover:text-ink active:scale-[0.98]",
   danger: "border-fault/35 bg-transparent text-fault hover:border-fault/60 hover:bg-fault/10 active:scale-[0.98]",

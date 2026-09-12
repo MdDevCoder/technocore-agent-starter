@@ -31,7 +31,7 @@ export function Disclosure({ summary, children, defaultOpen, className, group }:
       <summary
         className={cx(
           "flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-left",
-          "text-ink hover:text-white marker:content-none [&::-webkit-details-marker]:hidden",
+          "text-ink hover:text-signal marker:content-none [&::-webkit-details-marker]:hidden",
         )}
       >
         <span className="text-[0.9375rem] font-medium">{summary}</span>

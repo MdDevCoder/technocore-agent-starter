@@ -13,6 +13,8 @@ import { cx } from "../cx.ts";
 import { NUMBERED_STEPS, type FlowState, type StepDefinition } from "../steps.ts";
 import { StepRail } from "../StepRail.tsx";
 
+import { OnboardingStatusCard } from "./OnboardingStatusCard.tsx";
+
 export function StepShell({
   step,
   state,
@@ -40,7 +42,11 @@ export function StepShell({
         <p className="text-muted mt-3 max-w-[58ch] text-[0.9375rem] leading-relaxed">{step.purpose}</p>
       </header>
 
-      <div className="mt-9 flex flex-col gap-6">{children}</div>
+      <div className="mt-6">
+        <OnboardingStatusCard />
+      </div>
+
+      <div className="mt-6 flex flex-col gap-6">{children}</div>
     </div>
   );
 }

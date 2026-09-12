@@ -1,0 +1,20 @@
+{
+  "name": "05_valid_lock",
+  "description": "A valid lock frame committing escrowed funds on a supported rail.",
+  "frame": {
+    "type": "lock",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "contract": "f5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "rail": "paper",
+    "ref": "escrow-paper-test-001"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "lock"
+  },
+  "expectedTransition": {
+    "accepted": true,
+    "fromStatus": "accepted",
+    "toStatus": "locked"
+  }
+}

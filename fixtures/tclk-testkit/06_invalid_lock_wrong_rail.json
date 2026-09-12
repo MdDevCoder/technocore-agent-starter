@@ -1,0 +1,19 @@
+{
+  "name": "06_invalid_lock_wrong_rail",
+  "description": "A lock frame attempting to use an unsupported rail not listed in the offer.",
+  "frame": {
+    "type": "lock",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "contract": "f5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "rail": "unsupported-rail-xyz",
+    "ref": "escrow-bad-001"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "lock"
+  },
+  "expectedTransition": {
+    "accepted": false,
+    "expectedError": "rail"
+  }
+}

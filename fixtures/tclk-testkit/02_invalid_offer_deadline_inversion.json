@@ -1,0 +1,24 @@
+{
+  "name": "02_invalid_offer_deadline_inversion",
+  "description": "An invalid offer where refundAfterMs occurs before claimByMs, causing a race condition.",
+  "frame": {
+    "type": "offer",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "role": "payer",
+    "amount": "1000",
+    "asset": "FLOP",
+    "lock": "hash",
+    "rails": ["paper"],
+    "expiresMs": 1789201000000,
+    "claimByMs": 1789210000000,
+    "refundAfterMs": 1789205000000,
+    "nonce": "deadbeef00112233445566778899aabb"
+  },
+  "expectedValidation": {
+    "valid": false,
+    "expectedError": "refundAfterMs"
+  },
+  "expectedTransition": {
+    "accepted": false
+  }
+}

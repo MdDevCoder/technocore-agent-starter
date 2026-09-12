@@ -11,73 +11,56 @@ export const TransactionLedger: React.FC<TransactionLedgerProps> = ({ transactio
   const reversed = [...transactions].reverse();
 
   return (
-    <div
-      style={{
-        background: "rgba(15, 23, 42, 0.6)",
-        border: "1px solid rgba(51, 65, 85, 0.5)",
-        borderRadius: "8px",
-        padding: "1rem 1.25rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.75rem",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#f8fafc" }}>
+    <div className="bg-panel border border-hairline rounded-lg p-4 flex flex-col gap-3 shadow-sm">
+      <div className="flex justify-between items-center">
+        <div className="text-sm font-bold text-ink">
           📜 Verifiable Economic Transaction Ledger
         </div>
-        <span style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
+        <span className="text-xs text-muted mono">
           {transactions.length} Total Receipts
         </span>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", maxHeight: "320px", overflowY: "auto" }}>
+      <div className="flex flex-col gap-1.5 max-h-80 overflow-y-auto pr-1">
         {reversed.length === 0 ? (
-          <div style={{ padding: "1.5rem", textAlign: "center", color: "#64748b", fontSize: "0.85rem" }}>
+          <div className="p-6 text-center text-muted text-xs">
             No economic transactions recorded yet.
           </div>
         ) : (
           reversed.map((tx) => {
             const isCredit = tx.type === "PAYMENT_RELEASE" || tx.type === "JUDICIAL_SETTLEMENT";
             const isPenalty = tx.type === "PENALTY_DEDUCTION";
-            const color = isCredit ? "#22c55e" : isPenalty ? "#ef4444" : "#38bdf8";
+            const badgeClass = isCredit
+              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+              : isPenalty
+              ? "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30"
+              : "bg-signal/15 text-signal border-signal/30";
+
+            const amountColorClass = isCredit
+              ? "text-emerald-700 dark:text-emerald-400"
+              : isPenalty
+              ? "text-rose-700 dark:text-rose-400"
+              : "text-signal";
 
             return (
               <div
                 key={tx.txId}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "0.45rem 0.65rem",
-                  background: "rgba(30, 41, 59, 0.35)",
-                  borderRadius: "5px",
-                  fontSize: "0.8rem",
-                }}
+                className="flex justify-between items-center p-2 bg-panel-high rounded border border-hairline text-xs"
               >
                 <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span
-                      style={{
-                        fontSize: "0.7rem",
-                        fontWeight: 600,
-                        padding: "0.1rem 0.4rem",
-                        borderRadius: "4px",
-                        background: `${color}20`,
-                        color,
-                      }}
-                    >
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${badgeClass}`}>
                       {tx.type}
                     </span>
-                    <span style={{ color: "#cbd5e1" }}>{tx.reason}</span>
+                    <span className="text-ink">{tx.reason}</span>
                   </div>
-                  <div style={{ fontSize: "0.7rem", color: "#64748b", marginTop: "0.15rem", fontFamily: "var(--font-mono, monospace)" }}>
+                  <div className="text-[11px] text-muted mt-0.5 mono">
                     {tx.fromDid.slice(0, 10)}... → {tx.toDid.slice(0, 10)}... • {new Date(tx.timestamp).toLocaleTimeString()}
                   </div>
                 </div>
 
-                <div style={{ textAlign: "right" }}>
-                  <span style={{ fontWeight: 700, color, fontFamily: "var(--font-mono, monospace)", fontSize: "0.9rem" }}>
+                <div className="text-right">
+                  <span className={`font-bold mono text-sm ${amountColorClass}`}>
                     {isCredit ? "+" : isPenalty ? "-" : ""}
                     {tx.amount.toLocaleString()} FLOP
                   </span>

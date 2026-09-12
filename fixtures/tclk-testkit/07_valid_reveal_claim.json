@@ -1,0 +1,19 @@
+{
+  "name": "07_valid_reveal_claim",
+  "description": "A valid reveal frame presenting the correct 32-byte hash preimage secret.",
+  "frame": {
+    "type": "reveal",
+    "from": "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+    "contract": "f5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "secret": "0x0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "reveal"
+  },
+  "expectedTransition": {
+    "accepted": true,
+    "fromStatus": "locked",
+    "toStatus": "claimed"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "10_invalid_refund_premature",
+  "description": "A refund frame attempted prematurely before refundAfterMs deadline.",
+  "frame": {
+    "type": "refund",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "contract": "f5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "reason": "Premature refund attempt"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "refund"
+  },
+  "expectedTransition": {
+    "accepted": false,
+    "expectedError": "refund"
+  }
+}

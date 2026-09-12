@@ -10,50 +10,26 @@ interface VerifiedProofViewerProps {
 
 export const VerifiedProofViewer: React.FC<VerifiedProofViewerProps> = ({ proof, onClose }) => {
   const isVerified = proof.status === "VERIFIED";
-  const statusColor = isVerified ? "#22c55e" : proof.status === "FAILED" ? "#ef4444" : "#eab308";
+  const statusBadgeClass = isVerified
+    ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+    : proof.status === "FAILED"
+    ? "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30"
+    : "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30";
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        right: 0,
-        bottom: 0,
-        width: "min(560px, 90vw)",
-        background: "rgba(10, 15, 29, 0.95)",
-        backdropFilter: "blur(16px)",
-        borderLeft: "1px solid rgba(56, 189, 248, 0.25)",
-        zIndex: 1000,
-        padding: "1.5rem",
-        overflowY: "auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "1.25rem",
-        boxShadow: "-10px 0 30px rgba(0,0,0,0.5)",
-      }}
-    >
+    <div className="fixed top-0 right-0 bottom-0 w-full sm:max-w-lg bg-panel/95 backdrop-blur-md border-l border-hairline z-50 p-6 overflow-y-auto flex flex-col gap-5 shadow-2xl text-ink">
       {/* Drawer Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div className="flex justify-between items-start">
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-            <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#f8fafc" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-lg font-bold text-ink">
               Verified Work Proof
-            </span>
-            <span
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 600,
-                padding: "0.2rem 0.5rem",
-                borderRadius: "999px",
-                background: `${statusColor}20`,
-                color: statusColor,
-                border: `1px solid ${statusColor}50`,
-              }}
-            >
+            </h2>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadgeClass}`}>
               {proof.status}
             </span>
           </div>
-          <div style={{ fontSize: "0.8rem", color: "#94a3b8", fontFamily: "var(--font-mono, monospace)" }}>
+          <div className="text-xs text-muted mono">
             {proof.proofId}
           </div>
         </div>
@@ -61,14 +37,8 @@ export const VerifiedProofViewer: React.FC<VerifiedProofViewerProps> = ({ proof,
         {onClose && (
           <button
             onClick={onClose}
-            style={{
-              background: "rgba(30, 41, 59, 0.5)",
-              border: "1px solid rgba(100, 116, 139, 0.3)",
-              color: "#cbd5e1",
-              borderRadius: "6px",
-              padding: "0.3rem 0.6rem",
-              cursor: "pointer",
-            }}
+            className="p-1.5 rounded-md bg-panel-high border border-hairline text-muted hover:text-ink hover:border-hairline-bright transition-colors cursor-pointer"
+            aria-label="Close"
           >
             ✕
           </button>
@@ -76,50 +46,42 @@ export const VerifiedProofViewer: React.FC<VerifiedProofViewerProps> = ({ proof,
       </div>
 
       {/* Provenance Details */}
-      <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(51, 65, 85, 0.4)", borderRadius: "8px", padding: "1rem" }}>
-        <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
+      <div className="bg-panel border border-hairline rounded-lg p-4 shadow-sm space-y-2">
+        <div className="text-[11px] font-bold text-muted uppercase tracking-wider">
           Cryptographic Provenance
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", fontSize: "0.8rem" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
           <div>
-            <span style={{ color: "#64748b" }}>Agent DID: </span>
-            <span style={{ color: "#cbd5e1", fontFamily: "var(--font-mono, monospace)" }}>{proof.agentDid.slice(0, 14)}...</span>
+            <span className="text-muted">Agent DID: </span>
+            <span className="text-ink mono">{proof.agentDid.slice(0, 14)}...</span>
           </div>
           <div>
-            <span style={{ color: "#64748b" }}>Mission: </span>
-            <span style={{ color: "#cbd5e1", fontFamily: "var(--font-mono, monospace)" }}>{proof.missionId}</span>
+            <span className="text-muted">Mission: </span>
+            <span className="text-ink mono">{proof.missionId}</span>
           </div>
           <div>
-            <span style={{ color: "#64748b" }}>Task: </span>
-            <span style={{ color: "#cbd5e1", fontFamily: "var(--font-mono, monospace)" }}>{proof.taskId}</span>
+            <span className="text-muted">Task: </span>
+            <span className="text-ink mono">{proof.taskId}</span>
           </div>
           <div>
-            <span style={{ color: "#64748b" }}>Timestamp: </span>
-            <span style={{ color: "#cbd5e1" }}>{proof.timestamp ? new Date(proof.timestamp).toLocaleTimeString() : "N/A"}</span>
+            <span className="text-muted">Timestamp: </span>
+            <span className="text-ink">{proof.timestamp ? new Date(proof.timestamp).toLocaleTimeString() : "N/A"}</span>
           </div>
         </div>
       </div>
 
       {/* Artifact Hashes (Proof of Integrity) */}
-      <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(51, 65, 85, 0.4)", borderRadius: "8px", padding: "1rem" }}>
-        <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
+      <div className="bg-panel border border-hairline rounded-lg p-4 shadow-sm space-y-2">
+        <div className="text-[11px] font-bold text-muted uppercase tracking-wider">
           Artifact Integrity Hashes (SHA-256)
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-          {proof.artifactHashes.map((h, idx) => (
+        <div className="flex flex-col gap-1.5">
+          {proof.artifactHashes.map((h: string, idx: number) => (
             <div
               key={idx}
-              style={{
-                fontSize: "0.75rem",
-                fontFamily: "var(--font-mono, monospace)",
-                color: "#38bdf8",
-                background: "rgba(30, 41, 59, 0.4)",
-                padding: "0.3rem 0.5rem",
-                borderRadius: "4px",
-                wordBreak: "break-all",
-              }}
+              className="text-xs mono text-signal bg-panel-high border border-hairline p-2 rounded break-all"
             >
-              <span style={{ color: "#64748b", marginRight: "0.4rem" }}>#{idx + 1}</span>
+              <span className="text-muted mr-1.5">#{idx + 1}</span>
               {h}
             </div>
           ))}
@@ -127,59 +89,50 @@ export const VerifiedProofViewer: React.FC<VerifiedProofViewerProps> = ({ proof,
       </div>
 
       {/* Automated Test Verification Summary */}
-      <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(51, 65, 85, 0.4)", borderRadius: "8px", padding: "1rem" }}>
-        <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
+      <div className="bg-panel border border-hairline rounded-lg p-4 shadow-sm space-y-2">
+        <div className="text-[11px] font-bold text-muted uppercase tracking-wider">
           Automated Sandbox Test Execution
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-          <span style={{ fontSize: "0.85rem", color: "#f1f5f9" }}>
+        <div className="flex justify-between items-center text-xs">
+          <span className="font-semibold text-ink">
             {proof.testSummary.passed} / {proof.testSummary.total} Tests Passed
           </span>
-          <span style={{ fontSize: "0.75rem", color: "#64748b" }}>
+          <span className="text-muted">
             Duration: {proof.testSummary.durationMs}ms
           </span>
         </div>
 
-        <div style={{ height: "6px", background: "rgba(30, 41, 59, 0.8)", borderRadius: "3px", overflow: "hidden", marginBottom: "0.5rem" }}>
+        <div className="h-1.5 bg-panel-high rounded-full overflow-hidden border border-hairline">
           <div
+            className={`h-full ${isVerified ? "bg-emerald-500" : "bg-rose-500"}`}
             style={{
-              height: "100%",
               width: `${proof.testSummary.total > 0 ? (proof.testSummary.passed / proof.testSummary.total) * 100 : 0}%`,
-              background: isVerified ? "#22c55e" : "#ef4444",
             }}
           />
         </div>
 
-        <div style={{ fontSize: "0.75rem", color: "#64748b", fontFamily: "var(--font-mono, monospace)" }}>
+        <div className="text-[11px] text-muted mono">
           Test Result Hash: {proof.testResultHash.slice(0, 32)}...
         </div>
       </div>
 
       {/* Pipeline Verification Steps */}
       {proof.pipelineResult && proof.pipelineResult.checks && (
-        <div style={{ background: "rgba(15, 23, 42, 0.6)", border: "1px solid rgba(51, 65, 85, 0.4)", borderRadius: "8px", padding: "1rem" }}>
-          <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "0.5rem" }}>
+        <div className="bg-panel border border-hairline rounded-lg p-4 shadow-sm space-y-2">
+          <div className="text-[11px] font-bold text-muted uppercase tracking-wider">
             Verification Pipeline Checks
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-            {proof.pipelineResult.checks.map((check) => (
+          <div className="flex flex-col gap-1.5">
+            {proof.pipelineResult.checks.map((check: { stepName: string; passed: boolean; details: string }) => (
               <div
                 key={check.stepName}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontSize: "0.8rem",
-                  padding: "0.3rem 0.5rem",
-                  background: "rgba(30, 41, 59, 0.3)",
-                  borderRadius: "4px",
-                }}
+                className="flex justify-between items-center text-xs p-2 bg-panel-high border border-hairline rounded"
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                <div className="flex items-center gap-1.5">
                   <span>{check.passed ? "✅" : "❌"}</span>
-                  <span style={{ color: "#f1f5f9" }}>{check.stepName}</span>
+                  <span className="text-ink font-medium">{check.stepName}</span>
                 </div>
-                <span style={{ fontSize: "0.7rem", color: "#94a3b8" }}>{check.details}</span>
+                <span className="text-[11px] text-muted mono">{check.details}</span>
               </div>
             ))}
           </div>

@@ -1,0 +1,28 @@
+{
+  "name": "01_valid_offer",
+  "description": "A well-formed TCLK hashlock deal offer proposed by an agent payer.",
+  "frame": {
+    "type": "offer",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "role": "payer",
+    "amount": "1000",
+    "asset": "FLOP",
+    "lock": "hash",
+    "rails": ["paper", "flop-htlc"],
+    "expiresMs": 1789201000000,
+    "claimByMs": 1789205000000,
+    "refundAfterMs": 1789210000000,
+    "nonce": "a1b2c3d4e5f60718293a4b5c6d7e8f90",
+    "id": "0x31f7950ea87883d0ceba41c22672892367cdbfc77ccdc905bb27d69aaa3c9ab7"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "offer",
+    "lockKind": "hash"
+  },
+  "expectedTransition": {
+    "accepted": true,
+    "fromStatus": "none",
+    "toStatus": "proposed"
+  }
+}

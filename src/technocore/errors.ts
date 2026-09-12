@@ -16,8 +16,10 @@
 export type TechnocoreErrorCode =
   | "BROWSER_UNSUPPORTED"
   | "NETWORK_UNREACHABLE"
+  | "NETWORK_UNAVAILABLE"
   | "REQUEST_BLOCKED"
   | "TIMEOUT"
+  | "UPSTREAM_TIMEOUT"
   | "CANCELLED"
   | "RATE_LIMITED"
   | "REGISTRY_UNCONFIRMED"
@@ -28,7 +30,12 @@ export type TechnocoreErrorCode =
   | "INVALID_COMMIT"
   | "MALFORMED_RESPONSE"
   | "UPSTREAM_ERROR"
-  | "EGRESS_REFUSED";
+  | "EGRESS_REFUSED"
+  | "INVALID_IDENTITY"
+  | "BACKUP_VERIFICATION_FAILED"
+  | "SESSION_EXPIRED"
+  | "PROXY_UNAVAILABLE"
+  | "UNKNOWN_ERROR";
 
 export interface ErrorPresentation {
   /** Short, human, no jargon. Becomes the heading of the error state. */
@@ -66,6 +73,14 @@ const PRESENTATION: Record<TechnocoreErrorCode, ErrorPresentation> = {
     severity: "attention",
     retryable: true,
   },
+  NETWORK_UNAVAILABLE: {
+    title: "Network connection unavailable",
+    detail: "Could not establish a connection to Technocore network. Connectivity may be offline or blocked.",
+    remedy: "Check your internet connection and retry. Your in-memory key state and generated signatures remain intact.",
+    blocking: false,
+    severity: "attention",
+    retryable: true,
+  },
   REQUEST_BLOCKED: {
     title: "The browser blocked the request",
     detail:
@@ -80,6 +95,14 @@ const PRESENTATION: Record<TechnocoreErrorCode, ErrorPresentation> = {
     title: "Technocore did not respond in time",
     detail: "The request was cancelled after the timeout elapsed. It may or may not have been received.",
     remedy: "Retry. If the step repeats, read the room to check whether the message already landed.",
+    blocking: false,
+    severity: "attention",
+    retryable: true,
+  },
+  UPSTREAM_TIMEOUT: {
+    title: "Technocore upstream timed out",
+    detail: "The upstream Technocore service did not respond within the allocated timeout window.",
+    remedy: "Retry sending the request. Your signed message is preserved and safe to re-transmit.",
     blocking: false,
     severity: "attention",
     retryable: true,
@@ -182,6 +205,46 @@ const PRESENTATION: Record<TechnocoreErrorCode, ErrorPresentation> = {
     blocking: true,
     severity: "fault",
     retryable: false,
+  },
+  INVALID_IDENTITY: {
+    title: "Invalid or mismatched DID",
+    detail: "The derived DID does not match the Ed25519 public key format (did:key:z6Mk...).",
+    remedy: "Generate a fresh identity or re-import a valid backup file.",
+    blocking: true,
+    severity: "fault",
+    retryable: false,
+  },
+  BACKUP_VERIFICATION_FAILED: {
+    title: "Backup verification failed",
+    detail: "The provided passphrase could not decrypt the backup file, or the decrypted key did not match the DID.",
+    remedy: "Check your passphrase for exact spelling and casing, and verify you selected the correct .backup.json file.",
+    blocking: true,
+    severity: "fault",
+    retryable: true,
+  },
+  SESSION_EXPIRED: {
+    title: "Identity session reset",
+    detail: "The in-memory signing handle is not present. In accordance with non-custodial security, keys are never held in cookies or localStorage.",
+    remedy: "Import your encrypted .backup.json file at /import with your passphrase to restore your session.",
+    blocking: true,
+    severity: "attention",
+    retryable: false,
+  },
+  PROXY_UNAVAILABLE: {
+    title: "Local proxy unreachable",
+    detail: "The local Next.js API proxy route (/api/technocore/...) did not respond. The development server may not be running.",
+    remedy: "Ensure the Next.js server ('npm run dev') is running on port 3000, then retry.",
+    blocking: false,
+    severity: "fault",
+    retryable: true,
+  },
+  UNKNOWN_ERROR: {
+    title: "Unexpected error",
+    detail: "An unexpected condition occurred. No private key or secret material was leaked.",
+    remedy: "Retry the operation. If it persists, export your backup and reload the page.",
+    blocking: true,
+    severity: "fault",
+    retryable: true,
   },
 };
 

@@ -1,0 +1,19 @@
+{
+  "name": "11_valid_cancel_before_accept",
+  "description": "A valid cancellation of an unaccepted deal offer by its author.",
+  "frame": {
+    "type": "cancel",
+    "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    "contract": "f5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "reason": "Withdrawing unanswered offer"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "cancel"
+  },
+  "expectedTransition": {
+    "accepted": true,
+    "fromStatus": "proposed",
+    "toStatus": "cancelled"
+  }
+}

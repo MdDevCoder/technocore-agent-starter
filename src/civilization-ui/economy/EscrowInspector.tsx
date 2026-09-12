@@ -9,124 +9,87 @@ interface EscrowInspectorProps {
 }
 
 export const EscrowInspector: React.FC<EscrowInspectorProps> = ({ escrow, onSelectProof }) => {
-  const statusColor =
+  const statusBadgeClass =
     escrow.status === "RELEASED"
-      ? "#22c55e"
+      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
       : escrow.status === "REFUNDED"
-      ? "#ef4444"
+      ? "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30"
       : escrow.status === "DISPUTED"
-      ? "#f97316"
-      : "#eab308";
+      ? "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30"
+      : "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30";
 
   return (
-    <div
-      style={{
-        background: "rgba(15, 23, 42, 0.6)",
-        border: "1px solid rgba(51, 65, 85, 0.5)",
-        borderRadius: "8px",
-        padding: "1rem 1.25rem",
-        display: "flex",
-        flexDirection: "column",
-        gap: "0.75rem",
-      }}
-    >
+    <div className="bg-panel border border-hairline rounded-lg p-4 flex flex-col gap-3 shadow-sm">
       {/* Escrow Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <div className="flex justify-between items-start">
         <div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
-            <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#f8fafc", fontFamily: "var(--font-mono, monospace)" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-sm font-bold text-ink mono">
               {escrow.escrowId}
             </span>
-            <span
-              style={{
-                fontSize: "0.7rem",
-                fontWeight: 600,
-                padding: "0.15rem 0.5rem",
-                borderRadius: "999px",
-                background: `${statusColor}20`,
-                color: statusColor,
-                border: `1px solid ${statusColor}40`,
-              }}
-            >
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${statusBadgeClass}`}>
               {escrow.status}
             </span>
           </div>
-          <div style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
-            Mission: <span style={{ fontFamily: "var(--font-mono, monospace)", color: "#cbd5e1" }}>{escrow.missionId}</span>
+          <div className="text-xs text-muted">
+            Mission: <span className="mono text-ink">{escrow.missionId}</span>
           </div>
         </div>
 
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#38bdf8", fontFamily: "var(--font-mono, monospace)" }}>
+        <div className="text-right">
+          <div className="text-base font-bold text-signal mono">
             {escrow.totalBudget.toLocaleString()} FLOP
           </div>
-          <div style={{ fontSize: "0.7rem", color: "#64748b" }}>
+          <div className="text-[11px] text-muted">
             Locked: {escrow.lockedBudget} • Released: {escrow.releasedAmount}
           </div>
         </div>
       </div>
 
       {/* Milestone Progress List */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem", marginTop: "0.25rem" }}>
-        <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+      <div className="flex flex-col gap-1.5 mt-1">
+        <div className="text-[11px] font-bold text-muted uppercase tracking-wider">
           Milestone Allocations
         </div>
 
         {escrow.milestones.map((m) => {
-          const mColor =
+          const borderIndicator =
             m.status === "RELEASED"
-              ? "#22c55e"
+              ? "border-l-emerald-500"
               : m.status === "REFUNDED"
-              ? "#ef4444"
+              ? "border-l-rose-500"
               : m.status === "VERIFIED"
-              ? "#38bdf8"
-              : "#eab308";
+              ? "border-l-signal"
+              : "border-l-amber-500";
 
           return (
             <div
               key={m.milestoneId}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "0.4rem 0.6rem",
-                background: "rgba(30, 41, 59, 0.4)",
-                borderRadius: "5px",
-                borderLeft: `3px solid ${mColor}`,
-                fontSize: "0.8rem",
-              }}
+              className={`flex justify-between items-center p-2 bg-panel-high rounded border border-hairline border-l-4 ${borderIndicator} text-xs`}
             >
               <div>
-                <span style={{ fontWeight: 600, color: "#f1f5f9", marginRight: "0.5rem" }}>{m.title}</span>
+                <span className="font-semibold text-ink mr-2">{m.title}</span>
                 {m.assignedAgentDid && (
-                  <span style={{ color: "#64748b", fontFamily: "var(--font-mono, monospace)", fontSize: "0.7rem" }}>
+                  <span className="text-muted mono text-[10px]">
                     → {m.assignedAgentDid.slice(0, 10)}...
                   </span>
                 )}
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <span style={{ fontWeight: 600, color: "#cbd5e1", fontFamily: "var(--font-mono, monospace)" }}>
+              <div className="flex items-center gap-3">
+                <span className="font-semibold text-ink mono">
                   {m.amount.toLocaleString()} FLOP
                 </span>
 
                 {m.requiredProofId ? (
                   <button
                     onClick={() => onSelectProof?.(m.requiredProofId!)}
-                    style={{
-                      background: "rgba(56, 189, 248, 0.15)",
-                      border: "1px solid rgba(56, 189, 248, 0.3)",
-                      color: "#38bdf8",
-                      borderRadius: "4px",
-                      padding: "0.15rem 0.4rem",
-                      fontSize: "0.7rem",
-                      cursor: "pointer",
-                    }}
+                    className="bg-signal/15 border border-signal/30 text-signal hover:bg-signal/25 rounded px-2 py-0.5 text-[11px] font-medium transition-colors cursor-pointer"
                   >
                     View Proof 🔍
                   </button>
                 ) : (
-                  <span style={{ fontSize: "0.7rem", color: mColor, textTransform: "capitalize" }}>
+                  <span className="text-[11px] text-muted capitalize">
                     {m.status.toLowerCase()}
                   </span>
                 )}

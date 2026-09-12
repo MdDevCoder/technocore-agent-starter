@@ -5,7 +5,10 @@
   "type": "module",
   "description": "Community-built browser tooling for creating a Technocore agent identity and a verifiable contribution record.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev-server.mjs",
+    "dev:clean": "node scripts/dev-server.mjs --clean",
+    "health:css": "node scripts/check-css-health.mjs",
+    "health:onboarding": "node scripts/check-onboarding-health.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -27,7 +30,8 @@
     "test:protocol": "node verification/differential.test.mjs && node verification/negative.test.mjs && node verification/templates.test.mjs",
     "observe:technocore": "node scripts/observe-technocore.mjs",
     "doctor:signature": "node scripts/doctor-signature.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol"
+    "testkit:tclk": "node --experimental-strip-types scripts/testkit-tclk.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol && npm run health:onboarding"
   },
   "dependencies": {
     "@flop-labs/tclk": "^0.1.0",

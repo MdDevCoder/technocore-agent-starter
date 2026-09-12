@@ -24,10 +24,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
     case "LIVE_NETWORK":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/30 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 ${className}`}
           title="Authentic external data observed directly from the Technocore network"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           LIVE NETWORK
         </span>
       );
@@ -35,10 +35,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
     case "LIVE_PERSISTENCE":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/30 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 ${className}`}
           title="Authoritative state persisted in PostgreSQL/EventStore"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           LIVE PERSISTENCE
         </span>
       );
@@ -46,10 +46,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
     case "DERIVED_FROM_LIVE_EVENTS":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded bg-sky-500/15 px-2 py-0.5 text-[10px] font-bold text-sky-400 border border-sky-500/30 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded bg-sky-500/15 px-2 py-0.5 text-[10px] font-bold text-sky-700 dark:text-sky-400 border border-sky-500/30 ${className}`}
           title="Deterministically projected from verified historical live events"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-sky-400" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-sky-500" />
           DERIVED FROM LIVE
         </span>
       );
@@ -57,10 +57,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
     case "LOCAL_SIMULATION":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-400 border border-amber-500/30 ${className}`}
           title="Deterministic in-browser autonomous world simulation"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500" />
           LOCAL SIMULATION
         </span>
       );
@@ -68,10 +68,10 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
     case "LOCAL_DEMO":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded bg-purple-500/15 px-2 py-0.5 text-[10px] font-bold text-purple-400 border border-purple-500/30 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded bg-purple-500/15 px-2 py-0.5 text-[10px] font-bold text-purple-700 dark:text-purple-400 border border-purple-500/30 ${className}`}
           title="Static demo fixture for local UI testing and presentation"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-400" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500" />
           LOCAL DEMO
         </span>
       );
@@ -79,17 +79,17 @@ export const ProvenanceBadge: React.FC<ProvenanceBadgeProps> = ({
     case "REHEARSAL":
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-400 border border-rose-500/30 ${className}`}
+          className={`inline-flex items-center gap-1.5 rounded bg-rose-500/15 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-400 border border-rose-500/30 ${className}`}
           title="Educational PaperRail / MemoryRail settlement rehearsal (no financial value settled)"
         >
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-400" />
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500" />
           REHEARSAL RAIL
         </span>
       );
 
     default:
       return (
-        <span className={`inline-flex items-center gap-1 rounded bg-muted/20 px-2 py-0.5 text-[10px] font-bold text-muted border border-muted/30 ${className}`}>
+        <span className={`inline-flex items-center gap-1 rounded bg-panel-high px-2 py-0.5 text-[10px] font-bold text-muted border border-hairline ${className}`}>
           {formatProvenanceLabel(provenance)}
         </span>
       );
@@ -121,7 +121,7 @@ export const FreshnessBanner: React.FC<FreshnessBannerProps> = ({
   }, [metadata.updatedAt]);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-hairline bg-panel p-2.5 px-3 mono text-xs shrink-0">
+    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-hairline bg-panel p-2.5 px-3 mono text-xs shrink-0 shadow-sm">
       <div className="flex flex-wrap items-center gap-3">
         {/* Mode Switcher */}
         {onToggleMode && (
@@ -129,14 +129,14 @@ export const FreshnessBanner: React.FC<FreshnessBannerProps> = ({
             onClick={onToggleMode}
             className={`flex items-center gap-1.5 rounded px-2.5 py-1 text-[11px] font-bold transition-all border ${
               isLiveMode
-                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/30"
-                : "bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30"
+                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/25"
+                : "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/40 hover:bg-amber-500/25"
             }`}
             title="Switch between Authoritative Live Data and Deterministic Simulation"
           >
             <span
               className={`inline-block w-2 h-2 rounded-full ${
-                isLiveMode ? "bg-emerald-400 animate-pulse" : "bg-amber-400"
+                isLiveMode ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
               }`}
             />
             {isLiveMode ? "● LIVE MODE" : "⚙ SIMULATION MODE"}
@@ -152,20 +152,20 @@ export const FreshnessBanner: React.FC<FreshnessBannerProps> = ({
           {isLiveMode ? (
             <>
               {metadata.freshness === "LIVE" && (
-                <span className="text-emerald-400 font-bold">● LIVE / SYNCED</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-bold">● LIVE / SYNCED</span>
               )}
               {metadata.freshness === "UPDATING" && (
-                <span className="text-sky-400 font-bold animate-pulse">SYNCING / CONNECTING...</span>
+                <span className="text-sky-700 dark:text-sky-400 font-bold animate-pulse">SYNCING / CONNECTING...</span>
               )}
               {metadata.freshness === "STALE" && (
-                <span className="text-amber-400 font-bold">NETWORK STALE</span>
+                <span className="text-amber-800 dark:text-amber-400 font-bold">NETWORK STALE</span>
               )}
               {metadata.freshness === "OFFLINE" && (
-                <span className="text-rose-400 font-bold">OFFLINE (Showing last verified state)</span>
+                <span className="text-rose-700 dark:text-rose-400 font-bold">OFFLINE (Showing last verified state)</span>
               )}
             </>
           ) : (
-            <span className="text-amber-400 font-bold">⚙ SIMULATION ACTIVE</span>
+            <span className="text-amber-800 dark:text-amber-400 font-bold">⚙ SIMULATION ACTIVE</span>
           )}
         </div>
 

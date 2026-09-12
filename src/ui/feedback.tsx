@@ -130,13 +130,23 @@ export function ErrorNotice({ failure, onRetry, retryLabel, children, className 
       <p>{failure.detail}</p>
       <p className="text-ink/85 mt-2">{failure.remedy}</p>
 
-      {failure.code === undefined && failure.status === undefined ? null : (
-        <p className="mono text-faint mt-3 text-[0.6875rem] tracking-wide">
-          {[failure.code, failure.status === undefined ? null : `HTTP ${failure.status}`]
-            .filter((part): part is string => typeof part === "string" && part.length > 0)
-            .join(" · ")}
-        </p>
-      )}
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.6875rem] mono text-faint">
+        {failure.code === undefined && failure.status === undefined ? null : (
+          <span>
+            {[failure.code, failure.status === undefined ? null : `HTTP ${failure.status}`]
+              .filter((part): part is string => typeof part === "string" && part.length > 0)
+              .join(" · ")}
+          </span>
+        )}
+        {failure.keyState === "intact" ? (
+          <span className="text-verified font-medium">✓ Key state intact in memory</span>
+        ) : failure.keyState === "wiped" ? (
+          <span className="text-attention font-medium">⚠ In-memory key state wiped (restore via /import)</span>
+        ) : null}
+        {failure.retryable ? (
+          <span className="text-ink/60">Safe to retry</span>
+        ) : null}
+      </div>
 
       {showRetry || children !== undefined ? (
         <div className="mt-4 flex flex-wrap gap-2">

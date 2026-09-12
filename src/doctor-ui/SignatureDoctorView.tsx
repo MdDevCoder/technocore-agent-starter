@@ -269,7 +269,17 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
 
             {/* Text Payload */}
             <div className="space-y-1">
-              <label className="text-muted block text-[10px] uppercase font-semibold mono">Raw Text Payload:</label>
+              <div className="flex items-center justify-between">
+                <label className="text-muted block text-[10px] uppercase font-semibold mono">Raw Text Payload:</label>
+                {text.trim().startsWith("tclk1 ") && (
+                  <a
+                    href={`/testkit?source=doctor&frame=${encodeURIComponent(text.trim())}`}
+                    className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25 transition-colors mono"
+                  >
+                    ↗ Validate in TCLK-TestKit
+                  </a>
+                )}
+              </div>
               <textarea
                 rows={4}
                 value={text}
@@ -337,30 +347,30 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
 
             {/* Matched Variant Callout */}
             {report?.canonicalVerification.verified ? (
-              <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30 text-emerald-300 text-xs mono space-y-1">
+              <div className="p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs mono space-y-1">
                 <div className="font-bold uppercase tracking-wider">✓ Verified Under Canonical Rule</div>
-                <p className="text-xs font-sans text-emerald-400/90">
+                <p className="text-xs font-sans text-emerald-900/90 dark:text-emerald-400/90">
                   The signature strictly verifies against canonical formula: UTF-8(room + &quot;|&quot; + nonce + &quot;|&quot; + text). No candidate mutations needed.
                 </p>
               </div>
             ) : report?.differentialAnalysis.matchedVariant ? (
-              <div className="p-3 rounded-lg bg-amber-950/25 border border-amber-500/40 text-amber-300 text-xs mono space-y-2">
+              <div className="p-3 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-300 text-xs mono space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold uppercase tracking-wider text-amber-200">
+                  <span className="font-bold uppercase tracking-wider text-amber-950 dark:text-amber-200">
                     ⚡ Root Cause Identified: {report.differentialAnalysis.matchedCategory}
                   </span>
-                  <span className="rounded bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold">
+                  <span className="rounded bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">
                     CONFIDENCE: {report.differentialAnalysis.confidence}
                   </span>
                 </div>
-                <p className="text-xs font-sans text-amber-200/90">
+                <p className="text-xs font-sans text-amber-900/90 dark:text-amber-200/90">
                   {report.differentialAnalysis.primaryExplanation}
                 </p>
 
                 {/* Remediation Snippet */}
                 {report.differentialAnalysis.remediationSnippet && (
                   <div className="mt-2 pt-2 border-t border-amber-500/30">
-                    <span className="text-[10px] uppercase font-bold text-amber-400 block mb-1">
+                    <span className="text-[10px] uppercase font-bold text-amber-800 dark:text-amber-400 block mb-1">
                       Actionable Remediation:
                     </span>
                     <pre className="p-2 rounded bg-void border border-hairline text-signal text-[11px] overflow-x-auto select-all">
@@ -386,21 +396,21 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
                     key={cand.variantId}
                     className={`p-2 rounded border flex items-center justify-between ${
                       cand.verified
-                        ? "bg-amber-950/20 border-amber-500/40 text-amber-300"
+                        ? "bg-amber-500/15 border-amber-500/40 text-amber-900 dark:text-amber-300"
                         : "bg-void border-hairline text-muted"
                     }`}
                   >
                     <div className="flex items-center gap-2 truncate">
                       <span
                         className={`rounded px-1.5 py-0.2 text-[10px] font-bold ${
-                          cand.verified ? "bg-amber-500/20 text-amber-300" : "bg-panel-high text-faint"
+                          cand.verified ? "bg-amber-500/20 text-amber-800 dark:text-amber-300" : "bg-panel-high text-muted"
                         }`}
                       >
                         {cand.category}
                       </span>
                       <span className="truncate">{cand.name}</span>
                     </div>
-                    <span className={`text-[10px] font-bold ${cand.verified ? "text-amber-300" : "text-faint"}`}>
+                    <span className={`text-[10px] font-bold ${cand.verified ? "text-amber-800 dark:text-amber-300" : "text-muted"}`}>
                       {cand.verified ? "MATCHED (NON-CANONICAL)" : "MISMATCH"}
                     </span>
                   </div>
@@ -465,7 +475,7 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
             </div>
             <div>
               <span className="text-muted text-[10px] block">Shape Diagnostic:</span>
-              <span className={report?.signatureDiagnostics.isValidShape ? "text-emerald-400 font-bold" : "text-rose-400"}>
+              <span className={report?.signatureDiagnostics.isValidShape ? "text-emerald-700 dark:text-emerald-400 font-bold" : "text-rose-700 dark:text-rose-400 font-bold"}>
                 {report?.signatureDiagnostics.isValidShape ? "Valid 86-char unpadded Base64URL" : report?.signatureDiagnostics.error || "Invalid Shape"}
               </span>
             </div>
@@ -482,7 +492,7 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               <div>
                 <span className="text-muted text-[10px] block">Multibase:</span>
-                <span className={report?.didDiagnostics.multibaseValid ? "text-emerald-400 font-bold" : "text-rose-400"}>
+                <span className={report?.didDiagnostics.multibaseValid ? "text-emerald-700 dark:text-emerald-400 font-bold" : "text-rose-700 dark:text-rose-400 font-bold"}>
                   {report?.didDiagnostics.multibaseValid ? "Base58 BTC ('z')" : "Invalid"}
                 </span>
               </div>

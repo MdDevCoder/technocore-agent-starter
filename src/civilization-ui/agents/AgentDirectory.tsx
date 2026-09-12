@@ -30,20 +30,20 @@ function getConfidenceBadge(confidence: string) {
     case "authoritative":
       return <span className="rounded bg-signal/20 px-1.5 py-0.5 text-[10px] font-bold text-signal border border-signal/40">AUTH</span>;
     case "high":
-      return <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-bold text-sky-400 border border-sky-500/30">HIGH</span>;
+      return <span className="rounded bg-sky-500/15 px-1.5 py-0.5 text-[10px] font-bold text-sky-700 dark:text-sky-400 border border-sky-500/30">HIGH</span>;
     case "medium":
-      return <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30">MED</span>;
+      return <span className="rounded bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-400 border border-amber-500/30">MED</span>;
     case "low":
-      return <span className="rounded bg-orange-500/20 px-1.5 py-0.5 text-[10px] font-bold text-orange-400 border border-orange-500/30">LOW</span>;
+      return <span className="rounded bg-orange-500/15 px-1.5 py-0.5 text-[10px] font-bold text-orange-800 dark:text-orange-400 border border-orange-500/30">LOW</span>;
     default:
-      return <span className="rounded bg-muted/20 px-1.5 py-0.5 text-[10px] font-bold text-muted border border-muted/30">UNVERIFIED</span>;
+      return <span className="rounded bg-panel-high px-1.5 py-0.5 text-[10px] font-bold text-muted border border-hairline">UNVERIFIED</span>;
   }
 }
 
 function getScoreColor(score: number): { text: string; bg: string; border: string } {
   if (score >= 70) return { text: "text-signal", bg: "bg-signal/15", border: "border-signal/40" };
-  if (score >= 40) return { text: "text-amber-400", bg: "bg-amber-500/15", border: "border-amber-500/40" };
-  return { text: "text-muted", bg: "bg-muted/15", border: "border-muted/30" };
+  if (score >= 40) return { text: "text-amber-800 dark:text-amber-400", bg: "bg-amber-500/15", border: "border-amber-500/40" };
+  return { text: "text-muted", bg: "bg-panel-high", border: "border-hairline" };
 }
 
 export const AgentDirectory: React.FC<AgentDirectoryProps> = ({
@@ -114,41 +114,41 @@ export const AgentDirectory: React.FC<AgentDirectoryProps> = ({
   return (
     <div className="flex flex-col gap-4 h-full">
       {/* Rehearsal Notice Banner */}
-      <div className="flex items-center justify-between rounded-lg border border-amber-500/40 bg-amber-500/10 px-3.5 py-2 text-xs mono text-amber-300">
+      <div className="flex items-center justify-between rounded-lg border border-amber-500/40 bg-amber-500/10 px-3.5 py-2 text-xs mono text-amber-900 dark:text-amber-300">
         <div className="flex items-center gap-2">
           <span className="text-base">🛡️</span>
           <span>
             <strong className="font-bold">EVIDENCE-DERIVED REPUTATION</strong> — Pure deterministic projection over signed CivilizationEvents. No farming, no message-volume inflation.
           </span>
         </div>
-        <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/30">
+        <span className="rounded bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300 border border-amber-500/30">
           EVENT-SOURCED
         </span>
       </div>
 
       {/* KPI Cards Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono">
+        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono shadow-sm">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">KNOWN CITIZENS</span>
           <span className="text-xl font-bold text-ink mt-1">{kpis.totalAgents}</span>
           <span className="text-[10px] text-muted mt-0.5">Discovered on ledger</span>
         </div>
 
-        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono">
+        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono shadow-sm">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">VERIFIED WORKERS</span>
           <span className="text-xl font-bold text-signal mt-1">{kpis.verifiedWorkers}</span>
           <span className="text-[10px] text-muted mt-0.5">With accepted work proofs</span>
         </div>
 
-        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono">
+        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono shadow-sm">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">TOTAL SETTLED DEALS</span>
-          <span className="text-xl font-bold text-sky-400 mt-1">{kpis.totalSettledDeals}</span>
+          <span className="text-xl font-bold text-sky-700 dark:text-sky-400 mt-1">{kpis.totalSettledDeals}</span>
           <span className="text-[10px] text-muted mt-0.5">TCLK/1 contracts completed</span>
         </div>
 
-        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono">
+        <div className="flex flex-col rounded-lg border border-hairline bg-panel p-3 mono shadow-sm">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted">AVG NETWORK SCORE</span>
-          <span className="text-xl font-bold text-amber-400 mt-1">{kpis.avgReputation} / 100</span>
+          <span className="text-xl font-bold text-amber-800 dark:text-amber-400 mt-1">{kpis.avgReputation} / 100</span>
           <span className="text-[10px] text-muted mt-0.5">Bounded aggregate</span>
         </div>
       </div>

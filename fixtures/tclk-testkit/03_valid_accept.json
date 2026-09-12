@@ -1,0 +1,21 @@
+{
+  "name": "03_valid_accept",
+  "description": "A valid acceptance of an active hashlock deal offer by an agent payee.",
+  "frame": {
+    "type": "accept",
+    "from": "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+    "ref": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "statement": "0x2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824",
+    "contract": "0xf5a8b7c6d9e0123456789abcdef0123456789abcdef0123456789abcdef01234",
+    "nonce": "c0ffee00112233445566778899aabbcc"
+  },
+  "expectedValidation": {
+    "valid": true,
+    "frameType": "accept"
+  },
+  "expectedTransition": {
+    "accepted": true,
+    "fromStatus": "proposed",
+    "toStatus": "accepted"
+  }
+}

@@ -48,6 +48,8 @@ export interface FlowFailure {
   readonly retryable: boolean;
   /** Present only when this came from the protocol taxonomy, so the UI can show the code. */
   readonly code?: TechnocoreErrorCode;
+  /** In-memory key state status to inform the user whether their identity remains safe in RAM. */
+  readonly keyState?: "intact" | "wiped" | "not-generated";
   /** Which input to focus, when the failure is about a specific field. */
   readonly field?: string;
   /** HTTP status, when there was a response. */
@@ -75,6 +77,7 @@ export function failureFromCode(code: TechnocoreErrorCode, status?: number): Flo
     blocking: presentation.blocking,
     retryable: presentation.retryable,
     code,
+    keyState: "intact",
     ...(status === undefined ? {} : { status }),
   };
 }
@@ -97,6 +100,7 @@ export function toFlowFailure(error: unknown): FlowFailure {
       blocking: error.presentation.blocking,
       retryable: error.presentation.retryable,
       code: error.code,
+      keyState: "intact",
       ...(status === undefined ? {} : { status }),
     };
   }
@@ -113,6 +117,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
       remedy:
         "Check the passphrase, including capitals and spacing, and confirm you selected the file you " +
         "saved from this app. Nothing is retried automatically.",
+      code: "BACKUP_VERIFICATION_FAILED",
+      keyState: "intact",
       retryable: true,
     });
   }
@@ -124,6 +130,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
         "The file decrypted, but the key inside it derives a different DID from the one written in the " +
         "file. That means the file has been edited.",
       remedy: "Use an unmodified backup file. Do not continue with this one.",
+      code: "INVALID_IDENTITY",
+      keyState: "intact",
     });
   }
 
@@ -134,6 +142,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
       remedy:
         "Choose the .backup.json file this app produced. It never asks for a plaintext key file, a " +
         "seed phrase, or a wallet key.",
+      code: "BACKUP_VERIFICATION_FAILED",
+      keyState: "intact",
       field: "file",
     });
   }
@@ -182,7 +192,9 @@ export function toFlowFailure(error: unknown): FlowFailure {
     return make({
       title: "The key is no longer in memory for this session",
       detail: error.message,
-      remedy: "Import your encrypted backup file to regain the ability to export a new one.",
+      remedy: "Import your encrypted backup file at /import to regain the ability to export a new one.",
+      code: "SESSION_EXPIRED",
+      keyState: "wiped",
     });
   }
 
@@ -193,6 +205,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
       remedy: "Re-select the file you saved and enter its passphrase to prove it opens.",
       severity: "attention",
       blocking: false,
+      code: "BACKUP_VERIFICATION_FAILED",
+      keyState: "intact",
       retryable: true,
     });
   }
@@ -205,6 +219,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
         ? "Paste the full public link to your work, starting with https://."
         : "Say in a few words what your contribution helps people understand.",
       field: error.field,
+      code: "INVALID_URL",
+      keyState: "intact",
     });
   }
 
@@ -217,7 +233,9 @@ export function toFlowFailure(error: unknown): FlowFailure {
           ? "Paste the full 40- or 64-character hash, or skip the optional proof file."
           : "Paste the full public link to your work, starting with https://.",
       field: error.field,
+      code: error.field === "commit" ? "INVALID_COMMIT" : "INVALID_URL",
       blocking: error.field !== "commit",
+      keyState: "intact",
     });
   }
 
@@ -227,6 +245,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
       detail: error.message,
       remedy: "Choose a .proof.json file produced by this app or by the reference CLI.",
       field: "file",
+      code: "MALFORMED_RESPONSE",
+      keyState: "intact",
     });
   }
 
@@ -237,6 +257,7 @@ export function toFlowFailure(error: unknown): FlowFailure {
       remedy: "Post the contribution record first. Nothing is assembled from a placeholder.",
       severity: "attention",
       blocking: false,
+      keyState: "intact",
     });
   }
 
@@ -245,6 +266,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
       title: "Misconfigured room name",
       detail: error.message,
       remedy: "This is a configuration problem in the app rather than something you did. Please report it.",
+      code: "EGRESS_REFUSED",
+      keyState: "intact",
     });
   }
 
@@ -254,6 +277,8 @@ export function toFlowFailure(error: unknown): FlowFailure {
       title: "Blocked by a local safety check",
       detail: "Something in this app tried to serialize the signing key. The attempt was refused.",
       remedy: "Nothing left the browser. Please report this — it is a bug in the app, not in your input.",
+      code: "EGRESS_REFUSED",
+      keyState: "intact",
     });
   }
 
@@ -263,6 +288,7 @@ export function toFlowFailure(error: unknown): FlowFailure {
     title: "Something went wrong in this browser",
     detail: describe(error),
     remedy: "Retry the step. If it happens again, reload the page and import your backup to continue.",
+    code: "UNKNOWN_ERROR",
     retryable: true,
   });
 }

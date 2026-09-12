@@ -1,0 +1,66 @@
+{
+  "name": "12_complete_lifecycle",
+  "description": "A complete 4-step canonical TCLK deal lifecycle from initial offer through successful secret claim settlement.",
+  "scenario": "full-lifecycle",
+  "steps": [
+    {
+      "step": 1,
+      "description": "Payer agent creates deal offer for 500 FLOP with hash lock",
+      "frame": {
+        "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+        "role": "payer",
+        "amount": "500",
+        "asset": "FLOP",
+        "lock": "hash",
+        "rails": [
+          "paper",
+          "flop-htlc"
+        ],
+        "expiresMs": 1789203600000,
+        "claimByMs": 1789207200000,
+        "refundAfterMs": 1789210800000,
+        "nonce": "0102030405060708090a0b0c0d0e0f10",
+        "type": "offer",
+        "id": "0x0e59221032b0fb4ad0bd8300322c726f46b5dec5103a75ac02df05c4c9116079"
+      },
+      "expectedStatusAfter": "proposed"
+    },
+    {
+      "step": 2,
+      "description": "Payee agent accepts offer and supplies hash statement sha256(secret)",
+      "frame": {
+        "type": "accept",
+        "from": "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+        "ref": "0x0e59221032b0fb4ad0bd8300322c726f46b5dec5103a75ac02df05c4c9116079",
+        "statement": "0x9ab73b356878da6eab5cc0b4bde703447add3dd90fc8b5537ba8beffcbc86d22",
+        "nonce": "11223344556677889900aabbccddeeff",
+        "contract": "0xf1f01a0a3ce6494dc29e10b2d870d4792148fb80af777cb8707cb2da21b859b8"
+      },
+      "expectedStatusAfter": "accepted"
+    },
+    {
+      "step": 3,
+      "description": "Payer agent locks funds into paper escrow rail",
+      "frame": {
+        "type": "lock",
+        "from": "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+        "contract": "0xf1f01a0a3ce6494dc29e10b2d870d4792148fb80af777cb8707cb2da21b859b8",
+        "rail": "paper",
+        "ref": "paper-escrow-ref-001"
+      },
+      "expectedStatusAfter": "locked"
+    },
+    {
+      "step": 4,
+      "description": "Payee agent reveals secret to claim escrowed funds",
+      "frame": {
+        "type": "reveal",
+        "from": "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+        "contract": "0xf1f01a0a3ce6494dc29e10b2d870d4792148fb80af777cb8707cb2da21b859b8",
+        "secret": "0x9b2ff818dcf5ca732e50ba828a2c5cd735a7fb3ca64cbc3abf3a296cdcc2b7df"
+      },
+      "expectedStatusAfter": "claimed"
+    }
+  ],
+  "expectedFinalStatus": "claimed"
+}

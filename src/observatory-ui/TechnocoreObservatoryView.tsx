@@ -312,16 +312,16 @@ export const TechnocoreObservatoryView: React.FC = () => {
 
         {/* Provenance & Source Badges */}
         <div className="flex flex-wrap items-center gap-2 mono text-[11px]">
-          <span className="rounded bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 text-sky-400 font-semibold">
+          <span className="rounded bg-sky-500/15 border border-sky-500/30 px-2 py-0.5 text-sky-700 dark:text-sky-400 font-semibold">
             ● LIVE NETWORK (READ-ONLY)
           </span>
-          <span className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-emerald-400 font-semibold">
+          <span className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-emerald-700 dark:text-emerald-400 font-semibold">
             ● DERIVED CRYPTOGRAPHY
           </span>
-          <span className="rounded bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-amber-400 font-semibold">
+          <span className="rounded bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-amber-800 dark:text-amber-400 font-semibold">
             ● BOUNDED WINDOW (NON-EXHAUSTIVE)
           </span>
-          <span className="rounded bg-panel-high border border-hairline px-2 py-0.5 text-faint">
+          <span className="rounded bg-panel-high border border-hairline px-2 py-0.5 text-muted">
             ● SIMULATION: OFF (ZERO FAKE DATA)
           </span>
         </div>
@@ -344,25 +344,25 @@ export const TechnocoreObservatoryView: React.FC = () => {
           <div className="p-3 rounded-lg bg-void border border-hairline space-y-0.5">
             <span className="text-muted text-[10px] uppercase font-semibold">Active Room</span>
             <div className="text-base font-bold text-ink truncate">/r/{selectedRoom}</div>
-            <div className="text-[10px] text-faint">Public broadcast room</div>
+            <div className="text-[10px] text-muted">Public broadcast room</div>
           </div>
 
           <div className="p-3 rounded-lg bg-void border border-hairline space-y-0.5">
             <span className="text-muted text-[10px] uppercase font-semibold">Inspected Messages</span>
             <div className="text-base font-bold text-ink">{metrics.total} msgs</div>
-            <div className="text-[10px] text-faint">Bounded latest window</div>
+            <div className="text-[10px] text-muted">Bounded latest window</div>
           </div>
 
-          <div className="p-3 rounded-lg bg-emerald-950/20 border border-emerald-500/30 space-y-0.5">
-            <span className="text-emerald-400 text-[10px] uppercase font-semibold">Verified Valid</span>
-            <div className="text-base font-bold text-emerald-300">{metrics.verified} ({metrics.verifiedPct}%)</div>
-            <div className="text-[10px] text-emerald-400/70">Ed25519 signature valid</div>
+          <div className="p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 space-y-0.5">
+            <span className="text-emerald-700 dark:text-emerald-400 text-[10px] uppercase font-semibold">Verified Valid</span>
+            <div className="text-base font-bold text-emerald-800 dark:text-emerald-300">{metrics.verified} ({metrics.verifiedPct}%)</div>
+            <div className="text-[10px] text-emerald-900/80 dark:text-emerald-400/70">Ed25519 signature valid</div>
           </div>
 
           <div className="p-3 rounded-lg bg-void border border-hairline space-y-0.5">
             <span className="text-muted text-[10px] uppercase font-semibold">Unverified / Invalid</span>
             <div className="text-base font-bold text-muted">{metrics.invalid + metrics.unsigned} msgs</div>
-            <div className="text-[10px] text-rose-400/80">Firewalled (0 promotion)</div>
+            <div className="text-[10px] text-rose-700 dark:text-rose-400/80">Firewalled (0 promotion)</div>
           </div>
         </div>
       </div>
@@ -516,9 +516,9 @@ export const TechnocoreObservatoryView: React.FC = () => {
                           <span
                             className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
                               isVerified
-                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
                                 : isInvalid
-                                ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                                ? "bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30"
                                 : "bg-panel-high text-muted border border-hairline"
                             }`}
                           >
@@ -555,6 +555,14 @@ export const TechnocoreObservatoryView: React.FC = () => {
               </h2>
               {selectedMessage && (
                 <div className="flex flex-wrap items-center gap-2">
+                  {(selectedMessage.text.startsWith("tclk1 ") || selectedMessage.classification === "TCLK_CONTRACT_FRAME") && (
+                    <a
+                      href={`/testkit?source=observatory&frame=${encodeURIComponent(selectedMessage.text)}`}
+                      className="rounded bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25 transition-colors mono"
+                    >
+                      ↗ Open in TCLK TestKit
+                    </a>
+                  )}
                   <a
                     href={`/doctor?source=observatory&room=${encodeURIComponent(selectedMessage.room)}&did=${encodeURIComponent(selectedMessage.authorDid || "")}&nonce=${encodeURIComponent(selectedMessage.nonce || "")}&text=${encodeURIComponent(selectedMessage.text)}&sig=${encodeURIComponent(selectedMessage.signature || "")}`}
                     className="rounded bg-signal/15 border border-signal/30 px-2 py-0.5 text-[11px] font-bold text-signal hover:bg-signal/25 transition-colors mono"

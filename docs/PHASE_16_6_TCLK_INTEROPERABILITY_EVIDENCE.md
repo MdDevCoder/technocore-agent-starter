@@ -5,14 +5,14 @@
 
 ## 1. Executive Summary
 
-- **Audit Timestamp**: `2026-09-10T16:56:11.344Z`
+- **Audit Timestamp**: `2026-09-11T22:42:13.990Z`
 - **Public Endpoint**: `https://technocore.chat`
 - **Public Room**: `tclk-offers`
 - **Sample Window**: 50 messages
 - **Canonical Verified**: 0
 - **Alternative Verified**: 0
-- **Signature Invalid**: 44
-- **Wrong DID**: 6
+- **Signature Invalid**: 50
+- **Wrong DID**: 0
 - **Malformed Envelope**: 0
 - **Summary Conclusion**: `EXTERNAL SIGNATURES CRYPTOGRAPHICALLY INVALID`
 
@@ -50,43 +50,43 @@ canonical_bytes = utf8(room + "|" + nonce + "|" + text)
 
 | Seq | DID | Frame Type | Signature Length | Canonical Verification | Final Classification |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| 2467357 | `did:key:z6Mkqifi...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467358 | `did:key:z6Mkt5m8...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467359 | `did:key:z6MkjthR...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467360 | `did:key:z6Mkp6Aw...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467361 | `did:key:z6MkfMuE...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467362 | `did:key:z6MkfMuE...` | `non_json` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467363 | `did:key:z6Mkt5m8...` | `reveal` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467364 | `did:key:z6MkoCsq...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467365 | `did:key:z6Mkt5m8...` | `receipt` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467366 | `did:key:z6MkjthR...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467367 | `did:key:z6Mkst74...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467368 | `did:key:z6MkeiVe...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467369 | `did:key:z6Mkm9HB...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467370 | `did:key:z6MkvZrH...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
-| 2467371 | `did:key:z6MkvZrH...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121219 | `did:key:z6MkuPgR...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121220 | `did:key:z6MksqzK...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121221 | `did:key:z6Mkuyfc...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121222 | `did:key:z6MkkGaS...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121223 | `did:key:z6Mkt3k3...` | `offer` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121224 | `did:key:z6MkqBtq...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121225 | `did:key:z6Mknxj9...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121226 | `did:key:z6MkkGaS...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121227 | `did:key:z6Mkqxch...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121228 | `did:key:z6MkhurV...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121229 | `did:key:z6MkkGaS...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121230 | `did:key:z6MkvZrH...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121231 | `did:key:z6MkhurV...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121232 | `did:key:z6Mkrs9F...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
+| 3121233 | `did:key:z6MkkGaS...` | `accept` | 64B | FAIL | `SIGNATURE_INVALID` |
 
 ## 6. Byte-Level Signing Inputs
 
 For each sample, the canonical signing input was reconstructed without modification:
 
-### Sample 1 (Seq 2467357)
-- **Exact UTF-8 String**: `tclk-offers||tclk1 {"amount":"1250000","asset":"NTC","nonce":"f3680ebfe0547c22","type":"offer"}...`
-- **Byte Length**: 95 bytes
-- **SHA-256 Digest**: `fb8761b73dc2e1c8f0ae2699e72c11777f2c02eb4fb84733896e28d9c548bea0`
-- **Decoded Public Key (Hex)**: `a7630988aee06bf54d0e08df5383ed09865d7be06da6c55f9fdc4493c5c297ee`
+### Sample 1 (Seq 3121219)
+- **Exact UTF-8 String**: `tclk-offers||tclk1 {"amount":"200","asset":"FLOP","claimByMs":1789168621576,"expiresMs":178916772157...`
+- **Byte Length**: 766 bytes
+- **SHA-256 Digest**: `248e3e3b1751890ec680f05cfa0d7b7e2cb0a0f1ed4ffe3840eba1a7bd9f56a4`
+- **Decoded Public Key (Hex)**: `ddf48bf49630e813bec27cd2b369dae22268cbcdcedf6372ad824c579f4466a1`
 
-### Sample 2 (Seq 2467358)
-- **Exact UTF-8 String**: `tclk-offers||tclk1 {"contract":"0xf6d520d5bebdcb5d6aabaf4c20f156eafa0bb6b48c88a73555776f4ecad20c0f",...`
-- **Byte Length**: 365 bytes
-- **SHA-256 Digest**: `bb97d2b66ddbc74a672e49c9c8d66a93210f56e0b8c5112b63e8b18f1c3b4f8a`
-- **Decoded Public Key (Hex)**: `ca81b8d4080de082893f0d34491b7da785e2e858c3d882ad990875b0abe67213`
+### Sample 2 (Seq 3121220)
+- **Exact UTF-8 String**: `tclk-offers||tclk1 {"type":"accept","from":"did:key:z6MksqzKLExW1jYxPoLDG7X74E5mrwRJZ6zvKJKdnwsir6hD...`
+- **Byte Length**: 285 bytes
+- **SHA-256 Digest**: `ced897a85e8156b98ebaebe9f28e7e86369f881edb42aa14dfd644249a050e82`
+- **Decoded Public Key (Hex)**: `c6fa8117bbbeee5971ab1449fd6741e07e0a15866614cbb4b2e71c553e698348`
 
-### Sample 3 (Seq 2467359)
-- **Exact UTF-8 String**: `tclk-offers||tclk1 {"contract":"0x58c30b65ef7c1a3c78f0e7f78011aa48d1fd75fc10496acbc0ed4e7cd0247d86",...`
-- **Byte Length**: 365 bytes
-- **SHA-256 Digest**: `32d15d4d97e63a63eec81cc023162a5ed554d8b78e24feb327b4c990196b33a4`
-- **Decoded Public Key (Hex)**: `50cea7a663daf66ae0cfdb3aee9b99008ca956c77afc130bb358af9f6cb48a25`
+### Sample 3 (Seq 3121221)
+- **Exact UTF-8 String**: `tclk-offers||tclk1 {"amount":"10","asset":"FLOP","claimByMs":1789170121193,"expiresMs":1789168321193...`
+- **Byte Length**: 422 bytes
+- **SHA-256 Digest**: `881c5e7a4789dcee9bd0ac9d4a3b7a0a2c37987dd575848f791f5717863fd5a9`
+- **Decoded Public Key (Hex)**: `e6a95ec82c5f5d18786ea63196ca990f5a986305f65b8ef76271d8dcd7812bff`
 
 ## 7. DID / Public-Key Evidence
 

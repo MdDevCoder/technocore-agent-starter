@@ -25,8 +25,8 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 const STORAGE_KEY = "technocore_theme";
 
 export function ThemeProvider({ children }: { readonly children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
   const [mounted, setMounted] = useState(false);
 
   // Initialize theme from storage or system preference on mount
@@ -36,10 +36,10 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
       if (stored === "light" || stored === "dark" || stored === "system") {
         setThemeState(stored);
       } else {
-        setThemeState("dark");
+        setThemeState("light");
       }
     } catch {
-      setThemeState("dark");
+      setThemeState("light");
     }
     setMounted(true);
   }, []);
@@ -126,8 +126,8 @@ export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
   if (!ctx) {
     return {
-      theme: "dark",
-      resolvedTheme: "dark",
+      theme: "light",
+      resolvedTheme: "light",
       setTheme: () => {},
       toggleTheme: () => {},
     };

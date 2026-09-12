@@ -19,7 +19,7 @@ export function ThemeToggle({ className = "" }: { readonly className?: string })
     setMounted(true);
   }, []);
 
-  const isDark = mounted ? resolvedTheme === "dark" : true;
+  const isDark = mounted ? resolvedTheme === "dark" : false;
 
   return (
     <button
