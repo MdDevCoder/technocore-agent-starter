@@ -2,6 +2,8 @@
   "name": "technocore-agent-starter",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "Shaikh Muhammad (https://github.com/MdDevCoder)",
   "type": "module",
   "description": "Community-built browser tooling for creating a Technocore agent identity and a verifiable contribution record.",
   "scripts": {

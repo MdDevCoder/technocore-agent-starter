@@ -226,4 +226,4 @@ npm run build
 
 ## License
 
-Open source for the Technocore community. Refer to repository configuration for licensing terms.
+This project is open source and available under the [MIT License](LICENSE).
