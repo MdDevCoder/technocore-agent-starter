@@ -4,7 +4,7 @@
  * Route: /trace
  */
 
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { TraceStudioView } from "../../src/trace-ui/TraceStudioView.tsx";
 
@@ -28,7 +28,15 @@ export default function TracePage() {
   return (
     <main className="min-h-screen bg-background py-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <TraceStudioView />
+        <Suspense
+          fallback={
+            <div className="flex min-h-[400px] items-center justify-center bg-background mono text-xs text-muted">
+              Loading Agent Trace Studio...
+            </div>
+          }
+        >
+          <TraceStudioView />
+        </Suspense>
       </div>
     </main>
   );

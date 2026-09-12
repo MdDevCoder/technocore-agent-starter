@@ -15,6 +15,7 @@ import { buttonClasses } from "./buttonStyles.ts";
 import { ThemeToggle } from "./ThemeToggle.tsx";
 
 const LINKS = [
+  { href: "/workspace", label: "Workspace" },
   { href: "/start", label: "Builder" },
   { href: "/trace", label: "Trace" },
   { href: "/forge", label: "Forge" },

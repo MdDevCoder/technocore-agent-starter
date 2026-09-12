@@ -4,7 +4,7 @@
  * Route: /start
  */
 
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { FirstAgentBuilderView } from "../../src/starter-ui/FirstAgentBuilderView.tsx";
 
@@ -27,7 +27,15 @@ export const metadata: Metadata = {
 export default function StartPage() {
   return (
     <main className="min-h-screen bg-background py-8">
-      <FirstAgentBuilderView />
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center bg-background mono text-xs text-muted">
+            Loading First Agent Builder...
+          </div>
+        }
+      >
+        <FirstAgentBuilderView />
+      </Suspense>
     </main>
   );
 }

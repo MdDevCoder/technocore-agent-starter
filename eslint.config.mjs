@@ -33,7 +33,7 @@ export default [
   },
   {
     // The restriction above applies only to the protocol core; UI code needs React.
-    files: ["src/ui/**", "src/hooks/**", "src/civilization-ui/**", "src/sonnet-ui/**", "src/observatory-ui/**", "src/doctor-ui/**", "src/testkit-ui/**", "src/forge-ui/**", "src/starter-ui/**", "src/trace-ui/**", "app/**", "middleware.ts", "next.config.ts"],
+    files: ["src/ui/**", "src/hooks/**", "src/civilization-ui/**", "src/sonnet-ui/**", "src/observatory-ui/**", "src/doctor-ui/**", "src/testkit-ui/**", "src/forge-ui/**", "src/starter-ui/**", "src/trace-ui/**", "src/workspace-ui/**", "app/**", "middleware.ts", "next.config.ts"],
     rules: { "no-restricted-imports": "off" },
   },
 ];

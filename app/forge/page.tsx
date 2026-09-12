@@ -4,7 +4,7 @@
  * Route: /forge
  */
 
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { PayloadForgeView } from "../../src/forge-ui/PayloadForgeView.tsx";
 
@@ -27,7 +27,15 @@ export const metadata: Metadata = {
 export default function ForgePage() {
   return (
     <main className="min-h-screen bg-background py-8">
-      <PayloadForgeView />
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center bg-background mono text-xs text-muted">
+            Loading Payload Forge...
+          </div>
+        }
+      >
+        <PayloadForgeView />
+      </Suspense>
     </main>
   );
 }

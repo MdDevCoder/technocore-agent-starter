@@ -69,6 +69,7 @@ async function auditRoutes() {
     "/observatory",
     "/testkit",
     "/forge",
+    "/workspace",
     "/contributions/tclk-testkit",
     "/civilization",
     "/agent",
