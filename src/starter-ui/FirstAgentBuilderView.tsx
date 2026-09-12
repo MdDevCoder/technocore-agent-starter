@@ -1,15 +1,20 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ARCHETYPES, generateStarterProject, generateStarterZip } from "../starter/generator.ts";
 import type { AgentArchetypeId, AgentLanguageId } from "../starter/types.ts";
 import { inspectUnicodeSweep } from "../technocore/forge/engine.ts";
 import { generateKeyPair, importSigningKey, sign } from "../crypto/ed25519.ts";
 import { publicKeyToDid } from "../identity/did.ts";
 import { utf8, toBase64Url, wipe } from "../crypto/bytes.ts";
+import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 export const FirstAgentBuilderView: React.FC = () => {
+  const searchParams = useSearchParams();
+
   // State: Archetype & Language Selection
   const [selectedArchetypeId, setSelectedArchetypeId] = useState<AgentArchetypeId>("TCLK_TRADER");
   const [selectedLanguage, setSelectedLanguage] = useState<AgentLanguageId>("TYPESCRIPT");
@@ -19,6 +24,27 @@ export const FirstAgentBuilderView: React.FC = () => {
   const [publicDid, setPublicDid] = useState<string>("did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2");
   const [targetRoom, setTargetRoom] = useState<string>("tclk-offers");
   const [isGeneratingIdentity, setIsGeneratingIdentity] = useState<boolean>(false);
+
+  // Sync safe handoff parameters from URL
+  useEffect(() => {
+    if (!searchParams) return;
+    const safe = extractSafeHandoffParams(searchParams, "builder");
+    if (safe.project) setAgentName(safe.project);
+    if (safe.lang) {
+      setSelectedLanguage(safe.lang);
+      setSelectedFilePath(safe.lang === "TYPESCRIPT" ? "src/agent.ts" : "agent.py");
+    }
+    if (safe.archetype) {
+      setSelectedArchetypeId(safe.archetype);
+      const arch = ARCHETYPES.find((a) => a.id === safe.archetype);
+      if (arch) {
+        setTargetRoom(arch.defaultRoom);
+        setMessageText(arch.defaultPayloadTemplate);
+      }
+    }
+    if (safe.room) setTargetRoom(safe.room);
+    if (safe.did) setPublicDid(safe.did);
+  }, [searchParams]);
 
   // State: First Message Drafting & Dry-Run
   const selectedArchetype = useMemo(
@@ -197,6 +223,9 @@ export const FirstAgentBuilderView: React.FC = () => {
           </span>
         </div>
       </div>
+
+      {/* Workspace Context Handoff Banner */}
+      <HandoffBanner destination="builder" />
 
       {/* Step 1: "What are you building?" (Archetype Selection) */}
       <div className="p-6 rounded-xl border border-hairline bg-panel space-y-4 shadow-sm">

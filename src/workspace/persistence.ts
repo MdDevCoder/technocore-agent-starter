@@ -26,7 +26,7 @@ import type {
 
 export const WORKSPACE_STORAGE_KEY = "technocore_agent_workspace_v1";
 
-const FORBIDDEN_SECRET_KEYS = [
+export const FORBIDDEN_SECRET_KEYS = [
   "seed",
   "privatekey",
   "secret",
@@ -40,7 +40,18 @@ const FORBIDDEN_SECRET_KEYS = [
   "priv",
   "secretseed",
   "signingkey",
-];
+] as const;
+
+export const FORBIDDEN_SECRET_STRING_PATTERNS = [
+  "seed",
+  "privatekey",
+  "password",
+  "keypair",
+  "secretseed",
+  "signingkey",
+  "bearer",
+  "credential",
+] as const;
 
 const VALID_LANGUAGES: readonly WorkspaceLanguage[] = ["TYPESCRIPT", "PYTHON"] as const;
 const VALID_ARCHETYPES: readonly WorkspaceArchetype[] = [
@@ -57,7 +68,7 @@ export function containsForbiddenSecrets(data: unknown): boolean {
   if (data === null || data === undefined) return false;
   if (typeof data === "string") {
     const lower = data.toLowerCase();
-    return FORBIDDEN_SECRET_KEYS.some((k) => lower.includes(k));
+    return FORBIDDEN_SECRET_STRING_PATTERNS.some((k) => lower.includes(k));
   }
   if (typeof data === "object") {
     for (const key of Object.keys(data as Record<string, unknown>)) {

@@ -9,7 +9,8 @@
 
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import type { ForgeOperation } from "../technocore/forge/types.ts";
 import {
   buildRoomMessagePayload,
@@ -20,8 +21,11 @@ import {
   buildTclkFramePayload,
   generateMultiLanguageSnippets,
 } from "../technocore/forge/engine.ts";
+import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 export const PayloadForgeView: React.FC = () => {
+  const searchParams = useSearchParams();
   const [operation, setOperation] = useState<ForgeOperation>("room-message");
   const [copiedTab, setCopiedTab] = useState<string | null>(null);
   const [selectedLang, setSelectedLang] = useState<"curl" | "python" | "typescript" | "golang">("curl");
@@ -31,6 +35,26 @@ export const PayloadForgeView: React.FC = () => {
   const [nonce, setNonce] = useState<string>(() => String(Date.now() * 1000000));
   const [messageText, setMessageText] = useState<string>("Agent online check-in: Technocore Autonomous Node ready.");
   const [did, setDid] = useState<string>("did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2");
+
+  // Sync safe parameters from Workspace handoff
+  useEffect(() => {
+    if (!searchParams) return;
+    const safe = extractSafeHandoffParams(searchParams, "forge");
+    if (safe.room) setRoom(safe.room);
+    if (safe.did) setDid(safe.did);
+    if (safe.op) {
+      if (
+        safe.op === "room-message" ||
+        safe.op === "lobby-checkin" ||
+        safe.op === "contribute-record" ||
+        safe.op === "kv-did-register" ||
+        safe.op === "detached-proof" ||
+        safe.op === "tclk-frame"
+      ) {
+        setOperation(safe.op as ForgeOperation);
+      }
+    }
+  }, [searchParams]);
   const [contribUrl, setContribUrl] = useState<string>("https://github.com/MdDevCoder/technocore-agent-starter");
   const [contribTopic, setContribTopic] = useState<string>("Technocore Wire Protocol & Multi-Language Toolchain");
   const [proofCommit, setProofCommit] = useState<string>("83f3e8b1159960edbcc9e036e69b7103738d45d7");
@@ -129,6 +153,9 @@ export const PayloadForgeView: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Workspace Context Handoff Banner */}
+      <HandoffBanner destination="forge" />
 
       {/* 2. Operation Tabs */}
       <div className="bg-panel border border-hairline rounded-xl p-4 shadow-sm">

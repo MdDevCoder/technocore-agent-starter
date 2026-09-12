@@ -113,10 +113,25 @@ export interface WorkspaceState {
 /** Safe parameters allowed in URL deep-links between tools */
 export interface SafeHandoffParams {
   readonly project?: string;
-  readonly lang?: string;
-  readonly archetype?: string;
+  readonly lang?: WorkspaceLanguage;
+  readonly archetype?: WorkspaceArchetype;
   readonly did?: string;
   readonly room?: string;
   readonly preset?: string;
   readonly op?: string;
+  readonly text?: string;
+  readonly nonce?: string;
+  readonly sig?: string;
+  readonly source?: "PUBLIC_NETWORK" | "LOCAL_FIXTURE";
 }
+
+/** Structured preview metadata for Safe Handoff Link Modal */
+export interface HandoffPreviewMetadata {
+  readonly destination: string;
+  readonly toolTitle: string;
+  readonly path: string;
+  readonly fullUrl: string;
+  readonly sharedFields: readonly { readonly key: string; readonly label: string; readonly value: string }[];
+  readonly notSharedFields: readonly string[];
+}
+

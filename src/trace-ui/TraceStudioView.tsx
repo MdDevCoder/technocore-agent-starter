@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   TRACE_PRESETS,
   PUBLIC_ROOMS,
@@ -20,6 +21,8 @@ import type {
   TraceReconstructionResult,
   TraceSource,
 } from "../trace/types.ts";
+import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 export const TraceStudioView: React.FC = () => {
   // Preset Selection & Custom Input State
@@ -46,6 +49,23 @@ export const TraceStudioView: React.FC = () => {
   const [exportMarkdown, setExportMarkdown] = useState<string>("");
   const [exportSha256, setExportSha256] = useState<string>("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Sync safe parameters from Workspace handoff
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (!searchParams) return;
+    const safe = extractSafeHandoffParams(searchParams, "trace");
+    if (safe.room && PUBLIC_ROOMS.includes(safe.room as PublicRoomName)) {
+      setSelectedLiveRoom(safe.room as PublicRoomName);
+    }
+    if (safe.preset) {
+      const p = getPresetById(safe.preset);
+      if (p) {
+        setSelectedPresetId(p.id);
+        setIsCustomMode(false);
+      }
+    }
+  }, [searchParams]);
 
   // Execute Live Network Fetch from Public Technocore Endpoints
   const executeLiveFetch = useCallback(async (room: string) => {
@@ -297,6 +317,9 @@ export const TraceStudioView: React.FC = () => {
           </div>
         )}
       </section>
+
+      {/* Workspace Context Handoff Banner */}
+      <HandoffBanner destination="trace" />
 
       {/* 2. Controls & Preset Selection */}
       <section className="rounded-xl border border-hairline bg-panel/40 p-4 sm:p-6 space-y-4">

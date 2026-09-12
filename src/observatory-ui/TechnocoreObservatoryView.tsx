@@ -8,8 +8,11 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { verifyRoomMessage } from "../technocore/verify.ts";
 import { isValidDid } from "../identity/did.ts";
+import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 interface ObservedMessage {
   readonly room: string;
@@ -52,6 +55,7 @@ async function sha256Hex(str: string): Promise<string> {
 }
 
 export const TechnocoreObservatoryView: React.FC = () => {
+  const searchParams = useSearchParams();
   const [selectedRoom, setSelectedRoom] = useState<string>("events");
   const [filterStatus, setFilterStatus] = useState<string>("ALL");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,6 +64,16 @@ export const TechnocoreObservatoryView: React.FC = () => {
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<ObservedMessage | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Sync safe parameters from Workspace handoff
+  useEffect(() => {
+    if (!searchParams) return;
+    const safe = extractSafeHandoffParams(searchParams, "observatory");
+    if (safe.room) {
+      setSelectedRoom(safe.room);
+      setSandboxRoom(safe.room);
+    }
+  }, [searchParams]);
 
   // Sandbox state for interactive developer verification
   const [sandboxRoom, setSandboxRoom] = useState<string>("events");
@@ -326,6 +340,9 @@ export const TechnocoreObservatoryView: React.FC = () => {
           </span>
         </div>
       </div>
+
+      {/* Workspace Context Handoff Banner */}
+      <HandoffBanner destination="observatory" />
 
       {/* "What Was Observed?" Summary Card */}
       <div className="p-4 rounded-xl border border-hairline bg-panel space-y-3 shadow-sm">

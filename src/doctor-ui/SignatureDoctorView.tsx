@@ -10,6 +10,8 @@
 import React, { useState, useEffect, useCallback, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { diagnoseSignature, type DiagnosticReport } from "../technocore/diagnostics/signature-doctor.ts";
+import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 interface SignatureDoctorViewProps {
   readonly initialParams?: {
@@ -26,19 +28,36 @@ const SAMPLE_ROOMS = ["events", "general", "tclk-offers", "market", "civilizatio
 
 export const SignatureDoctorView: React.FC<SignatureDoctorViewProps> = ({ initialParams }) => {
   const searchParams = useSearchParams();
-  const paramRoom = searchParams?.get("room") || initialParams?.room || "events";
-  const paramDid = searchParams?.get("did") || initialParams?.did || "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2";
-  const paramNonce = searchParams?.get("nonce") || initialParams?.nonce || "1789200001000";
-  const paramText = searchParams?.get("text") || initialParams?.text || '{"protocol":"civilization-event-v1","eventType":"AGENT_REGISTERED"}';
-  const paramSig = searchParams?.get("sig") || searchParams?.get("signature") || initialParams?.sig || "";
-  const paramSource = searchParams?.get("source") || initialParams?.source || (searchParams?.get("source") ? "PUBLIC NETWORK OBSERVATION" : "MANUAL");
 
-  const [room, setRoom] = useState<string>(paramRoom);
-  const [did, setDid] = useState<string>(paramDid);
-  const [nonce, setNonce] = useState<string>(paramNonce);
-  const [text, setText] = useState<string>(paramText);
-  const [signature, setSignature] = useState<string>(paramSig);
-  const [sourceTag, setSourceTag] = useState<string>(paramSource);
+  const [room, setRoom] = useState<string>("events");
+  const [did, setDid] = useState<string>("did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2");
+  const [nonce, setNonce] = useState<string>("1789200001000");
+  const [text, setText] = useState<string>('{"protocol":"civilization-event-v1","eventType":"AGENT_REGISTERED"}');
+  const [signature, setSignature] = useState<string>("");
+  const [sourceTag, setSourceTag] = useState<string>("MANUAL");
+
+  // Sync parameters from safe handoff
+  useEffect(() => {
+    if (!searchParams && !initialParams) return;
+    const safe = extractSafeHandoffParams(searchParams, "doctor");
+    if (safe.room) setRoom(safe.room);
+    else if (initialParams?.room) setRoom(initialParams.room);
+
+    if (safe.did) setDid(safe.did);
+    else if (initialParams?.did) setDid(initialParams.did);
+
+    if (safe.nonce) setNonce(safe.nonce);
+    else if (initialParams?.nonce) setNonce(initialParams.nonce);
+
+    if (safe.text) setText(safe.text);
+    else if (initialParams?.text) setText(initialParams.text);
+
+    if (safe.sig) setSignature(safe.sig);
+    else if (initialParams?.sig) setSignature(initialParams.sig);
+
+    if (safe.source) setSourceTag(safe.source);
+    else if (initialParams?.source) setSourceTag(initialParams.source);
+  }, [searchParams, initialParams]);
 
   const [report, setReport] = useState<DiagnosticReport | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -166,6 +185,9 @@ sig_bytes = base64.urlsafe_b64decode(sig_padded)
           </span>
         </div>
       </div>
+
+      {/* Workspace Context Handoff Banner */}
+      <HandoffBanner destination="doctor" />
 
       {/* Quick Diagnostic Preset Strip */}
       <div className="flex flex-wrap items-center gap-2 p-3 rounded-xl border border-hairline bg-panel mono text-xs">

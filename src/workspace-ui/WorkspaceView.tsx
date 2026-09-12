@@ -14,8 +14,17 @@
 import React, { useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useWorkspace } from "../hooks/useWorkspace.ts";
-import { buildHandoffUrl } from "../workspace/handoff.ts";
-import type { WorkspaceLanguage, WorkspaceArchetype } from "../workspace/types.ts";
+import {
+  buildHandoffUrl,
+  getHandoffPreviewMetadata,
+  type ToolDestination,
+} from "../workspace/handoff.ts";
+import type {
+  WorkspaceLanguage,
+  WorkspaceArchetype,
+  HandoffPreviewMetadata,
+} from "../workspace/types.ts";
+import { HandoffModal } from "./HandoffModal.tsx";
 import { buttonClasses } from "../ui/buttonStyles.ts";
 
 const PUBLIC_ROOMS = [
@@ -72,11 +81,30 @@ export const WorkspaceView: React.FC = () => {
   const [isSaved, setIsSaved] = useState<boolean>(false);
   const [copiedDid, setCopiedDid] = useState<boolean>(false);
 
-  // Import / Export modal state
+  // Import / Export & Safe Handoff modal state
   const [importJsonText, setImportJsonText] = useState<string>("");
   const [importError, setImportError] = useState<string | null>(null);
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
   const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
+  const [handoffModalMeta, setHandoffModalMeta] = useState<HandoffPreviewMetadata | null>(null);
+
+  // Safe Handoff Modal Opener
+  const handleOpenHandoffModal = useCallback(
+    (destination: ToolDestination, customParams: Record<string, unknown> = {}) => {
+      const origin = typeof window !== "undefined" ? window.location.origin : "";
+      const baseParams: Record<string, unknown> = {
+        project: workspace.project.name,
+        lang: workspace.project.language,
+        archetype: workspace.project.archetype,
+        room: workspace.project.defaultRoom,
+        did: workspace.project.publicDid,
+        ...customParams,
+      };
+      const meta = getHandoffPreviewMetadata(destination, baseParams, origin);
+      setHandoffModalMeta(meta);
+    },
+    [workspace.project],
+  );
 
   // Sync edit form when workspace updates externally
   React.useEffect(() => {
@@ -271,18 +299,27 @@ export const WorkspaceView: React.FC = () => {
           <div className="flex shrink-0 flex-wrap gap-2 md:flex-col md:items-end">
             <button
               type="button"
-              onClick={handleDownloadJson}
-              className={buttonClasses("secondary", "sm", "text-xs px-3 py-1.5")}
+              onClick={() => handleOpenHandoffModal("forge")}
+              className="mono text-xs font-semibold px-3 py-1.5 rounded-md bg-signal/15 text-signal hover:bg-signal/25 border border-signal/30 shadow-xs transition-all active:scale-95 flex items-center gap-1.5"
             >
-              Export JSON
+              <span>🔗</span> Copy Safe Handoff Link
             </button>
-            <button
-              type="button"
-              onClick={() => setShowImportModal(true)}
-              className={buttonClasses("secondary", "sm", "text-xs px-3 py-1.5")}
-            >
-              Import Config
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleDownloadJson}
+                className={buttonClasses("secondary", "sm", "text-xs px-3 py-1.5")}
+              >
+                Export JSON
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowImportModal(true)}
+                className={buttonClasses("secondary", "sm", "text-xs px-3 py-1.5")}
+              >
+                Import Config
+              </button>
+            </div>
             <button
               type="button"
               onClick={() => setShowResetConfirm(true)}
@@ -368,18 +405,13 @@ export const WorkspaceView: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {/* Action 1: Builder */}
-          <Link
-            href={builderUrl}
-            className="border-hairline bg-panel hover:bg-panel-hover hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs"
-          >
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
             <div>
               <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal group-hover:bg-signal/20 rounded px-2 py-0.5 text-xs font-semibold">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
                   /start
                 </span>
-                <span className="text-muted group-hover:translate-x-0.5 transition-transform text-xs">
-                  →
-                </span>
+                <span className="text-muted text-xs">Builder</span>
               </div>
               <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
                 BUILD AGENT
@@ -391,21 +423,31 @@ export const WorkspaceView: React.FC = () => {
             <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
               Preset: {workspace.project.language} · {workspace.project.archetype}
             </div>
-          </Link>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={builderUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open →
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleOpenHandoffModal("builder")}
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
 
           {/* Action 2: Forge */}
-          <Link
-            href={forgeUrl}
-            className="border-hairline bg-panel hover:bg-panel-hover hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs"
-          >
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
             <div>
               <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal group-hover:bg-signal/20 rounded px-2 py-0.5 text-xs font-semibold">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
                   /forge
                 </span>
-                <span className="text-muted group-hover:translate-x-0.5 transition-transform text-xs">
-                  →
-                </span>
+                <span className="text-muted text-xs">Forge</span>
               </div>
               <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
                 FORGE PAYLOAD
@@ -417,21 +459,31 @@ export const WorkspaceView: React.FC = () => {
             <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
               Target: /r/{workspace.project.defaultRoom}
             </div>
-          </Link>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={forgeUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open →
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleOpenHandoffModal("forge")}
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
 
           {/* Action 3: Doctor */}
-          <Link
-            href={doctorUrl}
-            className="border-hairline bg-panel hover:bg-panel-hover hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs"
-          >
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
             <div>
               <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal group-hover:bg-signal/20 rounded px-2 py-0.5 text-xs font-semibold">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
                   /doctor
                 </span>
-                <span className="text-muted group-hover:translate-x-0.5 transition-transform text-xs">
-                  →
-                </span>
+                <span className="text-muted text-xs">Diagnostics</span>
               </div>
               <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
                 CHECK SIGNATURE
@@ -443,21 +495,31 @@ export const WorkspaceView: React.FC = () => {
             <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
               Diagnostics: Ed25519 Canonical Rule Sweep
             </div>
-          </Link>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={doctorUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open →
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleOpenHandoffModal("doctor")}
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
 
           {/* Action 4: TestKit */}
-          <Link
-            href={testkitUrl}
-            className="border-hairline bg-panel hover:bg-panel-hover hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs"
-          >
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
             <div>
               <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal group-hover:bg-signal/20 rounded px-2 py-0.5 text-xs font-semibold">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
                   /testkit
                 </span>
-                <span className="text-muted group-hover:translate-x-0.5 transition-transform text-xs">
-                  →
-                </span>
+                <span className="text-muted text-xs">Simulation</span>
               </div>
               <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
                 TEST TCLK
@@ -469,21 +531,33 @@ export const WorkspaceView: React.FC = () => {
             <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
               Total simulated runs: {workspace.telemetry.testkit.totalSimulationsRun}
             </div>
-          </Link>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={testkitUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open →
+              </Link>
+              <button
+                type="button"
+                onClick={() =>
+                  handleOpenHandoffModal("testkit", { preset: "bilateral-settlement" })
+                }
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
 
           {/* Action 5: Observatory */}
-          <Link
-            href={observatoryUrl}
-            className="border-hairline bg-panel hover:bg-panel-hover hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs"
-          >
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
             <div>
               <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal group-hover:bg-signal/20 rounded px-2 py-0.5 text-xs font-semibold">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
                   /observatory
                 </span>
-                <span className="text-muted group-hover:translate-x-0.5 transition-transform text-xs">
-                  →
-                </span>
+                <span className="text-muted text-xs">Observatory</span>
               </div>
               <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
                 OBSERVE NETWORK
@@ -495,21 +569,31 @@ export const WorkspaceView: React.FC = () => {
             <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
               Room: /r/{workspace.project.defaultRoom}
             </div>
-          </Link>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={observatoryUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open →
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleOpenHandoffModal("observatory")}
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
 
           {/* Action 6: Trace Studio */}
-          <Link
-            href={traceUrl}
-            className="border-hairline bg-panel hover:bg-panel-hover hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs"
-          >
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
             <div>
               <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal group-hover:bg-signal/20 rounded px-2 py-0.5 text-xs font-semibold">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
                   /trace
                 </span>
-                <span className="text-muted group-hover:translate-x-0.5 transition-transform text-xs">
-                  →
-                </span>
+                <span className="text-muted text-xs">Forensics</span>
               </div>
               <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
                 TRACE INTERACTION
@@ -521,7 +605,26 @@ export const WorkspaceView: React.FC = () => {
             <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
               Live Source: https://technocore.chat
             </div>
-          </Link>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={traceUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open →
+              </Link>
+              <button
+                type="button"
+                onClick={() =>
+                  handleOpenHandoffModal("trace", {
+                    preset: "live-public-network",
+                  })
+                }
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -874,6 +977,13 @@ export const WorkspaceView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Safe Handoff Link Modal */}
+      <HandoffModal
+        metadata={handoffModalMeta}
+        isOpen={handoffModalMeta !== null}
+        onClose={() => setHandoffModalMeta(null)}
+      />
     </div>
   );
 };

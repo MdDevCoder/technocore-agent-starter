@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   validateTclkFrame,
   evaluateStateTransition,
@@ -17,8 +18,11 @@ import {
   type LockFrame,
   type RevealFrame,
 } from "@flop-labs/tclk";
+import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
 export function TclkTestKitView() {
+  const searchParams = useSearchParams();
   const [sourceTag, setSourceTag] = useState<string>("LOCAL DRAFT");
   const [rawJsonText, setRawJsonText] = useState<string>("");
   const [validationResult, setValidationResult] = useState<FrameValidationResult | null>(null);
@@ -180,6 +184,19 @@ export function TclkTestKitView() {
     }
   };
 
+  // Sync safe handoff parameters from URL
+  useEffect(() => {
+    if (!searchParams) return;
+    const safe = extractSafeHandoffParams(searchParams, "testkit");
+    if (safe.preset === "bilateral-settlement" || safe.preset === "full-lifecycle") {
+      runFullLifecycleDemo();
+    } else if (safe.preset === "valid-offer") {
+      loadPreset("VALID_OFFER");
+    } else if (safe.preset === "invalid-timelock") {
+      loadPreset("INVALID_TIMELOCK");
+    }
+  }, [searchParams, loadPreset]);
+
   return (
     <div className="flex flex-col gap-6 p-4 lg:p-8 min-h-screen bg-void text-ink font-sans">
       {/* Top Banner & Safety Disclaimer */}
@@ -209,6 +226,9 @@ export function TclkTestKitView() {
           </span>
         </div>
       </div>
+
+      {/* Workspace Context Handoff Banner */}
+      <HandoffBanner destination="testkit" />
 
       {/* Preset Strips */}
       <div className="flex flex-wrap items-center gap-2 p-3 rounded-xl border border-hairline bg-panel mono text-xs">
