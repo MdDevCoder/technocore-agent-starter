@@ -6,9 +6,10 @@ import { useSearchParams } from "next/navigation";
 import { ARCHETYPES, generateStarterProject, generateStarterZip } from "../starter/generator.ts";
 import type { AgentArchetypeId, AgentLanguageId } from "../starter/types.ts";
 import { inspectUnicodeSweep } from "../technocore/forge/engine.ts";
-import { generateKeyPair, importSigningKey, sign } from "../crypto/ed25519.ts";
+import { generateKeyPair } from "../crypto/ed25519.ts";
 import { publicKeyToDid } from "../identity/did.ts";
-import { utf8, toBase64Url, wipe } from "../crypto/bytes.ts";
+import { wipe } from "../crypto/bytes.ts";
+import { executeEphemeralSigningDryRun } from "../crypto/dryRun.ts";
 import { extractSafeHandoffParams } from "../workspace/handoff.ts";
 import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
@@ -111,19 +112,19 @@ export const FirstAgentBuilderView: React.FC = () => {
   const handleDryRunSign = useCallback(async () => {
     setIsSigning(true);
     try {
-      const ephemeralKey = await generateKeyPair();
-      const signingKey = await importSigningKey(ephemeralKey.seed, ephemeralKey.publicKey);
-      const payloadBytes = utf8(canonicalFormula);
-      const sigBytes = await sign(signingKey, payloadBytes);
-      const b64Sig = toBase64Url(sigBytes);
-      setDryRunSignature(b64Sig);
-      wipe(ephemeralKey.seed);
+      const cleanRoom = targetRoom.trim().replace(/^\/r\//, "") || "lobby";
+      const result = await executeEphemeralSigningDryRun(cleanRoom, sweepReport.canonicalText, nonce.trim());
+      if (result.success) {
+        setDryRunSignature(result.signature);
+      } else {
+        setDryRunSignature(null);
+      }
     } catch {
       setDryRunSignature(null);
     } finally {
       setIsSigning(false);
     }
-  }, [canonicalFormula]);
+  }, [targetRoom, sweepReport.canonicalText, nonce]);
 
   // Generated Project Structure
   const starterProject = useMemo(() => {

@@ -165,3 +165,28 @@ function normalizeOrigin(baseUrl: string): string {
  * Length-capped and control-stripped. Always rendered as text.
  */
 export const excerptOf = (response: TechnocoreResponse): string => safeExcerpt(response.text);
+
+/**
+ * Normalizes raw JSON response from public room endpoints into a typed array of records.
+ * Safely handles plain arrays, { messages: [...] }, { records: [...] }, and { data: [...] }.
+ */
+export function parsePublicRoomMessagesResponse<T = Record<string, unknown>>(rawJson: unknown): T[] {
+  if (!rawJson) return [];
+  if (Array.isArray(rawJson)) {
+    return rawJson as T[];
+  }
+  if (typeof rawJson === "object") {
+    const obj = rawJson as Record<string, unknown>;
+    if (Array.isArray(obj.messages)) {
+      return obj.messages as T[];
+    }
+    if (Array.isArray(obj.records)) {
+      return obj.records as T[];
+    }
+    if (Array.isArray(obj.data)) {
+      return obj.data as T[];
+    }
+  }
+  return [];
+}
+

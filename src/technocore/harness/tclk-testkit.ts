@@ -21,6 +21,9 @@ import {
   isTclkLine,
   openContract,
   applyFrame,
+  makeOffer,
+  makeAccept,
+  generateHashLock,
   type OfferFields,
   type OfferFrame,
   type AcceptFrame,
@@ -591,3 +594,37 @@ export async function simulateTclkLifecycle(
     summary,
   };
 }
+
+/**
+ * Executes a canonical 4-stage bilateral settlement (offer -> accept -> lock -> reveal)
+ * in-memory simulation and returns the resulting lifecycle simulation report.
+ *
+ * Guaranteed offline and deterministic; zero network broadcast or private key usage.
+ */
+export async function runCanonicalTclkSettlementSimulation(
+  initialNowMs: number = 1789200000000,
+): Promise<LifecycleSimulationResult> {
+  const payerDid = "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2";
+  const payeeDid = "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG";
+  const baseClock = initialNowMs;
+
+  const offer = makeOffer({
+    from: payerDid,
+    role: "payer",
+    amount: "1000",
+    asset: "FLOP",
+    lock: "hash",
+    rails: ["paper"],
+    expiresMs: baseClock + 3600000,
+    claimByMs: baseClock + 7200000,
+    refundAfterMs: baseClock + 10800000,
+  });
+  const hashLock = generateHashLock();
+  const accept = makeAccept(offer, { from: payeeDid, statement: hashLock.hash });
+  const contractId = accept.contract;
+  const lock: LockFrame = { type: "lock", from: payerDid, contract: contractId, rail: "paper", ref: "ref-canonical-sim" };
+  const reveal: RevealFrame = { type: "reveal", from: payeeDid, contract: contractId, secret: hashLock.preimage };
+
+  return simulateTclkLifecycle([offer, accept, lock, reveal], { initialNowMs: baseClock });
+}
+

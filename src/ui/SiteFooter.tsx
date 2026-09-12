@@ -114,17 +114,23 @@ export function SiteFooter() {
 
           {/* Right navigation & verification */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:justify-items-start">
-            <nav aria-label="Navigation Flow" className="space-y-3">
-              <p className="eyebrow">Flow</p>
+            <nav aria-label="Workspace & Flow" className="space-y-3">
+              <p className="eyebrow">Workspace &amp; Flow</p>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/onboarding/identity" className="text-muted hover:text-ink transition-colors">
-                    Create identity
+                  <Link href="/workspace" className="text-muted hover:text-ink transition-colors">
+                    Workspace
                   </Link>
                 </li>
                 <li>
-                  <Link href="/civilization" className="text-muted hover:text-ink transition-colors">
-                    Civilization
+                  <Link href="/readiness" className="text-muted hover:text-ink transition-colors flex items-center gap-1.5">
+                    Readiness
+                    <span className="mono text-[0.625rem] text-signal font-semibold bg-signal/10 px-1 py-0.2 rounded">7-Stage</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/health" className="text-muted hover:text-ink transition-colors">
+                    Health Monitor
                   </Link>
                 </li>
                 <li>
@@ -133,19 +139,24 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/import" className="text-muted hover:text-ink transition-colors">
-                    Import backup
+                  <Link href="/onboarding/identity" className="text-muted hover:text-ink transition-colors">
+                    Create identity
                   </Link>
                 </li>
               </ul>
             </nav>
 
-            <nav aria-label="Developer Toolchain" className="space-y-3">
-              <p className="eyebrow">Toolchain</p>
+            <nav aria-label="Author & Diagnose" className="space-y-3">
+              <p className="eyebrow">Author &amp; Diagnose</p>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/observatory" className="text-muted hover:text-ink transition-colors">
-                    Observatory
+                  <Link href="/start" className="text-muted hover:text-ink transition-colors">
+                    Agent Builder
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/forge" className="text-muted hover:text-ink transition-colors">
+                    Payload Forge
                   </Link>
                 </li>
                 <li>
@@ -159,15 +170,41 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contributions/tclk-testkit" className="text-muted hover:text-ink transition-colors">
-                    Contribution Doc
+                  <Link href="/import" className="text-muted hover:text-ink transition-colors">
+                    Import backup
                   </Link>
                 </li>
               </ul>
             </nav>
 
-            <nav aria-label="Trust & Legal" className="space-y-3">
-              <p className="eyebrow">Trust &amp; Legal</p>
+            <nav aria-label="Network & Trace" className="space-y-3">
+              <p className="eyebrow">Network &amp; Trace</p>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/observatory" className="text-muted hover:text-ink transition-colors">
+                    Observatory
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/trace" className="text-muted hover:text-ink transition-colors">
+                    Public Trace
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/civilization" className="text-muted hover:text-ink transition-colors">
+                    Civilization
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contributions/tclk-testkit" className="text-muted hover:text-ink transition-colors">
+                    TestKit Docs
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            <div className="space-y-3">
+              <p className="eyebrow">Trust &amp; Verified</p>
               <ul className="space-y-2 text-sm">
                 <li>
                   <Link href="/privacy" className="text-muted hover:text-ink transition-colors">
@@ -194,18 +231,11 @@ export function SiteFooter() {
                     GitHub ↗
                   </a>
                 </li>
-              </ul>
-            </nav>
-
-            <div className="space-y-3">
-              <p className="eyebrow">Verified against</p>
-              <ul className="space-y-2 text-sm">
-                <li className="text-muted">{PROTOCOL_SOURCE.release}</li>
-                <li className="mono text-faint text-[0.6875rem] break-all">
-                  <span className="sr-only">SHA-256 of {PROTOCOL_SOURCE.file}: </span>
-                  {PROTOCOL_SOURCE.sha256.slice(0, 32)}
-                  <wbr />
-                  {PROTOCOL_SOURCE.sha256.slice(32)}
+                <li className="pt-2 border-t border-hairline">
+                  <span className="mono text-faint text-[0.625rem] block">{PROTOCOL_SOURCE.release}</span>
+                  <span className="mono text-faint text-[0.625rem] break-all block mt-0.5">
+                    {PROTOCOL_SOURCE.sha256.slice(0, 24)}...
+                  </span>
                 </li>
               </ul>
             </div>

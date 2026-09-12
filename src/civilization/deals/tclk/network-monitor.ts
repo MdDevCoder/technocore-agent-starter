@@ -1,7 +1,7 @@
 /**
  * TCLK Network Activity & Counterparty Discovery Monitor.
  *
- * Read-only analysis engine for inspecting public Technocore TCLK channels,
+ * Read-only analysis engine for inspecting public Technocore TCLK rooms,
  * evaluating counterparty readiness, analyzing protocol dialects, calculating
  * response-time latencies, and generating evidence-based pilot recommendations.
  *

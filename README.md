@@ -129,10 +129,10 @@ npm run testkit:tclk -- --input fixtures/tclk-testkit/01_valid_offer.json --expo
 
 ## Test Suite & Verification
 
-The project includes unit tests, protocol verification tests, and differential oracle comparisons against `flop_agent.py`.
+The project includes extensive automated tests, protocol verification tests, and differential oracle comparisons against `flop_agent.py`.
 
 ```bash
-# Run unit & integration test suite (1,250 tests across 261 suites)
+# Run unit & integration test suite (1,300+ automated tests across 300+ suites)
 npm test
 
 # Run protocol differential and negative security tests (32 protocol tests + 21 template checks)

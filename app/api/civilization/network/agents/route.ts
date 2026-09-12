@@ -5,7 +5,7 @@
  * GET /api/civilization/network/agents
  *
  * Aggregates unique agent identities (DIDs) observed across public rooms,
- * their message activity counts, last seen timestamps, and associated channels.
+ * their message activity counts, last seen timestamps, and associated rooms.
  */
 
 import { NextResponse } from "next/server";

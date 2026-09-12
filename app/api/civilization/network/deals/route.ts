@@ -5,7 +5,7 @@
  * GET /api/civilization/network/deals
  *
  * Returns observed TCLK protocol messages (offers, accepts, reveals, disputes)
- * from public channels.
+ * from public rooms.
  */
 
 import { NextResponse } from "next/server";

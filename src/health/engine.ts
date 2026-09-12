@@ -13,13 +13,10 @@
  * 6. Live network failures are NEVER masked with fixture fallbacks.
  */
 
-import { generateKeyPair, importSigningKey, sign } from "../crypto/ed25519.ts";
-import { toBase64Url, wipe } from "../crypto/bytes.ts";
-import { publicKeyToDid, isValidDid } from "../identity/did.ts";
-import { roomMessagePayloadBytes } from "../technocore/envelope.ts";
-import { verifyRoomMessage } from "../technocore/verify.ts";
-import { makeOffer, makeAccept, generateHashLock, type LockFrame, type RevealFrame } from "@flop-labs/tclk";
-import { simulateTclkLifecycle } from "../technocore/harness/tclk-testkit.ts";
+import { isValidDid } from "../identity/did.ts";
+import { executeEphemeralSigningDryRun } from "../crypto/dryRun.ts";
+import { runCanonicalTclkSettlementSimulation } from "../technocore/harness/tclk-testkit.ts";
+import { parsePublicRoomMessagesResponse } from "../technocore/transport.ts";
 import { reconstructTimeline } from "../trace/engine.ts";
 import type { RawTraceRecord } from "../trace/types.ts";
 import type {
@@ -418,91 +415,45 @@ async function evaluateNetworkHealth(
  * NEVER accesses, requests, exports, or exposes the user's actual private key.
  */
 async function evaluateSigningHealth(timestamp: string): Promise<HealthCheckItem> {
-  const start = Date.now();
-  let seedBuffer: Uint8Array | null = null;
+  const res = await executeEphemeralSigningDryRun("lobby", "technocore-health-dry-run");
 
-  try {
-    const { seed, publicKey } = await generateKeyPair();
-    seedBuffer = seed;
-    const testDid = publicKeyToDid(publicKey);
-    const nonce = Date.now().toString();
-    const text = "technocore-health-dry-run";
-    const room = "lobby";
-
-    const key = await importSigningKey(seed, publicKey, false);
-    const payloadBytes = roomMessagePayloadBytes(room, nonce, text);
-    const sigBytes = await sign(key, payloadBytes);
-    const signature = toBase64Url(sigBytes);
-
-    // Immediate security wipe of ephemeral test seed
-    wipe(seed);
-    seedBuffer = null;
-
-    // Verify the ephemeral signature
-    const verification = await verifyRoomMessage(room, {
-      did: testDid,
-      nonce,
-      text,
-      sig: signature,
-    });
-
-    const latencyMs = Date.now() - start;
-
-    if (verification.verified && signature.length === 86) {
-      return {
-        id: "health-signing",
-        category: "SIGNING",
-        title: "Cryptographic Signing Engine",
-        status: "HEALTHY",
-        statusLabel: "CANONICAL SIGNING DRY-RUN SUCCESSFUL",
-        summary: `Ephemeral WebCrypto Ed25519 dry-run generated and verified an 86-char base64url signature in ${latencyMs}ms.`,
-        evidence: {
-          testDid,
-          canonicalFormat: "{room}|{nonce}|{text}",
-          signatureLength: signature.length,
-          signatureVerified: true,
-          latencyMs,
-          userKeyAccess: "NONE (Ephemeral Isolated Keypair)",
-        },
-        lastChecked: timestamp,
-        latencyMs,
-      };
-    } else {
-      return {
-        id: "health-signing",
-        category: "SIGNING",
-        title: "Cryptographic Signing Engine",
-        status: "FAILED",
-        statusLabel: "SIGNING VERIFICATION FAILED",
-        summary: "Local WebCrypto Ed25519 signature failed internal verification.",
-        evidence: {
-          signatureVerified: verification.verified,
-          reason: verification.reason,
-        },
-        lastChecked: timestamp,
-        latencyMs,
-        remediation: {
-          why: "WebCrypto cryptographic subsystem failed to verify a newly generated signature.",
-          whatToDo: "Ensure the browser supports standard WebCrypto Ed25519 primitives.",
-        },
-      };
-    }
-  } catch (err) {
-    if (seedBuffer) wipe(seedBuffer);
+  if (res.success && res.signatureLength === 86) {
+    return {
+      id: "health-signing",
+      category: "SIGNING",
+      title: "Cryptographic Signing Engine",
+      status: "HEALTHY",
+      statusLabel: "CANONICAL SIGNING DRY-RUN SUCCESSFUL",
+      summary: `Ephemeral WebCrypto Ed25519 dry-run generated and verified an 86-char base64url signature in ${res.latencyMs}ms.`,
+      evidence: {
+        testDid: res.did,
+        canonicalFormat: "{room}|{nonce}|{text}",
+        signatureLength: res.signatureLength,
+        signatureVerified: true,
+        latencyMs: res.latencyMs,
+        userKeyAccess: "NONE (Ephemeral Isolated Keypair)",
+      },
+      lastChecked: timestamp,
+      latencyMs: res.latencyMs,
+    };
+  } else {
     return {
       id: "health-signing",
       category: "SIGNING",
       title: "Cryptographic Signing Engine",
       status: "FAILED",
-      statusLabel: "SIGNING ENGINE ERROR",
-      summary: "Cryptographic signing subsystem encountered an execution error.",
+      statusLabel: "SIGNING VERIFICATION FAILED",
+      summary: "Local WebCrypto Ed25519 signature failed internal verification.",
       evidence: {
-        error: err instanceof Error ? err.message : "Cryptographic failure",
+        signatureVerified: res.verified,
       },
       lastChecked: timestamp,
+      latencyMs: res.latencyMs,
       remediation: {
-        why: "An error occurred during ephemeral WebCrypto key generation or signature calculation.",
-        whatToDo: "Check browser console for WebCrypto permission errors.",
+        why: "WebCrypto cryptographic subsystem failed to verify a newly generated signature.",
+        whatToDo: "Ensure the browser supports standard WebCrypto Ed25519 primitives.",
+        actionLabel: "Open Signature Doctor →",
+        actionHref: "/doctor",
       },
     };
   }
@@ -515,29 +466,9 @@ async function evaluateSigningHealth(timestamp: string): Promise<HealthCheckItem
  */
 async function evaluateProtocolHealth(timestamp: string): Promise<HealthCheckItem> {
   const start = Date.now();
-  const payerDid = "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2";
-  const payeeDid = "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG";
-  const baseClock = 1789200000000;
 
   try {
-    const offer = makeOffer({
-      from: payerDid,
-      role: "payer",
-      amount: "1000",
-      asset: "FLOP",
-      lock: "hash",
-      rails: ["paper"],
-      expiresMs: baseClock + 3600000,
-      claimByMs: baseClock + 7200000,
-      refundAfterMs: baseClock + 10800000,
-    });
-    const hashLock = generateHashLock();
-    const accept = makeAccept(offer, { from: payeeDid, statement: hashLock.hash });
-    const contractId = accept.contract;
-    const lock: LockFrame = { type: "lock", from: payerDid, contract: contractId, rail: "paper", ref: "ref-100" };
-    const reveal: RevealFrame = { type: "reveal", from: payeeDid, contract: contractId, secret: hashLock.preimage };
-
-    const sim = await simulateTclkLifecycle([offer, accept, lock, reveal], { initialNowMs: baseClock });
+    const sim = await runCanonicalTclkSettlementSimulation();
     const latencyMs = Date.now() - start;
 
     if (sim.success && sim.finalStatus === "claimed") {
@@ -652,16 +583,7 @@ async function evaluateObservatoryHealth(
 
     if (res.ok) {
       const data = await res.json();
-      let records: RawTraceRecord[] = [];
-
-      if (Array.isArray(data)) {
-        records = data;
-      } else if (data && Array.isArray(data.messages)) {
-        records = data.messages;
-      } else if (data && Array.isArray(data.records)) {
-        records = data.records;
-      }
-
+      const records: RawTraceRecord[] = parsePublicRoomMessagesResponse(data);
       const count = records.length;
       const headSeq = count > 0 ? records[records.length - 1]?.seq ?? null : null;
 

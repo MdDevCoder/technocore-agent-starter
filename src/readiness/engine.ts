@@ -7,19 +7,10 @@
  * strictly bounded read-only GET requests.
  */
 
-import { generateKeyPair, importSigningKey, sign } from "../crypto/ed25519.ts";
-import { toBase64Url, wipe } from "../crypto/bytes.ts";
-import { publicKeyToDid, isValidDid } from "../identity/did.ts";
-import { roomMessagePayloadBytes } from "../technocore/envelope.ts";
-import { verifyRoomMessage } from "../technocore/verify.ts";
-import {
-  makeOffer,
-  makeAccept,
-  generateHashLock,
-  type LockFrame,
-  type RevealFrame,
-} from "@flop-labs/tclk";
-import { simulateTclkLifecycle } from "../technocore/harness/tclk-testkit.ts";
+import { isValidDid } from "../identity/did.ts";
+import { executeEphemeralSigningDryRun } from "../crypto/dryRun.ts";
+import { runCanonicalTclkSettlementSimulation } from "../technocore/harness/tclk-testkit.ts";
+import { parsePublicRoomMessagesResponse } from "../technocore/transport.ts";
 import { reconstructTimeline } from "../trace/engine.ts";
 import type { RawTraceRecord } from "../trace/types.ts";
 import type {
@@ -444,100 +435,47 @@ async function evaluateDryRunStage(
   _options: EvaluateReadinessOptions,
   timestamp: string,
 ): Promise<ReadinessStageItem> {
-  const start = Date.now();
-  let seedBuffer: Uint8Array | null = null;
+  const res = await executeEphemeralSigningDryRun("lobby", "readiness-dry-run-check");
 
-  try {
-    const { seed, publicKey } = await generateKeyPair();
-    seedBuffer = seed;
-    const testDid = publicKeyToDid(publicKey);
-    const nonce = Date.now().toString();
-    const text = "readiness-dry-run-check";
-    const room = "lobby";
-
-    const key = await importSigningKey(seed, publicKey, false);
-    const payloadBytes = roomMessagePayloadBytes(room, nonce, text);
-    const sigBytes = await sign(key, payloadBytes);
-    const signature = toBase64Url(sigBytes);
-
-    // Immediate zeroization of ephemeral test key
-    wipe(seed);
-    seedBuffer = null;
-
-    const verification = await verifyRoomMessage(room, {
-      did: testDid,
-      nonce,
-      text,
-      sig: signature,
-    });
-
-    const latencyMs = Date.now() - start;
-
-    if (verification.verified && signature.length === 86) {
-      return {
-        id: "DRY_RUN",
-        stageNumber: 4,
-        title: "Local Message Dry-Run",
-        status: "READY",
-        statusLabel: "DRY-RUN VERIFIED",
-        summary: `Canonical payload constructed and verified with valid 86-char Ed25519 signature in ${latencyMs}ms.`,
-        isLocalStage: true,
-        isNetworkStage: false,
-        evidence: {
-          canonicalFormat: "{room}|{nonce}|{text}",
-          signatureLength: signature.length,
-          signatureVerified: true,
-          liveBroadcast: false,
-        },
-        lastChecked: timestamp,
-        latencyMs,
-        actionLabel: "Open Payload Forge →",
-        actionHref: "/forge",
-      };
-    } else {
-      return {
-        id: "DRY_RUN",
-        stageNumber: 4,
-        title: "Local Message Dry-Run",
-        status: "FAILED",
-        statusLabel: "DRY-RUN FAILED",
-        summary: "Local WebCrypto Ed25519 signature verification failed.",
-        isLocalStage: true,
-        isNetworkStage: false,
-        evidence: {
-          signatureVerified: verification.verified,
-          reason: verification.reason,
-        },
-        lastChecked: timestamp,
-        latencyMs,
-        remediation: {
-          why: "Cryptographic signing subsystem failed to verify a test signature locally.",
-          whatToDo: "Check WebCrypto support in your browser.",
-          actionLabel: "Open Signature Doctor →",
-          actionHref: "/doctor",
-        },
-        actionLabel: "Open Doctor →",
-        actionHref: "/doctor",
-      };
-    }
-  } catch (err) {
-    if (seedBuffer) wipe(seedBuffer);
+  if (res.success && res.signatureLength === 86) {
+    return {
+      id: "DRY_RUN",
+      stageNumber: 4,
+      title: "Local Message Dry-Run",
+      status: "READY",
+      statusLabel: "DRY-RUN VERIFIED",
+      summary: `Canonical payload constructed and verified with valid 86-char Ed25519 signature in ${res.latencyMs}ms.`,
+      isLocalStage: true,
+      isNetworkStage: false,
+      evidence: {
+        canonicalFormat: "{room}|{nonce}|{text}",
+        signatureLength: res.signatureLength,
+        signatureVerified: true,
+        liveBroadcast: false,
+      },
+      lastChecked: timestamp,
+      latencyMs: res.latencyMs,
+      actionLabel: "Open Payload Forge →",
+      actionHref: "/forge",
+    };
+  } else {
     return {
       id: "DRY_RUN",
       stageNumber: 4,
       title: "Local Message Dry-Run",
       status: "FAILED",
-      statusLabel: "DRY-RUN ERROR",
-      summary: "Execution error during local signing dry-run.",
+      statusLabel: "DRY-RUN FAILED",
+      summary: "Local WebCrypto Ed25519 signature verification failed.",
       isLocalStage: true,
       isNetworkStage: false,
       evidence: {
-        error: err instanceof Error ? err.message : "Signing error",
+        signatureVerified: res.verified,
       },
       lastChecked: timestamp,
+      latencyMs: res.latencyMs,
       remediation: {
-        why: "Local signing failed to execute.",
-        whatToDo: "Inspect browser console and diagnose in Signature Doctor.",
+        why: "Cryptographic signing subsystem failed to verify a test signature locally.",
+        whatToDo: "Check WebCrypto support in your browser.",
         actionLabel: "Open Signature Doctor →",
         actionHref: "/doctor",
       },
@@ -552,29 +490,9 @@ async function evaluateDryRunStage(
  */
 async function evaluateTclkStage(timestamp: string): Promise<ReadinessStageItem> {
   const start = Date.now();
-  const payerDid = "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2";
-  const payeeDid = "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG";
-  const baseClock = 1789200000000;
 
   try {
-    const offer = makeOffer({
-      from: payerDid,
-      role: "payer",
-      amount: "1000",
-      asset: "FLOP",
-      lock: "hash",
-      rails: ["paper"],
-      expiresMs: baseClock + 3600000,
-      claimByMs: baseClock + 7200000,
-      refundAfterMs: baseClock + 10800000,
-    });
-    const hashLock = generateHashLock();
-    const accept = makeAccept(offer, { from: payeeDid, statement: hashLock.hash });
-    const contractId = accept.contract;
-    const lock: LockFrame = { type: "lock", from: payerDid, contract: contractId, rail: "paper", ref: "ref-readiness" };
-    const reveal: RevealFrame = { type: "reveal", from: payeeDid, contract: contractId, secret: hashLock.preimage };
-
-    const sim = await simulateTclkLifecycle([offer, accept, lock, reveal], { initialNowMs: baseClock });
+    const sim = await runCanonicalTclkSettlementSimulation();
     const latencyMs = Date.now() - start;
 
     if (sim.success && sim.finalStatus === "claimed") {
@@ -705,11 +623,7 @@ async function evaluateObservationStage(
 
     if (res.ok) {
       const data = await res.json();
-      const records: RawTraceRecord[] = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.messages)
-          ? data.messages
-          : [];
+      const records: RawTraceRecord[] = parsePublicRoomMessagesResponse(data);
 
       return {
         stage: {

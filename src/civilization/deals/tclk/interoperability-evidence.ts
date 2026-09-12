@@ -533,7 +533,7 @@ export function formatEvidenceMarkdown(pkg: TclkEvidencePackage): string {
   lines.push("");
   lines.push(`- **Generated At**: \`${pkg.exportedAt}\``);
   lines.push(`- **Target Network**: \`${pkg.sampleSource.networkUrl}\``);
-  lines.push(`- **Target Channel**: \`${pkg.sampleSource.room}\``);
+  lines.push(`- **Target Room**: \`${pkg.sampleSource.room}\``);
   lines.push(`- **Samples Analyzed**: \`${pkg.sampleSource.sampleCount}\``);
   lines.push(`- **Summary Conclusion**: \`${pkg.summaryConclusion}\``);
   lines.push("");

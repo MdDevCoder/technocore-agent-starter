@@ -19,6 +19,7 @@ import { utf8, toHex } from "../crypto/bytes.ts";
 import { sha256Hex } from "../crypto/hash.ts";
 import { verifyRoomMessage, isValidSignatureShape } from "../technocore/verify.ts";
 import { inspectUnicodeSweep } from "../technocore/forge/engine.ts";
+import { parsePublicRoomMessagesResponse } from "../technocore/transport.ts";
 import type {
   EvidenceGraph,
   EvidenceGraphEdge,
@@ -218,13 +219,11 @@ export async function fetchLivePublicTrace(
       };
     }
 
-    const data = (await res.json()) as Record<string, unknown>;
-    const rawList = Array.isArray(data.messages)
-      ? (data.messages as Record<string, unknown>[])
-      : Array.isArray(data)
-        ? (data as Record<string, unknown>[])
-        : [];
-    const generation = typeof data.generation === "number" ? data.generation : undefined;
+    const data = await res.json();
+    const rawList = parsePublicRoomMessagesResponse<Record<string, unknown>>(data);
+    const generation = typeof (data as Record<string, unknown>)?.generation === "number"
+      ? (data as Record<string, unknown>).generation as number
+      : undefined;
 
     const records: RawTraceRecord[] = rawList.map((m) => {
       const did = typeof m.did === "string" ? m.did : typeof m.from === "string" ? m.from : "server";
@@ -1033,9 +1032,9 @@ export function buildEvidenceGraph(event: ReconstructedEvent): EvidenceGraph {
     label: "Broadcast Room",
     value: `/r/${event.room}`,
     status: "VALID",
-    description: "Public broadcast channel namespace",
+    description: "Public broadcast room namespace",
   });
-  edges.push({ source: "node-event", target: "node-room", label: "channel" });
+  edges.push({ source: "node-event", target: "node-room", label: "room" });
 
   // 3. Timestamp / Sequence
   nodes.push({

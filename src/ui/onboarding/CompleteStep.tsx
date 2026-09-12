@@ -179,6 +179,55 @@ export function CompleteStep() {
           : "Close this tab and the only way back is the encrypted backup you saved. Keep the file and the passphrase in two different places."}
       </Callout>
 
+      {/* Developer Handoff Card */}
+      <div className="border-hairline bg-panel/70 rounded-xl p-5 border shadow-sm space-y-4">
+        <div>
+          <p className="eyebrow text-signal">Next Developer Milestones</p>
+          <p className="text-ink text-sm font-semibold mt-1">
+            Transition your verified identity into active development
+          </p>
+          <p className="text-muted text-xs mt-0.5">
+            Open the centralized Workspace to configure projects and generate safe tool handoffs, or run the 7-stage Readiness verification checklist.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <Link
+            href="/workspace"
+            className="border-hairline bg-void/80 hover:bg-void hover:border-signal/50 text-ink rounded-lg p-3.5 border transition-all flex flex-col justify-between group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="mono text-xs font-bold text-signal group-hover:text-signal-bright">
+                Open Workspace →
+              </span>
+              <span className="mono text-[0.625rem] text-faint border border-hairline px-1.5 py-0.5 rounded">
+                /workspace
+              </span>
+            </div>
+            <p className="text-muted text-xs mt-2 line-clamp-2">
+              Manage projects, safe tool handoffs, and synchronized agent runtime state.
+            </p>
+          </Link>
+
+          <Link
+            href="/readiness"
+            className="border-hairline bg-void/80 hover:bg-void hover:border-signal/50 text-ink rounded-lg p-3.5 border transition-all flex flex-col justify-between group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="mono text-xs font-bold text-signal group-hover:text-signal-bright">
+                Run Readiness Check →
+              </span>
+              <span className="mono text-[0.625rem] text-signal font-semibold bg-signal/10 px-1.5 py-0.5 rounded border border-signal/20">
+                7-Stage
+              </span>
+            </div>
+            <p className="text-muted text-xs mt-2 line-clamp-2">
+              Guided end-to-end evidence checklist verifying your agent for production development.
+            </p>
+          </Link>
+        </div>
+      </div>
+
       <StepActions
         primary={
           <Link href="/agent" className={buttonClasses("primary", "lg")}>

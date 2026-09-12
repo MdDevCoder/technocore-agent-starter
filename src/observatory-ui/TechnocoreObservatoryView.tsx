@@ -11,6 +11,7 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { verifyRoomMessage } from "../technocore/verify.ts";
 import { isValidDid } from "../identity/did.ts";
+import { parsePublicRoomMessagesResponse } from "../technocore/transport.ts";
 import { extractSafeHandoffParams } from "../workspace/handoff.ts";
 import { HandoffBanner } from "../workspace-ui/HandoffBanner.tsx";
 
@@ -115,8 +116,20 @@ export const TechnocoreObservatoryView: React.FC = () => {
 
       if (res.ok) {
         const data = await res.json();
-        const rawList = Array.isArray(data.messages) ? data.messages : (Array.isArray(data) ? data : []);
-        const generation = typeof data.generation === "number" ? data.generation : 0;
+        const rawList = parsePublicRoomMessagesResponse<{
+          readonly did?: string;
+          readonly from?: string;
+          readonly sig?: string;
+          readonly signature?: string;
+          readonly nonce?: string | number;
+          readonly text?: unknown;
+          readonly seq?: number;
+          readonly sequence?: number;
+          readonly ts?: string;
+          readonly serverTimestamp?: string;
+          readonly observedAt?: string;
+        }>(data);
+        const generation = typeof data?.generation === "number" ? data.generation : 0;
         
         // Verify each message
         const verifiedList: ObservedMessage[] = [];
