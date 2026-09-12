@@ -29,17 +29,20 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme from storage or system preference on mount
+  // Initialize theme from storage on mount (defaults to light mode)
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-      if (stored === "light" || stored === "dark" || stored === "system") {
-        setThemeState(stored);
+      if (stored === "dark") {
+        setThemeState("dark");
+        setResolvedTheme("dark");
       } else {
         setThemeState("light");
+        setResolvedTheme("light");
       }
     } catch {
       setThemeState("light");
+      setResolvedTheme("light");
     }
     setMounted(true);
   }, []);
@@ -49,10 +52,10 @@ export function ThemeProvider({ children }: { readonly children: React.ReactNode
     if (!mounted) return;
 
     function computeResolved(currentTheme: Theme): ResolvedTheme {
-      if (currentTheme === "system") {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      if (currentTheme === "dark") {
+        return "dark";
       }
-      return currentTheme;
+      return "light";
     }
 
     const resolved = computeResolved(theme);

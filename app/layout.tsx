@@ -74,7 +74,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#f8fafc",
-  colorScheme: "light dark",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
@@ -83,13 +83,14 @@ export default function RootLayout({ children }: { readonly children: React.Reac
   return (
     <html
       lang="en"
+      data-theme="light"
       suppressHydrationWarning
-      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+      className={`light ${display.variable} ${sans.variable} ${mono.variable}`}
     >
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("technocore_theme")||"light";var d=t==="system"?window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light":t;document.documentElement.setAttribute("data-theme",d);if(d==="dark"){document.documentElement.classList.add("dark");document.documentElement.classList.remove("light");document.documentElement.style.colorScheme="dark";}else{document.documentElement.classList.add("light");document.documentElement.classList.remove("dark");document.documentElement.style.colorScheme="light";}}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem("technocore_theme");var d=t==="dark"?"dark":"light";document.documentElement.setAttribute("data-theme",d);if(d==="dark"){document.documentElement.classList.add("dark");document.documentElement.classList.remove("light");document.documentElement.style.colorScheme="dark";}else{document.documentElement.classList.add("light");document.documentElement.classList.remove("dark");document.documentElement.style.colorScheme="light";}}catch(e){}})();`,
           }}
         />
       </head>

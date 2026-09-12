@@ -61,10 +61,10 @@ describe("Theme System & Light Mode Default", () => {
     const layout = readFileSync(layoutPath, "utf-8");
 
     assert.ok(layout.includes('themeColor: "#f8fafc"'), "Viewport themeColor must default to light (#f8fafc)");
-    assert.ok(layout.includes('colorScheme: "light dark"'), "Viewport colorScheme must be light dark");
+    assert.ok(layout.includes('colorScheme: "light"'), "Viewport colorScheme must be light");
     assert.ok(
-      layout.includes('localStorage.getItem("technocore_theme")||"light"'),
-      "Inline head script must fall back to 'light' when no stored preference exists",
+      layout.includes('var d=t==="dark"?"dark":"light"'),
+      "Inline head script must strictly resolve to 'light' unless explicitly 'dark'",
     );
   });
 
@@ -97,23 +97,19 @@ describe("Theme System & Light Mode Default", () => {
   });
 
   it("6. Simulates inline head script theme resolution logic", () => {
-    function simulateBootstrap(storedValue: string | null, systemIsDark: boolean): string {
-      const t = storedValue || "light";
-      const resolved = t === "system" ? (systemIsDark ? "dark" : "light") : t;
+    function simulateBootstrap(storedValue: string | null): string {
+      const t = storedValue;
+      const resolved = t === "dark" ? "dark" : "light";
       return resolved;
     }
 
     // First visit: no stored preference -> Light
-    assert.equal(simulateBootstrap(null, false), "light", "First visit on light OS -> light");
-    assert.equal(simulateBootstrap(null, true), "light", "First visit on dark OS -> light (does not auto-override)");
+    assert.equal(simulateBootstrap(null), "light", "First visit -> light default");
+    assert.equal(simulateBootstrap(""), "light", "Empty stored preference -> light default");
 
     // Explicit user choice
-    assert.equal(simulateBootstrap("dark", false), "dark", "Explicit dark stored -> dark");
-    assert.equal(simulateBootstrap("light", true), "light", "Explicit light stored -> light");
-
-    // Explicit system preference
-    assert.equal(simulateBootstrap("system", false), "light", "System pref on light OS -> light");
-    assert.equal(simulateBootstrap("system", true), "dark", "System pref on dark OS -> dark");
+    assert.equal(simulateBootstrap("dark"), "dark", "Explicit dark stored -> dark");
+    assert.equal(simulateBootstrap("light"), "light", "Explicit light stored -> light");
   });
 
   it("7. Primary button styles support light and dark contrast seamlessly", () => {
