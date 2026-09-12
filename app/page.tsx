@@ -253,7 +253,7 @@ export default function LandingPage() {
                 cd technocore-agent-starter{"\n"}
                 npm install{"\n"}
                 npm run dev{"\n"}
-                # Open http://localhost:3000
+                # Open local dev server (port 3000)
               </pre>
             </div>
 
