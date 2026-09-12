@@ -31,7 +31,8 @@
     "observe:technocore": "node scripts/observe-technocore.mjs",
     "doctor:signature": "node scripts/doctor-signature.mjs",
     "testkit:tclk": "node --experimental-strip-types scripts/testkit-tclk.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol && npm run health:onboarding"
+    "audit:prelaunch": "node scripts/prelaunch-audit.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run test:protocol && npm run health:onboarding && npm run health:css && npm run audit:prelaunch"
   },
   "dependencies": {
     "@flop-labs/tclk": "^0.1.0",

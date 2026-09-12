@@ -113,7 +113,7 @@ export function SiteFooter() {
           </div>
 
           {/* Right navigation & verification */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 lg:justify-items-end">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 lg:justify-items-start">
             <nav aria-label="Navigation Flow" className="space-y-3">
               <p className="eyebrow">Flow</p>
               <ul className="space-y-2 text-sm">
@@ -124,7 +124,7 @@ export function SiteFooter() {
                 </li>
                 <li>
                   <Link href="/civilization" className="text-muted hover:text-ink transition-colors">
-                    Civilization Observatory
+                    Civilization
                   </Link>
                 </li>
                 <li>
@@ -134,18 +134,59 @@ export function SiteFooter() {
                 </li>
                 <li>
                   <Link href="/import" className="text-muted hover:text-ink transition-colors">
-                    Import a backup
+                    Import backup
                   </Link>
                 </li>
               </ul>
             </nav>
 
-            <div className="space-y-3">
-              <p className="eyebrow">Connect</p>
+            <nav aria-label="Developer Toolchain" className="space-y-3">
+              <p className="eyebrow">Toolchain</p>
               <ul className="space-y-2 text-sm">
                 <li>
+                  <Link href="/observatory" className="text-muted hover:text-ink transition-colors">
+                    Observatory
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/doctor" className="text-muted hover:text-ink transition-colors">
+                    Signature Doctor
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/testkit" className="text-muted hover:text-ink transition-colors">
+                    TCLK-TestKit
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contributions/tclk-testkit" className="text-muted hover:text-ink transition-colors">
+                    Contribution Doc
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+
+            <nav aria-label="Trust & Legal" className="space-y-3">
+              <p className="eyebrow">Trust &amp; Legal</p>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link href="/privacy" className="text-muted hover:text-ink transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="text-muted hover:text-ink transition-colors">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="text-muted hover:text-ink transition-colors">
+                    Technical FAQ
+                  </Link>
+                </li>
+                <li>
                   <a
-                    href="https://github.com/MdDevCoder"
+                    href="https://github.com/MdDevCoder/technocore-agent-starter"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-muted hover:text-ink transition-colors"
@@ -153,40 +194,10 @@ export function SiteFooter() {
                     GitHub ↗
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="https://x.com/Muhammad_0423"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted hover:text-ink transition-colors"
-                  >
-                    𝕏 (Twitter) ↗
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://t.me/satoshiskillz"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted hover:text-ink transition-colors"
-                  >
-                    Telegram ↗
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.instagram.com/muhammad__0423?igsi=MW04ZXVxdmNzaGVnZQ=="
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-muted hover:text-ink transition-colors"
-                  >
-                    Instagram ↗
-                  </a>
-                </li>
               </ul>
-            </div>
+            </nav>
 
-            <div className="col-span-2 sm:col-span-1 space-y-3">
+            <div className="space-y-3">
               <p className="eyebrow">Verified against</p>
               <ul className="space-y-2 text-sm">
                 <li className="text-muted">{PROTOCOL_SOURCE.release}</li>
@@ -203,7 +214,19 @@ export function SiteFooter() {
 
         <div className="border-hairline text-faint mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 border-t pt-6 text-[0.75rem]">
           <p>{YEAR} · Built with precision by Shaikh Muhammad (@MdDevCoder).</p>
-          <p>No account, no wallet, and no private key ever leaves your browser.</p>
+          <div className="flex items-center gap-4 text-muted">
+            <Link href="/privacy" className="hover:text-ink transition-colors">
+              Privacy
+            </Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:text-ink transition-colors">
+              Terms
+            </Link>
+            <span>·</span>
+            <Link href="/faq" className="hover:text-ink transition-colors">
+              FAQ
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
