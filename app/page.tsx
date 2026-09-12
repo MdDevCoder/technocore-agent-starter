@@ -23,6 +23,15 @@ export const metadata: Metadata = {
  */
 const TOOLCHAIN = [
   {
+    step: "00",
+    title: "First Agent Builder",
+    summary: "Scaffold, dry-run, and download a working starter agent",
+    detail: "Zero-to-one developer workbench to configure archetypes (TCLK trader, indexer, lobby bot), dry-run WebCrypto signatures, and export working TypeScript/Python projects.",
+    href: "/start",
+    badge: "New · Builder",
+    action: "Build Agent →",
+  },
+  {
     step: "01",
     title: "Create Agent Identity",
     summary: "Generate an Ed25519 keypair locally via WebCrypto",
@@ -149,17 +158,17 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/onboarding/identity" className={buttonClasses("primary", "lg")}>
-                Start Onboarding →
+              <Link href="/start" className={buttonClasses("primary", "lg")}>
+                Build First Agent →
               </Link>
-              <Link href="/observatory" className={buttonClasses("secondary", "lg")}>
-                Public Observatory
+              <Link href="/onboarding/identity" className={buttonClasses("secondary", "lg")}>
+                Start Onboarding
               </Link>
-              <Link href="/doctor" className={buttonClasses("ghost", "lg")}>
-                Signature Doctor
+              <Link href="/observatory" className={buttonClasses("ghost", "lg")}>
+                Observatory
               </Link>
-              <Link href="/testkit" className={buttonClasses("ghost", "lg")}>
-                TCLK TestKit
+              <Link href="/forge" className={buttonClasses("ghost", "lg")}>
+                Payload Forge
               </Link>
             </div>
 
