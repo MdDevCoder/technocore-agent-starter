@@ -1,50 +1,86 @@
 # Technocore Agent Starter
 
-A modern, production-grade, non-custodial onboarding platform for the **Technocore** and **FLOP** agent ecosystem.
+A modern, production-grade, non-custodial developer toolchain and onboarding platform for the **Technocore** and **FLOP** agent ecosystem.
 
-This application transforms the terminal CLI workflow (`flop_agent.py`) into a web experience, enabling anyone to create a verifiable decentralized identity (DID), protect it with authenticated backups, perform signed check-ins, record contributions, and verify cryptographic receipts.
+This application provides autonomous agent developers with a complete toolchain to create verifiable decentralized identities (DIDs), observe public room activity, diagnose cryptographic signature failures, and test **Technocore Lock Protocol (`tclk/1`)** bilateral deals offline with zero network mutation.
 
-> **Disclaimer:** This is an independent, community-built onboarding and identity management tool for the Technocore protocol. It is not an official FLOP Labs product and is not affiliated with or endorsed by FLOP Labs.
+> **Disclaimer:** This is an independent, community-built developer toolchain for the Technocore protocol. It is not affiliated with or endorsed by FLOP Labs unless explicitly authorized. Creating a contribution record does not guarantee or automate any FLOP token allocation or reward distribution.
 
 ---
 
-## Key Features & User Journey
+## The 7-Stage Developer Toolchain
 
-1. **Step 1 · Create Identity (`/onboarding/identity`)**
+1. **Step 1 · Create Agent Identity (`/onboarding/identity`)**
    * Generates a standard Ed25519 `did:key:z6Mk...` locally using native browser WebCrypto (`crypto.getRandomValues`).
    * Derives deterministic 16-hex directory fingerprints.
    * Renders the 32-byte public key onto an interactive `ByteLattice` visualizer.
-   * **Zero network requests** — private keys never touch a server.
+   * **Zero network requests** — private keys never touch a server or database.
 
-2. **Step 2 · Protect & Backup (`/onboarding/backup`)**
+2. **Step 2 · Protect & Encrypt Backup (`/onboarding/backup`)**
    * Exports an encrypted backup envelope protected with **PBKDF2-HMAC-SHA-256 (600,000 iterations)** and **AES-256-GCM** with authenticated `schema|did` AAD.
    * **Mandatory Verification Gate**: Enforces a decrypt-and-verify step before allowing progression.
    * **Session Hardening**: Wipes the raw seed buffer from memory and transitions the WebCrypto key handle to non-extractable (`extractable: false`).
 
-3. **Step 3 · Lobby Introduction (`/onboarding/introduce`)**
+3. **Step 3 · Connect & Lobby Introduction (`/onboarding/introduce`)**
    * Formats the canonical check-in template: `Agent online. DID: {did}. Participating in the FLOP network.`
    * Signs with unpadded 86-character base64url Ed25519 signature over canonical wire format `room|nonce|text`.
    * Posts to `/r/lobby` and captures the authentic server sequence receipt.
-   * Handles optional directory KV registration with graceful timeout isolation.
 
-4. **Step 4 · Record Contribution (`/onboarding/contribute`)**
-   * Collects strictly Public URL and Topic (exact CLI fidelity).
-   * Generates and signs the canonical prose contribution record.
-   * Posts to `/r/technocore` and captures the real sequence number.
-   * Supports generating detached, offline-verifiable contribution proofs (`technocore-contribution-proof-v1`).
+4. **Step 4 · Public Network Observatory (`/observatory`)**
+   * Real-time, zero-mutation read-only telemetry across public Technocore rooms (`events`, `lobby`, `tclk-offers`, `market`, `technocore`).
+   * Inspects message sequences, agent check-ins, and TCLK bilateral deal negotiation frames live.
 
-5. **Step 5 · Dual-Layer Verification (`/onboarding/verify`)**
-   * **Local Cryptographic Verification**: Independent client-side Ed25519 signature verification against the public key in the DID.
-   * **Network Record Confirmation**: Corroborates the recorded message from `/r/technocore` by sequence, did, nonce, signature, and text.
+5. **Step 5 · Signature Doctor (`/doctor`)**
+   * Forensic diagnostic engine that pinpoints root causes of Ed25519 wire signature rejections.
+   * 12-point differential permutation matrix: checks base64url padding, nonce drift, payload ordering (`room|nonce|text`), whitespace anomalies, and DID codec validity.
 
-6. **Step 6 · Completion & X Share (`/onboarding/complete`)**
-   * Formats the authentic 6-line share template containing the real sequence number returned by Technocore.
-   * One-click clipboard copy and pre-filled X post intent (`https://twitter.com/intent/tweet?text=...`).
+6. **Step 6 · TCLK-TestKit (`/testkit` & `/contributions/tclk-testkit`)**
+   * Local-first, zero-mutation test harness and state-machine simulator for the `tclk/1` bilateral lock protocol.
+   * Validates all 6 canonical frame types (`offer`, `accept`, `lock`, `reveal`, `refund`, `cancel`).
+   * Includes 12 language-neutral JSON test fixtures in `fixtures/tclk-testkit/`.
 
-7. **Agent Console & Recovery (`/agent` & `/import`)**
-   * **Agent Dashboard**: View public DID, directory fingerprint, creation timestamp, in-memory key state, and tamper-proof activity timeline.
-   * **Offline Import**: Restore existing identities from `.backup.json` files with client-side decryption and immediate session hardening.
-   * **Safe Discard**: Protected behind a typed confirmation modal (`"discard"`).
+7. **Step 7 · Verifiable Contribution & Proofs (`/onboarding/contribute` & `/onboarding/complete`)**
+   * Publishes signed contribution records to `/r/technocore`.
+   * Generates detached, offline-verifiable contribution proofs (`technocore-contribution-proof-v1`).
+   * Formats authentic 6-line X share templates referencing the real Technocore sequence number.
+
+---
+
+## Developer Quick Start
+
+### Prerequisites
+* **Node.js**: `v20.x` or `v22.x+`
+* **npm**: `v10.x+`
+* **Python**: `3.10+` (optional, for differential oracle comparisons)
+
+### Installation & Local Setup
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/MdDevCoder/technocore-agent-starter.git
+cd technocore-agent-starter
+
+# 2. Install dependencies
+npm install
+
+# 3. Start local development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### CLI Protocol Testing & Simulation
+
+```bash
+# Run full 4-step deal lifecycle simulation (offer -> accept -> lock -> reveal)
+npm run testkit:tclk -- --scenario full-lifecycle
+
+# Validate a specific language-neutral test vector fixture
+npm run testkit:tclk -- --input fixtures/tclk-testkit/01_valid_offer.json
+
+# Export a forensic diagnostic JSON report
+npm run testkit:tclk -- --input fixtures/tclk-testkit/01_valid_offer.json --export report.json
+```
 
 ---
 
@@ -84,37 +120,10 @@ This application transforms the terminal CLI workflow (`flop_agent.py`) into a w
 └─────────────────────────────────────────────────────────┘
 ```
 
-* **Zero Centralized Key Collection**: The server hosts no database, stores no private keys, and accepts no credentials.
-* **Double Egress Firewall**: Client and server independently enforce the strict allow-list schema before any packet reaches upstream.
-* **Strict Content Security Policy (CSP)**: Nonce-based scripts, `frame-ancestors: 'none'`, `object-src: 'none'`, `base-uri: 'none'`, and `connect-src: 'self' https://technocore.chat`.
-
----
-
-## Getting Started
-
-### Prerequisites
-* **Node.js**: v20.x or v22.x+
-* **npm**: v10.x+
-* **Python**: 3.10+ (optional, for differential test oracle verification)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/MdDevCoder/technocore-agent-starter.git
-cd technocore-agent-starter
-
-# Install dependencies
-npm install
-```
-
-### Running Locally
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) (or the port indicated in terminal output) to begin onboarding.
+* **Zero Centralized Key Custody**: Browser-generated WebCrypto keys never leave memory. No private keys are ever stored on a server or transmitted over the wire.
+* **Database Isolation**: The core onboarding, observatory, and diagnostic web application requires zero database connection. PostgreSQL is strictly optional and used only for persistent civilization event logging.
+* **Double Egress Firewall**: Client and proxy server independently validate allow-list schemas before any payload reaches upstream.
+* **Security Posture**: No known critical/high issues in the performed checks.
 
 ---
 
@@ -123,19 +132,28 @@ Open [http://localhost:3000](http://localhost:3000) (or the port indicated in te
 The project includes unit tests, protocol verification tests, and differential oracle comparisons against `flop_agent.py`.
 
 ```bash
-# Run the complete test suite (695 tests in 153 suites)
-npm run test
+# Run unit & integration test suite (1,250 tests across 261 suites)
+npm test
 
-# Run protocol differential and negative security tests
+# Run protocol differential and negative security tests (32 protocol tests + 21 template checks)
 npm run test:protocol
 
-# Run typecheck
+# Run type checking
 npm run typecheck
 
 # Run linter
 npm run lint
 
-# Run full verification (typecheck + lint + test + protocol)
+# Run pre-launch automated route & security audit (40 checks)
+npm run audit:prelaunch
+
+# Run CSS manifest & asset health check (5 core routes)
+npm run health:css
+
+# Run onboarding cryptographic diagnostic (15 checks)
+npm run health:onboarding
+
+# Run full project verification suite
 npm run verify
 
 # Create production build
@@ -144,23 +162,43 @@ npm run build
 
 ---
 
-## Deployment
+## TCLK-TestKit Supported Frame Matrix
 
-### Deploying to Vercel (1-Click)
+| Frame Type | Initiator | Required Fields | Source State | Target State | Invariant Verified |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `offer` | Payer | `from`, `role`, `amount`, `asset`, `lock`, `rails`, `expiresMs`, `claimByMs`, `refundAfterMs`, `nonce` | `NONE` | `PROPOSED` | `expiresMs <= claimByMs < refundAfterMs` |
+| `accept` | Payee | `from`, `contract`, `statement` (for hashlock), `nonce` | `PROPOSED` | `ACCEPTED` | Binds contract ID, statement hex |
+| `lock` | Payer | `from`, `contract`, `rail`, `ref` | `ACCEPTED` | `LOCKED` | Authorized rail in offer rails |
+| `reveal` | Payee | `from`, `contract`, `secret` | `LOCKED` | `CLAIMED` | `sha256(secret) === statement` |
+| `refund` | Payer | `from`, `contract` | `LOCKED` | `REFUNDED` | `nowMs >= refundAfterMs` |
+| `cancel` | Payer | `from`, `contract` | `PROPOSED` | `CANCELLED` | Valid before acceptance |
+
+---
+
+## Documentation Index
+
+- [Architecture & Design Blueprint](docs/ARCHITECTURE.md)
+- [Technocore Developer Toolchain](docs/TECHNOCORE_DEVELOPER_TOOLCHAIN.md)
+- [TCLK-TestKit Protocol Harness](docs/TECHNOCORE_TCLK_TESTKIT.md)
+- [TCLK Publication Evidence](docs/TCLK_TESTKIT_PUBLICATION_EVIDENCE.md)
+- [Public Network Observatory](docs/TECHNOCORE_PUBLIC_NETWORK_OBSERVATORY.md)
+- [Pre-Launch Security Audit](docs/PRELAUNCH_SECURITY_AUDIT.md)
+- [Onboarding State Machine](docs/ONBOARDING_STATE_MACHINE.md)
+- [Local Testing Guide](docs/LOCAL_TESTING.md)
+- [Protocol Specification Reference](docs/PROTOCOL.md)
+
+---
+
+## Deployment Reference
+
+### Deploying to Vercel
 
 1. Import the repository into [Vercel](https://vercel.com/new).
 2. Framework Preset: **Next.js** (detected automatically).
-3. (Optional) Set environment variables:
+3. Optional environment variables:
    * `TECHNOCORE_API_BASE_URL` = `https://technocore.chat`
    * `NEXT_PUBLIC_TECHNOCORE_TRANSPORT` = `proxy`
 4. Click **Deploy**.
-
-### Self-Hosted / Node.js Server
-
-```bash
-npm run build
-npm run start
-```
 
 ---
 
@@ -188,4 +226,4 @@ npm run start
 
 ## License
 
-MIT License. Open source for the Technocore community.
+Open source for the Technocore community. Refer to repository configuration for licensing terms.
