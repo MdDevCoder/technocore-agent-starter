@@ -174,6 +174,104 @@ export function classifyProtocolPayload(
   return { classification: "UNKNOWN", tclkFrame: null };
 }
 
+export interface LiveTraceFetchResult {
+  readonly ok: boolean;
+  readonly room: string;
+  readonly records: readonly RawTraceRecord[];
+  readonly lastFetchedAt: string;
+  readonly networkSourceUrl: string;
+  readonly generation?: number;
+  readonly error?: string;
+}
+
+/**
+ * Fetch current live retained room records from Technocore network endpoints at runtime.
+ * Strictly read-only GET. Never fabricates records.
+ */
+export async function fetchLivePublicTrace(
+  room: string,
+  limit = 50,
+): Promise<LiveTraceFetchResult> {
+  const cleanRoom = room.trim().replace(/^\/r\//, "");
+  const lastFetchedAt = new Date().toISOString();
+  const networkSourceUrl = "https://technocore.chat";
+
+  try {
+    let res: Response;
+    try {
+      res = await fetch(`/api/civilization/network/messages?room=${encodeURIComponent(cleanRoom)}&limit=${limit}`);
+      if (!res.ok) {
+        res = await fetch(`${networkSourceUrl}/r/${encodeURIComponent(cleanRoom)}?format=json&limit=${limit}`);
+      }
+    } catch {
+      res = await fetch(`${networkSourceUrl}/r/${encodeURIComponent(cleanRoom)}?format=json&limit=${limit}`);
+    }
+
+    if (!res.ok) {
+      return {
+        ok: false,
+        room: cleanRoom,
+        records: [],
+        lastFetchedAt,
+        networkSourceUrl,
+        error: `HTTP ${res.status}: ${res.statusText || "Live Network Unavailable"}`,
+      };
+    }
+
+    const data = (await res.json()) as Record<string, unknown>;
+    const rawList = Array.isArray(data.messages)
+      ? (data.messages as Record<string, unknown>[])
+      : Array.isArray(data)
+        ? (data as Record<string, unknown>[])
+        : [];
+    const generation = typeof data.generation === "number" ? data.generation : undefined;
+
+    const records: RawTraceRecord[] = rawList.map((m) => {
+      const did = typeof m.did === "string" ? m.did : typeof m.from === "string" ? m.from : "server";
+      const sig = typeof m.sig === "string" ? m.sig : typeof m.signature === "string" ? m.signature : null;
+      const nonce = m.nonce !== undefined && m.nonce !== null ? String(m.nonce) : null;
+      const text = typeof m.text === "string" ? m.text : JSON.stringify(m.text || {});
+      const sequence = typeof m.seq === "number" ? m.seq : typeof m.sequence === "number" ? m.sequence : undefined;
+      const serverTimestamp =
+        typeof m.ts === "string"
+          ? m.ts
+          : typeof m.serverTimestamp === "string"
+            ? m.serverTimestamp
+            : typeof m.time === "string"
+              ? m.time
+              : undefined;
+
+      return {
+        room: cleanRoom,
+        sequence,
+        serverTimestamp,
+        authorDid: did,
+        nonce,
+        sig,
+        text,
+      };
+    });
+
+    return {
+      ok: true,
+      room: cleanRoom,
+      records,
+      lastFetchedAt,
+      networkSourceUrl,
+      generation,
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      room: cleanRoom,
+      records: [],
+      lastFetchedAt,
+      networkSourceUrl,
+      error: (err as Error).message || "Failed to reach live Technocore public network",
+    };
+  }
+}
+
 /**
  * Reconstruct a deterministic event timeline from raw records with cryptographic verification.
  */
@@ -181,6 +279,10 @@ export async function reconstructTimeline(
   records: readonly RawTraceRecord[],
   source: TraceSource,
   fallbackRoom = "events",
+  meta?: {
+    readonly lastFetchedAt?: string;
+    readonly networkSourceUrl?: string;
+  },
 ): Promise<TraceReconstructionResult> {
   const parsedEvents: ReconstructedEvent[] = [];
 
@@ -338,6 +440,10 @@ export async function reconstructTimeline(
   return {
     source,
     generatedAt: new Date().toISOString(),
+    lastFetchedAt: meta?.lastFetchedAt,
+    networkSourceUrl: meta?.networkSourceUrl || (source === "PUBLIC_NETWORK" ? "https://technocore.chat" : undefined),
+    retainedWindowNotice:
+      source === "PUBLIC_NETWORK" ? "LIVE PUBLIC NETWORK · RETAINED WINDOW · NON-EXHAUSTIVE" : undefined,
     totalRecordsInput: records.length,
     events: enrichedEvents,
     anomalies,
@@ -533,11 +639,16 @@ export function foldTclkState(events: readonly ReconstructedEvent[]): TclkStateF
     }
   }
 
-  const contracts = Array.from(contractMap.values());
+  const rawContracts = Array.from(contractMap.values());
+  const contracts = rawContracts.map((c) => ({
+    ...c,
+    isPartial: !c.isTerminal,
+  }));
   const totalDealsObserved = contracts.length;
   const completedDealsCount = contracts.filter((c) => c.currentStatus === "claimed").length;
   const failedDealsCount = contracts.filter((c) => c.currentStatus === "refunded" || c.currentStatus === "cancelled").length;
   const activeDealsCount = contracts.filter((c) => !c.isTerminal).length;
+  const partialDealsCount = contracts.filter((c) => c.isPartial).length;
 
   return {
     contracts,
@@ -545,6 +656,7 @@ export function foldTclkState(events: readonly ReconstructedEvent[]): TclkStateF
     activeDealsCount,
     completedDealsCount,
     failedDealsCount,
+    partialDealsCount,
   };
 }
 
@@ -1026,6 +1138,9 @@ export async function generateTraceReport(result: TraceReconstructionResult): Pr
     reportVersion: "1.0.0",
     generatedAt: result.generatedAt,
     source: result.source,
+    lastFetchedAt: result.lastFetchedAt,
+    networkSourceUrl: result.networkSourceUrl,
+    retainedWindowNotice: result.retainedWindowNotice,
     metadata: {
       totalEvents: result.events.length,
       totalAnomalies: result.anomalies.length,
@@ -1053,6 +1168,19 @@ export async function generateTraceReport(result: TraceReconstructionResult): Pr
     ``,
     `> **Source**: \`SOURCE: ${result.source}\`  `,
     `> **Generated**: \`${result.generatedAt}\`  `,
+  ];
+
+  if (result.lastFetchedAt) {
+    mdLines.push(`> **Last Fetched**: \`${result.lastFetchedAt}\`  `);
+  }
+  if (result.networkSourceUrl) {
+    mdLines.push(`> **Network Source**: \`${result.networkSourceUrl}\`  `);
+  }
+  if (result.retainedWindowNotice) {
+    mdLines.push(`> **Notice**: \`${result.retainedWindowNotice}\`  `);
+  }
+
+  mdLines.push(
     `> **SHA-256 Integrity Hash**: \`${sha256Hash}\`  `,
     ``,
     `---`,
@@ -1069,7 +1197,7 @@ export async function generateTraceReport(result: TraceReconstructionResult): Pr
     ``,
     `## 2. Anomalies & Diagnostic Findings`,
     ``,
-  ];
+  );
 
   if (result.anomalies.length === 0) {
     mdLines.push(`*No protocol or cryptographic anomalies detected in this transcript.*`, ``);

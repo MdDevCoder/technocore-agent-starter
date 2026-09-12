@@ -125,6 +125,7 @@ export interface ReconstructedContract {
   readonly secret?: string;
   readonly currentStatus: TclkStatus;
   readonly isTerminal: boolean;
+  readonly isPartial?: boolean;
   readonly transitions: readonly {
     readonly sequence: number;
     readonly eventId: string;
@@ -141,6 +142,7 @@ export interface TclkStateFold {
   readonly activeDealsCount: number;
   readonly completedDealsCount: number;
   readonly failedDealsCount: number;
+  readonly partialDealsCount: number;
 }
 
 export type EvidenceNodeType =
@@ -179,6 +181,9 @@ export interface EvidenceGraph {
 export interface TraceReconstructionResult {
   readonly source: TraceSource;
   readonly generatedAt: string;
+  readonly lastFetchedAt?: string;
+  readonly networkSourceUrl?: string;
+  readonly retainedWindowNotice?: string;
   readonly totalRecordsInput: number;
   readonly events: readonly ReconstructedEvent[];
   readonly anomalies: readonly TraceAnomaly[];
@@ -201,6 +206,9 @@ export interface TraceReport {
   readonly reportVersion: "1.0.0";
   readonly generatedAt: string;
   readonly source: TraceSource;
+  readonly lastFetchedAt?: string;
+  readonly networkSourceUrl?: string;
+  readonly retainedWindowNotice?: string;
   readonly sha256ReportHash: string;
   readonly metadata: {
     readonly totalEvents: number;

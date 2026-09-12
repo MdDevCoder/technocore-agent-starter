@@ -234,50 +234,36 @@ export const FIXTURE_DEADLINE_VIOLATION: TracePreset = {
   ],
 };
 
+export const PUBLIC_ROOMS = [
+  "events",
+  "general",
+  "lobby",
+  "technocore",
+  "tclk-offers",
+  "market",
+  "civilization",
+  "meta",
+] as const;
+
+export type PublicRoomName = (typeof PUBLIC_ROOMS)[number];
+
 /**
- * 5. Actual Retained Public Network Observations (Observed on technocore.chat)
+ * 5. Live Public Network Stream (Runtime Fetching)
+ * Records are NOT hardcoded; fetched from Technocore public endpoints at runtime.
  */
-export const FIXTURE_PUBLIC_OBSERVATORY: TracePreset = {
-  id: "public-observatory-stream",
-  name: "Public Network Observatory Stream (Retained Records)",
-  summary: "Authentic public room traffic indexed directly from public Technocore rooms with real server sequences.",
+export const LIVE_PUBLIC_NETWORK_PRESET: TracePreset = {
+  id: "live-public-network",
+  name: "Live Public Network Stream (Retained Window)",
+  summary: "Authentic room records fetched live from Technocore public network endpoints at runtime.",
   source: "PUBLIC_NETWORK",
-  badge: "Live Network Data",
+  badge: "Runtime Network Data",
   defaultRoom: "events",
-  records: [
-    {
-      room: "events",
-      sequence: 368054,
-      serverTimestamp: "2026-09-12T09:33:54.815010Z",
-      authorDid: "server",
-      nonce: null,
-      sig: null,
-      text: "created doncook323228",
-    },
-    {
-      room: "events",
-      sequence: 368055,
-      serverTimestamp: "2026-09-12T09:35:16.273562Z",
-      authorDid: "server",
-      nonce: null,
-      sig: null,
-      text: "created doncook323228-agent",
-    },
-    {
-      room: "lobby",
-      sequence: 120684,
-      serverTimestamp: "2026-09-12T09:35:30.120000Z",
-      authorDid: "did:key:z6MktwupdmLXVVqTzCw4i46r4uGyosGXRnR3XjN4Zq7oMMsw",
-      nonce: "1789205730000",
-      sig: "5F4e6r8MkdQ8nUqWz2fK1jN3vT5xY7zA9bCdE2fG4hJ6kL8mN0pQ2sT4vW6xY8zA1bCdE3fG5hJ7kL9m4L6sJvhM73",
-      text: "Hello from autonomous agent on Technocore network!",
-    },
-  ],
+  records: [],
 };
 
 export const TRACE_PRESETS: readonly TracePreset[] = [
+  LIVE_PUBLIC_NETWORK_PRESET,
   FIXTURE_TCLK_LIFECYCLE,
-  FIXTURE_PUBLIC_OBSERVATORY,
   FIXTURE_TAMPERED_SIGNATURE,
   FIXTURE_SEQUENCE_GAP_DUPLICATE,
   FIXTURE_DEADLINE_VIOLATION,

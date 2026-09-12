@@ -4,7 +4,9 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import {
   TRACE_PRESETS,
+  PUBLIC_ROOMS,
   getPresetById,
+  type PublicRoomName,
 } from "../trace/fixtures.ts";
 import {
   parseTranscriptInput,
@@ -12,6 +14,7 @@ import {
   explainWhy,
   buildEvidenceGraph,
   generateTraceReport,
+  fetchLivePublicTrace,
 } from "../trace/engine.ts";
 import type {
   TraceReconstructionResult,
@@ -20,14 +23,17 @@ import type {
 
 export const TraceStudioView: React.FC = () => {
   // Preset Selection & Custom Input State
-  const [selectedPresetId, setSelectedPresetId] = useState<string>("tclk-clean-lifecycle");
+  const [selectedPresetId, setSelectedPresetId] = useState<string>("live-public-network");
   const [isCustomMode, setIsCustomMode] = useState<boolean>(false);
   const [customInputText, setCustomInputText] = useState<string>("");
-  const [customSource, setCustomSource] = useState<TraceSource>("LOCAL_FIXTURE");
+  const [customSource, setCustomSource] = useState<TraceSource>("PUBLIC_NETWORK");
 
-  // Live Room Fetching State (Strictly Read-Only)
+  // Live Public Network Room & State
+  const [selectedLiveRoom, setSelectedLiveRoom] = useState<PublicRoomName>("events");
   const [isFetchingLive, setIsFetchingLive] = useState<boolean>(false);
   const [liveFetchError, setLiveFetchError] = useState<string | null>(null);
+  const [lastFetchedAt, setLastFetchedAt] = useState<string | null>(null);
+  const [networkSourceUrl] = useState<string>("https://technocore.chat");
 
   // Active Reconstruction & Selection State
   const [reconstruction, setReconstruction] = useState<TraceReconstructionResult | null>(null);
@@ -41,13 +47,52 @@ export const TraceStudioView: React.FC = () => {
   const [exportSha256, setExportSha256] = useState<string>("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  // Load Preset or Reconstruct
-  const runReconstruction = useCallback(async () => {
+  // Execute Live Network Fetch from Public Technocore Endpoints
+  const executeLiveFetch = useCallback(async (room: string) => {
+    setIsFetchingLive(true);
     setIsReconstructing(true);
+    setLiveFetchError(null);
+
+    try {
+      const res = await fetchLivePublicTrace(room, 40);
+      if (res.ok) {
+        setLastFetchedAt(res.lastFetchedAt);
+        const result = await reconstructTimeline(res.records, "PUBLIC_NETWORK", room, {
+          lastFetchedAt: res.lastFetchedAt,
+          networkSourceUrl: res.networkSourceUrl,
+        });
+        setReconstruction(result);
+        if (result.events.length > 0) {
+          setSelectedEventId(result.events[0]!.id);
+        } else {
+          setSelectedEventId(null);
+        }
+      } else {
+        setLiveFetchError(res.error || "Live Technocore network endpoint is unavailable.");
+        setReconstruction(null);
+        setSelectedEventId(null);
+      }
+    } catch (err) {
+      setLiveFetchError((err as Error).message || "Failed to reach live Technocore public network.");
+      setReconstruction(null);
+      setSelectedEventId(null);
+    } finally {
+      setIsFetchingLive(false);
+      setIsReconstructing(false);
+    }
+  }, []);
+
+  // Run Reconstruction for Fixture or Custom Input
+  const runLocalReconstruction = useCallback(async () => {
+    setIsReconstructing(true);
+    setLiveFetchError(null);
     try {
       if (isCustomMode) {
         const rawRecords = parseTranscriptInput(customInputText);
-        const result = await reconstructTimeline(rawRecords, customSource, "events");
+        const result = await reconstructTimeline(rawRecords, customSource, "events", {
+          lastFetchedAt: customSource === "PUBLIC_NETWORK" ? new Date().toISOString() : undefined,
+          networkSourceUrl: customSource === "PUBLIC_NETWORK" ? networkSourceUrl : undefined,
+        });
         setReconstruction(result);
         if (result.events.length > 0) {
           setSelectedEventId(result.events[0]!.id);
@@ -56,6 +101,10 @@ export const TraceStudioView: React.FC = () => {
         }
       } else {
         const preset = getPresetById(selectedPresetId);
+        if (preset.id === "live-public-network") {
+          await executeLiveFetch(selectedLiveRoom);
+          return;
+        }
         const result = await reconstructTimeline(preset.records, preset.source, preset.defaultRoom);
         setReconstruction(result);
         if (result.events.length > 0) {
@@ -69,16 +118,19 @@ export const TraceStudioView: React.FC = () => {
     } finally {
       setIsReconstructing(false);
     }
-  }, [isCustomMode, customInputText, customSource, selectedPresetId]);
+  }, [isCustomMode, customInputText, customSource, selectedPresetId, selectedLiveRoom, networkSourceUrl, executeLiveFetch]);
 
   // Initial Load & on Preset Change
   useEffect(() => {
     if (!isCustomMode) {
       const preset = getPresetById(selectedPresetId);
-      setCustomSource(preset.source);
+      if (preset.id === "live-public-network") {
+        void executeLiveFetch(selectedLiveRoom);
+      } else {
+        void runLocalReconstruction();
+      }
     }
-    void runReconstruction();
-  }, [selectedPresetId, isCustomMode, runReconstruction]);
+  }, [selectedPresetId, selectedLiveRoom, isCustomMode, executeLiveFetch, runLocalReconstruction]);
 
   // Re-generate Export report when reconstruction updates
   useEffect(() => {
@@ -90,52 +142,6 @@ export const TraceStudioView: React.FC = () => {
       });
     }
   }, [reconstruction]);
-
-  // Live Read-Only Public Room Fetcher
-  const handleFetchLiveRoom = useCallback(async (roomName: string) => {
-    setIsFetchingLive(true);
-    setLiveFetchError(null);
-    try {
-      const cleanRoom = roomName.trim().replace(/^\/r\//, "");
-      let res = await fetch(`/api/civilization/network/messages?room=${encodeURIComponent(cleanRoom)}&limit=30`);
-      if (!res.ok) {
-        res = await fetch(`https://technocore.chat/r/${encodeURIComponent(cleanRoom)}?format=json&limit=30`);
-      }
-      if (res.ok) {
-        const data = (await res.json()) as Record<string, unknown>;
-        const rawList = Array.isArray(data.messages)
-          ? (data.messages as Record<string, unknown>[])
-          : Array.isArray(data)
-            ? (data as Record<string, unknown>[])
-            : [];
-        const records = rawList.map((m: Record<string, unknown>) => ({
-          room: cleanRoom,
-          sequence: typeof m.seq === "number" ? m.seq : typeof m.sequence === "number" ? m.sequence : 0,
-          serverTimestamp:
-            typeof m.ts === "string"
-              ? m.ts
-              : typeof m.serverTimestamp === "string"
-                ? m.serverTimestamp
-                : typeof m.time === "string"
-                  ? m.time
-                  : new Date().toISOString(),
-          authorDid: typeof m.did === "string" ? m.did : typeof m.from === "string" ? m.from : "server",
-          nonce: m.nonce !== undefined && m.nonce !== null ? String(m.nonce) : null,
-          sig: typeof m.sig === "string" ? m.sig : typeof m.signature === "string" ? m.signature : null,
-          text: typeof m.text === "string" ? m.text : JSON.stringify(m.text || {}),
-        }));
-        setCustomInputText(JSON.stringify(records, null, 2));
-        setCustomSource("PUBLIC_NETWORK");
-        setIsCustomMode(true);
-      } else {
-        setLiveFetchError(`HTTP ${res.status}: Failed to retrieve public room records.`);
-      }
-    } catch (err) {
-      setLiveFetchError((err as Error).message || "Network error fetching live records.");
-    } finally {
-      setIsFetchingLive(false);
-    }
-  }, []);
 
   // Selected Event Object
   const selectedEvent = useMemo(() => {
@@ -177,7 +183,8 @@ export const TraceStudioView: React.FC = () => {
     URL.revokeObjectURL(url);
   }, []);
 
-  const currentSource: TraceSource = isCustomMode ? customSource : (reconstruction?.source || "LOCAL_FIXTURE");
+  const isLivePublicSelected = !isCustomMode && selectedPresetId === "live-public-network";
+  const currentSource: TraceSource = isCustomMode ? customSource : (isLivePublicSelected ? "PUBLIC_NETWORK" : "LOCAL_FIXTURE");
 
   return (
     <div className="space-y-8 pb-16">
@@ -237,40 +244,84 @@ export const TraceStudioView: React.FC = () => {
             >
               {isCustomMode ? "← Back to Presets" : "Paste Custom Trace"}
             </button>
-            <button
-              type="button"
-              id="btn-rerun-replay"
-              onClick={() => void runReconstruction()}
-              disabled={isReconstructing}
-              className="mono rounded-md border border-hairline bg-panel hover:bg-panel-hover px-3 py-1.5 text-xs font-medium text-ink transition-colors disabled:opacity-50"
-            >
-              {isReconstructing ? "Replaying..." : "Replay Timeline"}
-            </button>
+
+            {isLivePublicSelected ? (
+              <button
+                type="button"
+                id="btn-refresh-live-network"
+                onClick={() => void executeLiveFetch(selectedLiveRoom)}
+                disabled={isFetchingLive}
+                className="mono rounded-md bg-signal hover:bg-signal/90 px-3.5 py-1.5 text-xs font-semibold text-void transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {isFetchingLive ? (
+                  <>
+                    <span className="h-2 w-2 rounded-full bg-void animate-ping" />
+                    Fetching Live...
+                  </>
+                ) : (
+                  <>↻ Refresh Live Trace</>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                id="btn-rerun-replay"
+                onClick={() => void runLocalReconstruction()}
+                disabled={isReconstructing}
+                className="mono rounded-md border border-hairline bg-panel hover:bg-panel-hover px-3 py-1.5 text-xs font-medium text-ink transition-colors disabled:opacity-50"
+              >
+                {isReconstructing ? "Replaying..." : "Replay Timeline"}
+              </button>
+            )}
           </div>
         </div>
+
+        {/* Retained Window Disclosure Banner for Live Public Data */}
+        {currentSource === "PUBLIC_NETWORK" && (
+          <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 text-xs">
+            <div className="flex items-center gap-2 text-ink">
+              <span className="mono font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                LIVE PUBLIC NETWORK · RETAINED WINDOW · NON-EXHAUSTIVE
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 text-muted mono text-[0.6875rem]">
+              <span>
+                Source: <strong className="text-ink">{networkSourceUrl}</strong>
+              </span>
+              {lastFetchedAt && (
+                <span>
+                  Last Fetched: <strong className="text-ink">{lastFetchedAt.slice(11, 19)} UTC</strong>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* 2. Controls & Preset Selection */}
       <section className="rounded-xl border border-hairline bg-panel/40 p-4 sm:p-6 space-y-4">
         {!isCustomMode ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <span className="mono text-xs font-medium text-muted uppercase tracking-wider">
                 Select Forensic Preset
               </span>
               <span className="text-xs text-muted">
-                Choose a canonical TCLK scenario, public observatory stream, or protocol anomaly vector.
+                Choose live public network streaming or an offline local fixture vector.
               </span>
             </div>
 
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {TRACE_PRESETS.map((preset) => {
                 const isSelected = selectedPresetId === preset.id;
+                const isLive = preset.source === "PUBLIC_NETWORK";
                 return (
                   <button
                     key={preset.id}
                     type="button"
-                    onClick={() => setSelectedPresetId(preset.id)}
+                    onClick={() => {
+                      setSelectedPresetId(preset.id);
+                    }}
                     className={`flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition-all ${
                       isSelected
                         ? "border-signal bg-signal/5 shadow-sm ring-1 ring-signal/30"
@@ -281,22 +332,65 @@ export const TraceStudioView: React.FC = () => {
                       <span className="mono text-xs font-bold text-ink truncate">{preset.name}</span>
                       <span
                         className={`mono text-[0.625rem] px-1.5 py-0.5 rounded ${
-                          preset.source === "PUBLIC_NETWORK"
+                          isLive
                             ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-semibold"
                             : "bg-amber-500/15 text-amber-600 dark:text-amber-400 font-semibold"
                         }`}
                       >
-                        {preset.source === "PUBLIC_NETWORK" ? "NETWORK" : "FIXTURE"}
+                        {isLive ? "LIVE NETWORK" : "LOCAL FIXTURE"}
                       </span>
                     </div>
                     <p className="text-xs text-muted line-clamp-2 leading-relaxed">{preset.summary}</p>
                     <div className="mono text-[0.6875rem] text-muted/80 mt-1">
-                      Room: <span className="text-ink">/r/{preset.defaultRoom}</span> · {preset.records.length} records
+                      {isLive ? (
+                        <span>
+                          Live Endpoint: <span className="text-ink">/r/{selectedLiveRoom}</span>
+                        </span>
+                      ) : (
+                        <span>
+                          Room: <span className="text-ink">/r/{preset.defaultRoom}</span> · {preset.records.length} records
+                        </span>
+                      )}
                     </div>
                   </button>
                 );
               })}
             </div>
+
+            {/* Live Public Room Selector (Visible when Live Public Network preset is active) */}
+            {isLivePublicSelected && (
+              <div className="space-y-2 rounded-lg border border-hairline/80 bg-panel/80 p-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <span className="mono text-xs font-semibold text-ink">
+                    Select Public Broadcast Room to Stream:
+                  </span>
+                  <span className="mono text-[0.6875rem] text-muted">
+                    Read-only query of retained records on technocore.chat
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  {PUBLIC_ROOMS.map((room) => {
+                    const isRoomActive = selectedLiveRoom === room;
+                    return (
+                      <button
+                        key={room}
+                        type="button"
+                        onClick={() => setSelectedLiveRoom(room)}
+                        disabled={isFetchingLive}
+                        className={`mono rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                          isRoomActive
+                            ? "bg-signal text-void font-bold shadow-sm"
+                            : "border border-hairline bg-panel hover:bg-panel-hover text-muted hover:text-ink"
+                        }`}
+                      >
+                        /r/{room}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -318,8 +412,8 @@ export const TraceStudioView: React.FC = () => {
                   onChange={(e) => setCustomSource(e.target.value as TraceSource)}
                   className="mono rounded border border-hairline bg-panel px-2.5 py-1 text-xs text-ink focus:border-signal focus:outline-none"
                 >
-                  <option value="LOCAL_FIXTURE">SOURCE: LOCAL FIXTURE</option>
                   <option value="PUBLIC_NETWORK">SOURCE: PUBLIC NETWORK</option>
+                  <option value="LOCAL_FIXTURE">SOURCE: LOCAL FIXTURE</option>
                 </select>
               </div>
             </div>
@@ -327,13 +421,23 @@ export const TraceStudioView: React.FC = () => {
             {/* Quick Live Fetch helpers */}
             <div className="flex flex-wrap items-center gap-2 rounded-lg border border-hairline/80 bg-panel/80 p-2.5">
               <span className="mono text-xs text-muted">Fetch Live Public Room:</span>
-              {(["events", "lobby", "tclk-offers"] as const).map((r) => (
+              {PUBLIC_ROOMS.map((r) => (
                 <button
                   key={r}
                   type="button"
                   disabled={isFetchingLive}
-                  onClick={() => {
-                    void handleFetchLiveRoom(r);
+                  onClick={async () => {
+                    setIsFetchingLive(true);
+                    setLiveFetchError(null);
+                    const res = await fetchLivePublicTrace(r, 30);
+                    if (res.ok) {
+                      setCustomInputText(JSON.stringify(res.records, null, 2));
+                      setCustomSource("PUBLIC_NETWORK");
+                      setLastFetchedAt(res.lastFetchedAt);
+                    } else {
+                      setLiveFetchError(res.error || "Failed to fetch room records.");
+                    }
+                    setIsFetchingLive(false);
                   }}
                   className="mono rounded border border-hairline bg-panel hover:bg-panel-hover px-2 py-1 text-xs text-ink transition-colors disabled:opacity-50"
                 >
@@ -341,7 +445,6 @@ export const TraceStudioView: React.FC = () => {
                 </button>
               ))}
               {isFetchingLive && <span className="mono text-xs text-signal animate-pulse">Fetching records...</span>}
-              {liveFetchError && <span className="mono text-xs text-red-500">{liveFetchError}</span>}
             </div>
 
             <textarea
@@ -375,7 +478,7 @@ export const TraceStudioView: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => void runReconstruction()}
+                onClick={() => void runLocalReconstruction()}
                 className="mono rounded bg-signal hover:bg-signal/90 px-4 py-1.5 text-xs font-semibold text-void transition-colors"
               >
                 Reconstruct Custom Timeline
@@ -385,8 +488,43 @@ export const TraceStudioView: React.FC = () => {
         )}
       </section>
 
+      {/* Offline / Live Network Unavailable State */}
+      {liveFetchError && (
+        <section className="rounded-xl border border-red-500/40 bg-red-500/10 p-5 sm:p-6 space-y-3">
+          <div className="flex items-center gap-2.5">
+            <span className="mono rounded bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
+              LIVE NETWORK UNAVAILABLE
+            </span>
+            <span className="text-sm font-semibold text-ink">Failed to fetch live public network data</span>
+          </div>
+          <p className="text-xs text-muted leading-relaxed">
+            Technocore public network endpoint error: <span className="mono text-ink font-semibold">{liveFetchError}</span>.
+            Trace Studio will not fabricate or inject synthetic fallback records into the live view.
+          </p>
+          <div className="flex flex-wrap gap-2 pt-2">
+            <button
+              type="button"
+              onClick={() => void executeLiveFetch(selectedLiveRoom)}
+              className="mono rounded bg-signal hover:bg-signal/90 px-3.5 py-1.5 text-xs font-semibold text-void transition-colors"
+            >
+              ↻ Retry Live Fetch
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedPresetId("tclk-clean-lifecycle");
+                setLiveFetchError(null);
+              }}
+              className="mono rounded border border-hairline bg-panel hover:bg-panel-hover px-3.5 py-1.5 text-xs font-medium text-ink transition-colors"
+            >
+              Load Local Fixture Instead →
+            </button>
+          </div>
+        </section>
+      )}
+
       {/* 3. Executive Metrics Bar */}
-      {reconstruction && (
+      {reconstruction && !liveFetchError && (
         <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
           <div className="rounded-xl border border-hairline bg-panel/40 p-4">
             <span className="mono text-[0.6875rem] text-muted uppercase">Events in Trace</span>
@@ -394,7 +532,9 @@ export const TraceStudioView: React.FC = () => {
               {reconstruction.events.length}
             </div>
             <span className="mono text-[0.6875rem] text-muted">
-              Seq {reconstruction.sequenceRange.min}..{reconstruction.sequenceRange.max}
+              {reconstruction.events.length > 0
+                ? `Seq ${reconstruction.sequenceRange.min}..${reconstruction.sequenceRange.max}`
+                : "0 records in room"}
             </span>
           </div>
 
@@ -431,7 +571,7 @@ export const TraceStudioView: React.FC = () => {
               {reconstruction.tclkFold.totalDealsObserved}
             </div>
             <span className="mono text-[0.6875rem] text-muted">
-              {reconstruction.tclkFold.completedDealsCount} claimed · {reconstruction.tclkFold.failedDealsCount} failed
+              {reconstruction.tclkFold.completedDealsCount} claimed · {reconstruction.tclkFold.partialDealsCount} partial
             </span>
           </div>
 
@@ -452,7 +592,7 @@ export const TraceStudioView: React.FC = () => {
       )}
 
       {/* 4. Main Interactive Workbench: Reconstructed Timeline + Forensic Inspector */}
-      {reconstruction && (
+      {reconstruction && !liveFetchError && (
         <section className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Timeline Column (5 cols on lg) */}
           <div className="lg:col-span-5 space-y-3">
@@ -465,8 +605,11 @@ export const TraceStudioView: React.FC = () => {
 
             <div className="max-h-[640px] space-y-2 overflow-y-auto rounded-xl border border-hairline bg-panel/20 p-2.5">
               {reconstruction.events.length === 0 ? (
-                <div className="py-12 text-center text-sm text-muted">
-                  No events found in transcript input.
+                <div className="py-16 text-center text-sm text-muted space-y-2">
+                  <div className="mono font-semibold text-ink">0 retained records in /r/{selectedLiveRoom}</div>
+                  <p className="text-xs text-muted max-w-xs mx-auto">
+                    This public room currently has no messages in the retained window. No synthetic records were injected.
+                  </p>
                 </div>
               ) : (
                 reconstruction.events.map((evt) => {
@@ -493,7 +636,7 @@ export const TraceStudioView: React.FC = () => {
                           <span className="mono text-xs text-signal">/r/{evt.room}</span>
                         </div>
                         <span className="mono text-[0.6875rem] text-muted">
-                          {evt.serverTimestamp.slice(11, 19)}
+                          {evt.serverTimestamp.slice(11, 19)} UTC
                         </span>
                       </div>
 
@@ -811,21 +954,28 @@ export const TraceStudioView: React.FC = () => {
                               {contract.contractId}
                             </div>
                           </div>
-                          <span
-                            className={`mono rounded px-2 py-0.5 text-xs font-bold uppercase ${
-                              contract.currentStatus === "claimed"
-                                ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                                : contract.currentStatus === "locked"
-                                  ? "bg-blue-500/20 text-blue-600 dark:text-blue-400"
-                                  : contract.currentStatus === "accepted"
-                                    ? "bg-purple-500/20 text-purple-600 dark:text-purple-400"
-                                    : contract.currentStatus === "refunded" || contract.currentStatus === "cancelled"
-                                      ? "bg-red-500/20 text-red-600 dark:text-red-400"
-                                      : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
-                            }`}
-                          >
-                            Status: {contract.currentStatus}
-                          </span>
+                          <div className="flex items-center gap-1.5">
+                            {contract.isPartial && (
+                              <span className="mono rounded bg-amber-500/20 px-2 py-0.5 text-[0.625rem] font-bold text-amber-600 dark:text-amber-400">
+                                PARTIAL TRANSCRIPT
+                              </span>
+                            )}
+                            <span
+                              className={`mono rounded px-2 py-0.5 text-xs font-bold uppercase ${
+                                contract.currentStatus === "claimed"
+                                  ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+                                  : contract.currentStatus === "locked"
+                                    ? "bg-blue-500/20 text-blue-600 dark:text-blue-400"
+                                    : contract.currentStatus === "accepted"
+                                      ? "bg-purple-500/20 text-purple-600 dark:text-purple-400"
+                                      : contract.currentStatus === "refunded" || contract.currentStatus === "cancelled"
+                                        ? "bg-red-500/20 text-red-600 dark:text-red-400"
+                                        : "bg-amber-500/20 text-amber-600 dark:text-amber-400"
+                              }`}
+                            >
+                              Status: {contract.currentStatus}
+                            </span>
+                          </div>
                         </div>
 
                         {/* State Machine Progress Bar */}
@@ -910,7 +1060,7 @@ export const TraceStudioView: React.FC = () => {
 
                 {reconstruction.anomalies.length === 0 ? (
                   <div className="py-12 text-center text-sm text-emerald-600 dark:text-emerald-400">
-                    ✓ Clean Transcript: Zero cryptographic or protocol anomalies detected.
+                    ✓ Clean Transcript: Zero cryptographic or protocol anomalies detected in current window.
                   </div>
                 ) : (
                   <div className="space-y-3">
