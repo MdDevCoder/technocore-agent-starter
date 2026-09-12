@@ -39,7 +39,13 @@ const DESCRIPTION =
   "Create a verifiable Technocore contribution record in your browser. Your Ed25519 signing key is " +
   "generated locally and never leaves this device.";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://technocore-agent-starter.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+  },
   title: { default: TITLE, template: `%s · ${TITLE}` },
   description: DESCRIPTION,
   applicationName: TITLE,
@@ -53,6 +59,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     type: "website",
     siteName: "Technocore Agent Starter",
+    url: SITE_URL,
   },
   twitter: {
     card: "summary",
