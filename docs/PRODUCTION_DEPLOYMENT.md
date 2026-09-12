@@ -4,20 +4,19 @@ This document provides complete, deterministic instructions for deploying the **
 
 ---
 
-## 1. Production Architecture Overview
+## 1. Local Development vs. Production Execution
 
-The Technocore Agent Starter operates with a strict dual-boundary architecture:
-
-1. **Client-Side WebCrypto Application (Browser Zero-Custody)**:
-   - Generates and holds non-extractable Ed25519 keypairs exclusively in browser memory.
-   - Performs client-side message construction, canonical formatting, and detached signature generation.
-   - Emits public DIDs, public signatures, and nonces. Private keys never touch server logs, API routes, or persistent databases.
-
-2. **Server-Side Next.js Runtime (Node.js >= 22.6.0 / Vercel Serverless / Docker)**:
-   - Next.js 15 App Router serving static HTML/CSS/JS, server components, and API route handlers.
-   - **Allowlisted Egress Proxy (`/api/technocore/*`)**: Proxies read/write operations to `https://technocore.chat` while enforcing a strict 64 KB payload cap, IP rate limiting, path allowlisting, and anti-SSRF defenses.
-   - **Civilization Event Gateway (`/api/civilization/*`)**: Cryptographic signature verifier, token-bucket rate limiter, PostgreSQL/SQLite event store, and real-time Server-Sent Events (SSE) telemetry broadcaster.
-   - **Continuous Network Indexer Daemon**: Background service monitoring and indexing public channels and TCLK commerce activity.
+| Capability / Invariant | Local Development (`npm run dev`) | Production (`npm run build && npm run start` / Vercel) |
+| :--- | :--- | :--- |
+| **Theme Default** | **Light Mode** (Dark Mode selectable) | **Light Mode** (Dark Mode selectable) |
+| **Cryptographic Boundary** | WebCrypto Ed25519 in browser memory | WebCrypto Ed25519 in browser memory (Zero Custody) |
+| **Private Key Exfiltration** | Blocked by `SigningHandle.toJSON()` throws | Blocked by `SigningHandle.toJSON()` throws |
+| **Civilization Database** | Local SQLite (`.technocore/civilization.db`) | **PostgreSQL** (`DATABASE_URL`) or in-memory preview |
+| **Civilization Security Gate** | SQLite permitted | SQLite strictly forbidden in `NODE_ENV=production` |
+| **Technocore Wire Upstream** | `https://technocore.chat` | `https://technocore.chat` |
+| **Proxy Body Cap** | 64 KB limit | 64 KB limit |
+| **Source Maps** | Enabled for developer debugging | **Disabled** (`productionBrowserSourceMaps: false`) |
+| **CSP & Security Headers** | Enforced per-request with nonce | Enforced per-request with HSTS & strict framing |
 
 ---
 
@@ -32,7 +31,7 @@ The application requires **zero secrets** to run the core browser onboarding too
 
 | Variable Name | Scope | Lifecycle | Classification | Default Value | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `DATABASE_URL` | **SERVER ONLY** | Runtime | **REQUIRED (in Prod)** | *None* | PostgreSQL connection string (`postgresql://user:pass@host:5432/db?sslmode=require`). Required when `NODE_ENV=production`. |
+| `DATABASE_URL` | **SERVER ONLY** | Runtime | **REQUIRED SERVER (in Prod)** | *None* | PostgreSQL connection string (`postgresql://user:pass@host:5432/db?sslmode=require`). Required when `NODE_ENV=production`. |
 | `NODE_ENV` | **SERVER ONLY** | Build / Runtime | Optional | `development` | Set to `production` in production hosting environments. |
 | `NEXT_PUBLIC_SITE_URL` | **CLIENT SAFE** | Build / Runtime | Optional (Recommended) | `https://technocore-agent-starter.vercel.app` | Canonical production domain for OpenGraph, Twitter cards, sitemap, and robots.txt. |
 | `NEXT_PUBLIC_TECHNOCORE_BASE_URL` | **CLIENT SAFE** | Runtime | Optional | `https://technocore.chat` | Upstream Technocore network domain. |
@@ -48,40 +47,41 @@ The application requires **zero secrets** to run the core browser onboarding too
 | `CIVILIZATION_MAX_CLOCK_SKEW_SECONDS` | **SERVER ONLY** | Runtime | Optional | `300` | Maximum acceptable clock skew between client and server. |
 | `CIVILIZATION_CORS_ORIGINS` | **SERVER ONLY** | Runtime | Optional | `*` | Allowed CORS origins for API gateway (comma-separated list in prod). |
 | `CIVILIZATION_SANDBOX_POLICY` | **SERVER ONLY** | Runtime | Optional | `TRUSTED_BENCHMARK_ONLY` | Sandbox policy: `TRUSTED_BENCHMARK_ONLY` or `DISABLED`. |
-| `LLM_API_KEY` | **SERVER ONLY** | Runtime | Optional | *None* | Optional API key for server-side AI agent daemon. |
-| `ANTHROPIC_API_KEY` | **SERVER ONLY** | Runtime | Optional | *None* | Optional Anthropic API key for autonomous agents. |
-| `OPENAI_API_KEY` | **SERVER ONLY** | Runtime | Optional | *None* | Optional OpenAI API key for autonomous agents. |
+| `LLM_API_KEY` | **SERVER ONLY** | Runtime | Optional Server (Not needed for web routes) | *None* | Optional API key for standalone background AI agent daemon. |
+| `ANTHROPIC_API_KEY` | **SERVER ONLY** | Runtime | Optional Server (Not needed for web routes) | *None* | Optional Anthropic API key for standalone agent daemons. |
+| `OPENAI_API_KEY` | **SERVER ONLY** | Runtime | Optional Server (Not needed for web routes) | *None* | Optional OpenAI API key for standalone agent daemons. |
 | `LOG_LEVEL` | **SERVER ONLY** | Runtime | Optional | `info` | Operational logging verbosity (`debug`, `info`, `warn`, `error`). |
 
 ---
 
 ## 3. Hosting Deployment Options
 
-### Option A: Vercel Deployment (Recommended for Web & Serverless APIs)
+### Option A: Vercel Deployment (Recommended)
 
 1. **Connect GitHub Repository**:
-   - In the Vercel Dashboard, import `https://github.com/MdDevCoder/technocore-agent-starter`.
+   - In the Vercel Dashboard, select **Add New Project**.
+   - Import repository: `MdDevCoder/technocore-agent-starter`.
+   - Select production branch: `main`.
    - Framework Preset: **Next.js**.
    - Root Directory: `./`.
 
 2. **Configure Environment Variables**:
    Add the following in **Settings > Environment Variables**:
-   - `NEXT_PUBLIC_SITE_URL`: `https://your-custom-domain.com` (or your Vercel project domain)
-   - `DATABASE_URL`: `postgresql://technocore_user:...@ep-xyz.postgres.database.azure.com:5432/technocore_prod?sslmode=require`
+   - `NEXT_PUBLIC_SITE_URL`: `https://your-custom-domain.com` (or your assigned Vercel URL)
+   - `DATABASE_URL`: `postgresql://technocore_user:...@ep-xyz.postgres.database.azure.com:5432/technocore_prod?sslmode=require` (Optional if only serving core onboarding; Required for persistent civilization SQL store)
    - `CIVILIZATION_CORS_ORIGINS`: `https://your-custom-domain.com`
    - `NODE_ENV`: `production`
 
 3. **Deploy**:
-   - Trigger deployment via Git push or Vercel CLI.
-   - Vercel automatically runs `npm ci` and `next build`.
+   - Click **Deploy**. Vercel will run `npm ci` and `next build`.
 
 ---
 
 ### Option B: Generic Node.js 22 LTS / Container / VPS Deployment
 
 1. **Prerequisites**:
-   - Node.js version `>= 22.6.0` (supports native TypeScript stripping and web standard APIs).
-   - PostgreSQL 15+ database instance.
+   - Node.js version `>= 22.6.0` (supports native TypeScript type stripping and Web standard APIs).
+   - PostgreSQL 15+ database instance (for persistent civilization event log).
 
 2. **Installation & Build**:
    ```bash
@@ -132,16 +132,39 @@ After deploying to production, run the automated production smoke test against t
 node scripts/production-smoke-test.mjs --url https://your-production-domain.com
 ```
 
-### Verified Checks:
+### Verified Checks (275 Automated Assertions):
 - **25+ HTTP 200 Routes**: Primary landing, Onboarding (all 6 steps), Doctor, Observatory, TestKit, Civilization, Terms, Privacy, FAQ.
-- **Static Assets**: `/robots.txt`, `/sitemap.xml`, `/icon`, and compiled CSS stylesheets.
+- **Static Discovery Assets**: `/robots.txt`, `/sitemap.xml`, `/icon`, and compiled CSS stylesheets.
 - **Security Headers**: Content-Security-Policy, HSTS, X-Content-Type-Options (`nosniff`), X-Frame-Options (`DENY`), Referrer-Policy (`no-referrer`), Permissions-Policy.
 - **Leakage Prevention**: Zero private keys, zero database credentials, zero local filesystem paths, zero `localhost` URLs in production output.
 - **Theme Guarantee**: Light Mode default initialization confirmed with no flash of unstyled content or dark flash.
 
 ---
 
-## 5. Security & Cryptographic Boundary Checklist
+## 5. Rollback Guidance
+
+If a production issue occurs after deployment:
+
+1. **Vercel Instant Rollback**:
+   - Navigate to the project dashboard in Vercel.
+   - Go to **Deployments**.
+   - Locate the previous stable deployment (e.g. commit `64cb6d4`).
+   - Click the three dots (`...`) and select **Promote to Production** (or **Instant Rollback**).
+   - Traffic instantly switches with zero downtime.
+
+2. **Git Revert Rollback**:
+   ```bash
+   git revert HEAD -m 1
+   git push origin main
+   ```
+
+3. **Database Migration Safety**:
+   - All migrations in `scripts/migrate.ts` are strictly additive and idempotent (`CREATE TABLE IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`).
+   - Reverting code does not require destructive database schema drops.
+
+---
+
+## 6. Security & Cryptographic Boundary Checklist
 
 - [x] **Private Keys in Memory Only**: Client WebCrypto Ed25519 private keys are never stored on server disks or transmitted over the wire.
 - [x] **Strict Content Security Policy**: `frame-ancestors 'none'`, `object-src 'none'`, `connect-src 'self' https://technocore.chat`.
