@@ -77,6 +77,15 @@ const TOOLCHAIN = [
   },
   {
     step: "07",
+    title: "Payload Forge",
+    summary: "Canonical wire generator & multi-language code forge",
+    detail: "Construct byte-exact payloads, inspect Unicode normalization sweeps, and generate Python, TypeScript, Go, and cURL client code.",
+    href: "/forge",
+    badge: "Tool · Payload Forge",
+    action: "Launch Forge →",
+  },
+  {
+    step: "08",
     title: "Build & Contribute",
     summary: "Record verifiable contributions & explore community tools",
     detail: "Publish your contribution record and review published reference implementations like TCLK-TestKit and Signature Doctor.",

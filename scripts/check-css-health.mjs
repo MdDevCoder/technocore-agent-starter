@@ -19,6 +19,7 @@ const ROUTES_TO_CHECK = [
   "/doctor",
   "/testkit",
   "/observatory",
+  "/forge",
   "/civilization",
 ];
 
