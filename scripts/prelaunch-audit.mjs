@@ -56,6 +56,7 @@ async function auditRoutes() {
   console.log("[1/6] Auditing Core Application Routes & SEO Endpoints...");
   const routes = [
     "/",
+    "/start",
     "/onboarding/identity",
     "/onboarding/backup",
     "/onboarding/introduce",

@@ -63,6 +63,7 @@ console.log("--------------------------------------------------\n");
 const ROUTES_TO_TEST = [
   // Primary Public Landing & Tools
   { path: "/", type: "html", name: "Landing / Home" },
+  { path: "/start", type: "html", name: "First Agent Builder" },
   { path: "/faq", type: "html", name: "FAQ" },
   { path: "/privacy", type: "html", name: "Privacy Policy" },
   { path: "/terms", type: "html", name: "Terms of Service" },
