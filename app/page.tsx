@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buttonClasses } from "@/ui/buttonStyles.ts";
+import { CopyButton } from "@/ui/copy.tsx";
 import { Disclosure } from "@/ui/Disclosure.tsx";
 import { HeroLattice } from "@/ui/HeroLattice.tsx";
 import { StatusPill } from "@/ui/StatusPill.tsx";
@@ -253,30 +254,48 @@ export default function LandingPage() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="p-6 rounded-xl border border-hairline bg-panel space-y-4">
-              <h3 className="text-sm font-bold text-ink mono uppercase flex items-center gap-2">
-                <span className="text-signal">1.</span> Clone & Start Local Web App
-              </h3>
-              <pre className="p-4 rounded-lg bg-void border border-hairline text-ink text-xs overflow-x-auto mono leading-relaxed">
-                git clone https://github.com/MdDevCoder/technocore-agent-starter.git{"\n"}
-                cd technocore-agent-starter{"\n"}
-                npm install{"\n"}
-                npm run dev{"\n"}
-                # Open local dev server (port 3000)
-              </pre>
+            <div className="p-5 sm:p-6 rounded-xl border border-hairline bg-panel flex flex-col justify-between space-y-4 shadow-sm">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-ink mono uppercase flex items-center gap-2">
+                    <span className="text-signal">1.</span> Clone & Start Local Web App
+                  </h3>
+                  <CopyButton
+                    value={`git clone https://github.com/MdDevCoder/technocore-agent-starter.git\ncd technocore-agent-starter\nnpm install\nnpm run dev`}
+                    label="clone commands"
+                    variant="ghost"
+                  />
+                </div>
+                <div className="p-3.5 sm:p-4 rounded-lg bg-void border border-hairline text-ink text-[11px] sm:text-xs mono leading-relaxed whitespace-pre-wrap break-words overflow-hidden">
+                  git clone https://github.com/MdDevCoder/technocore-agent-starter.git{"\n"}
+                  cd technocore-agent-starter{"\n"}
+                  npm install{"\n"}
+                  npm run dev{"\n"}
+                  <span className="text-muted"># Open local dev server (port 3000)</span>
+                </div>
+              </div>
             </div>
 
-            <div className="p-6 rounded-xl border border-hairline bg-panel space-y-4">
-              <h3 className="text-sm font-bold text-ink mono uppercase flex items-center gap-2">
-                <span className="text-signal">2.</span> Run Offline TCLK Protocol Test Harness
-              </h3>
-              <pre className="p-4 rounded-lg bg-void border border-hairline text-ink text-xs overflow-x-auto mono leading-relaxed">
-                # Run full 4-step deal lifecycle simulation{"\n"}
-                npm run testkit:tclk -- --scenario full-lifecycle{"\n"}
-                {"\n"}
-                # Run full 1,250-test verification suite{"\n"}
-                npm run verify
-              </pre>
+            <div className="p-5 sm:p-6 rounded-xl border border-hairline bg-panel flex flex-col justify-between space-y-4 shadow-sm">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-ink mono uppercase flex items-center gap-2">
+                    <span className="text-signal">2.</span> Run Offline TCLK Protocol Test Harness
+                  </h3>
+                  <CopyButton
+                    value={`npm run testkit:tclk -- --scenario full-lifecycle\nnpm run verify`}
+                    label="test harness commands"
+                    variant="ghost"
+                  />
+                </div>
+                <div className="p-3.5 sm:p-4 rounded-lg bg-void border border-hairline text-ink text-[11px] sm:text-xs mono leading-relaxed whitespace-pre-wrap break-words overflow-hidden">
+                  <span className="text-muted"># Run full 4-step deal lifecycle simulation</span>{"\n"}
+                  npm run testkit:tclk -- --scenario full-lifecycle{"\n"}
+                  {"\n"}
+                  <span className="text-muted"># Run full 1,250-test verification suite</span>{"\n"}
+                  npm run verify
+                </div>
+              </div>
             </div>
           </div>
         </div>
