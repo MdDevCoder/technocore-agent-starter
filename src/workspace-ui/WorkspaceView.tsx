@@ -297,13 +297,21 @@ export const WorkspaceView: React.FC = () => {
 
           {/* Quick Config Actions */}
           <div className="flex shrink-0 flex-wrap gap-2 md:flex-col md:items-end">
-            <button
-              type="button"
-              onClick={() => handleOpenHandoffModal("forge")}
-              className="mono text-xs font-semibold px-3 py-1.5 rounded-md bg-signal/15 text-signal hover:bg-signal/25 border border-signal/30 shadow-xs transition-all active:scale-95 flex items-center gap-1.5"
-            >
-              <span>🔗</span> Copy Safe Handoff Link
-            </button>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/health"
+                className={buttonClasses("secondary", "sm", "text-xs px-3 py-1.5 flex items-center gap-1.5 font-mono")}
+              >
+                <span>🩺</span> Check Health
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleOpenHandoffModal("forge")}
+                className="mono text-xs font-semibold px-3 py-1.5 rounded-md bg-signal/15 text-signal hover:bg-signal/25 border border-signal/30 shadow-xs transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                <span>🔗</span> Copy Handoff Link
+              </button>
+            </div>
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -623,6 +631,41 @@ export const WorkspaceView: React.FC = () => {
               >
                 Copy Link
               </button>
+            </div>
+          </div>
+
+          {/* Action 7: Health Monitor */}
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                  /health
+                </span>
+                <span className="text-muted text-xs">Diagnostic</span>
+              </div>
+              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                CHECK AGENT HEALTH
+              </h3>
+              <p className="text-muted mt-1 text-xs leading-relaxed">
+                Factual runtime evaluation across Identity, Backup, Network, Signing, Protocol, and Trace.
+              </p>
+            </div>
+            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+              Factual Signals · Zero Secrets
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href="/health"
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Inspect Health →
+              </Link>
+              <Link
+                href="/health"
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Run Check
+              </Link>
             </div>
           </div>
         </div>

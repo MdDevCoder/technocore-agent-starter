@@ -6,6 +6,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const routes = [
     "",
+    "/workspace",
+    "/health",
     "/start",
     "/trace",
     "/onboarding/identity",

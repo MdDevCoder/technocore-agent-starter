@@ -32,6 +32,15 @@ const TOOLCHAIN = [
     action: "Open Workspace →",
   },
   {
+    step: "00",
+    title: "Agent Health Monitor",
+    summary: "Evidence-driven runtime health & diagnostic console",
+    detail: "Factual runtime diagnostic evaluating real signals across Identity, Backup, Network, Signing, Protocol, Observatory, Trace, Workspace, and Project with zero fake scores.",
+    href: "/health",
+    badge: "New · Diagnostic",
+    action: "Check Health →",
+  },
+  {
     step: "01",
     title: "First Agent Builder",
     summary: "Scaffold, dry-run, and download a working starter agent",
