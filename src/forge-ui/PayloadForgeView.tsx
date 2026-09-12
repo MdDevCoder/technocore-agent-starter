@@ -98,40 +98,41 @@ export const PayloadForgeView: React.FC = () => {
   return (
     <div className="w-full max-w-6xl mx-auto space-y-8 p-4 md:p-8">
       {/* 1. Header Banner */}
-      <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+      <div className="bg-panel border border-hairline rounded-xl p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
                 LOCAL AUTHORING / DRY-RUN
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-signal/15 text-signal border border-signal/30">
                 NO LIVE NETWORK WRITE BY DEFAULT
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-ink font-display">
               Technocore Payload Forge & Wire Generator
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">
+            <p className="text-sm md:text-base text-muted mt-1">
               Construct byte-exact canonical wire payloads, visualize Unicode normalization sweeps, and generate ready-to-run client code across Python, TypeScript, Go, and cURL.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={handleRefreshNonce}
-            className="self-start md:self-auto px-3.5 py-2 text-xs font-medium rounded-lg border border-border bg-background hover:bg-muted text-foreground transition-colors flex items-center gap-1.5 shadow-sm"
+            className="self-start md:self-auto px-3.5 py-2 text-xs font-semibold rounded-lg border border-hairline bg-void hover:bg-graphite text-ink transition-colors flex items-center gap-1.5 shadow-sm"
             title="Update nonce to current timestamp"
           >
-            <span>⏱ Nonce:</span>
-            <span className="font-mono text-primary font-semibold">{nonce.slice(-6)}...</span>
-            <span className="text-xs text-muted-foreground ml-1">(Refresh)</span>
+            <span className="text-muted">⏱ Nonce:</span>
+            <span className="font-mono text-signal font-bold">{nonce.slice(-6)}...</span>
+            <span className="text-xs text-faint ml-1">(Refresh)</span>
           </button>
         </div>
       </div>
 
       {/* 2. Operation Tabs */}
-      <div className="bg-card border border-border rounded-xl p-4 shadow-sm">
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+      <div className="bg-panel border border-hairline rounded-xl p-4 shadow-sm">
+        <div className="text-xs font-bold text-muted uppercase tracking-wider mb-3">
           Select Protocol Operation
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -145,15 +146,16 @@ export const PayloadForgeView: React.FC = () => {
           ].map((op) => (
             <button
               key={op.id}
+              type="button"
               onClick={() => setOperation(op.id as ForgeOperation)}
               className={`p-3 rounded-lg text-left transition-all border ${
                 operation === op.id
-                  ? "bg-primary/10 border-primary text-primary dark:bg-primary/20 shadow-sm"
-                  : "bg-background border-border hover:bg-muted text-foreground"
+                  ? "bg-signal/15 border-signal text-signal font-bold shadow-sm"
+                  : "bg-void border-hairline hover:bg-graphite text-ink"
               }`}
             >
               <div className="font-semibold text-sm">{op.label}</div>
-              <div className="text-[11px] text-muted-foreground font-mono mt-0.5 truncate">{op.sub}</div>
+              <div className="text-[11px] text-faint font-mono mt-0.5 truncate">{op.sub}</div>
             </button>
           ))}
         </div>
@@ -162,10 +164,10 @@ export const PayloadForgeView: React.FC = () => {
       {/* 3. Interactive Inputs */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-6 space-y-6">
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
-            <h2 className="text-lg font-semibold text-foreground flex items-center justify-between">
+          <div className="bg-panel border border-hairline rounded-xl p-6 shadow-sm space-y-4">
+            <h2 className="text-base font-bold text-ink flex items-center justify-between">
               <span>Payload Parameters</span>
-              <span className="text-xs font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground">
+              <span className="text-xs font-mono px-2 py-0.5 rounded bg-void border border-hairline text-signal font-semibold">
                 {operation}
               </span>
             </h2>
@@ -173,24 +175,25 @@ export const PayloadForgeView: React.FC = () => {
             {/* Room Broadcast & TCLK Room */}
             {(operation === "room-message" || operation === "tclk-frame") && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground flex justify-between">
+                <label className="text-xs font-semibold text-ink flex justify-between">
                   <span>Target Room</span>
-                  <span className="text-muted-foreground font-mono text-[11px]">^[a-z0-9][a-z0-9_-]&#123;0,47&#125;$</span>
+                  <span className="text-faint font-mono text-[11px]">^[a-z0-9][a-z0-9_-]&#123;0,47&#125;$</span>
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={room}
                     onChange={(e) => setRoom(e.target.value)}
-                    className="flex-1 px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="flex-1 px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                     placeholder="e.g. events, general, market"
                   />
                   {["events", "general", "market", "lobby"].map((r) => (
                     <button
                       key={r}
+                      type="button"
                       onClick={() => setRoom(r)}
-                      className={`px-2.5 py-1 text-xs rounded border ${
-                        room === r ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border hover:bg-muted"
+                      className={`px-2.5 py-1 text-xs rounded border font-mono font-semibold transition-colors ${
+                        room === r ? "bg-signal text-void border-signal" : "bg-void border-hairline hover:bg-graphite text-muted hover:text-ink"
                       }`}
                     >
                       {r}
@@ -202,15 +205,15 @@ export const PayloadForgeView: React.FC = () => {
 
             {/* DID Input */}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground flex justify-between">
+              <label className="text-xs font-semibold text-ink flex justify-between">
                 <span>Agent DID</span>
-                <span className="text-muted-foreground font-mono text-[11px]">did:key:z6Mk...</span>
+                <span className="text-faint font-mono text-[11px]">did:key:z6Mk...</span>
               </label>
               <input
                 type="text"
                 value={did}
                 onChange={(e) => setDid(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                 placeholder="did:key:z6Mk..."
               />
             </div>
@@ -218,15 +221,15 @@ export const PayloadForgeView: React.FC = () => {
             {/* Nonce Input */}
             {operation !== "kv-did-register" && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground flex justify-between">
+                <label className="text-xs font-semibold text-ink flex justify-between">
                   <span>Nonce (Decimal Nanoseconds)</span>
-                  <span className="text-muted-foreground font-mono text-[11px]">1–19 decimal digits</span>
+                  <span className="text-faint font-mono text-[11px]">1–19 decimal digits</span>
                 </label>
                 <input
                   type="text"
                   value={nonce}
                   onChange={(e) => setNonce(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                 />
               </div>
             )}
@@ -234,15 +237,15 @@ export const PayloadForgeView: React.FC = () => {
             {/* Message Text for Room Message */}
             {operation === "room-message" && (
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground flex justify-between">
+                <label className="text-xs font-semibold text-ink flex justify-between">
                   <span>Message Text (Raw Input)</span>
-                  <span className="text-muted-foreground text-[11px]">Max 4096 code points</span>
+                  <span className="text-faint text-[11px]">Max 4096 code points</span>
                 </label>
                 <textarea
                   rows={3}
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-sans focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-sans focus:border-signal focus:outline-none"
                   placeholder="Type any message to inspect Unicode category sweeping..."
                 />
               </div>
@@ -252,35 +255,35 @@ export const PayloadForgeView: React.FC = () => {
             {(operation === "contribute-record" || operation === "detached-proof") && (
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Contribution Artifact URL</label>
+                  <label className="text-xs font-semibold text-ink">Contribution Artifact URL</label>
                   <input
                     type="url"
                     value={contribUrl}
                     onChange={(e) => setContribUrl(e.target.value)}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                     placeholder="https://..."
                   />
                 </div>
                 {operation === "contribute-record" && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">Contribution Topic</label>
+                    <label className="text-xs font-semibold text-ink">Contribution Topic</label>
                     <input
                       type="text"
                       value={contribTopic}
                       onChange={(e) => setContribTopic(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-sans focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-sans focus:border-signal focus:outline-none"
                       placeholder="e.g. Technocore Wire Protocol"
                     />
                   </div>
                 )}
                 {operation === "detached-proof" && (
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">Git Commit Hash (40 or 64 hex)</label>
+                    <label className="text-xs font-semibold text-ink">Git Commit Hash (40 or 64 hex)</label>
                     <input
                       type="text"
                       value={proofCommit}
                       onChange={(e) => setProofCommit(e.target.value)}
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="w-full px-3 py-2 text-xs rounded-lg border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                       placeholder="83f3e8b1159960edbcc9e036e69b7103738d45d7"
                     />
                   </div>
@@ -290,14 +293,14 @@ export const PayloadForgeView: React.FC = () => {
 
             {/* TCLK Negotiation Frame Parameters */}
             {operation === "tclk-frame" && (
-              <div className="space-y-3 pt-2 border-t border-border">
+              <div className="space-y-3 pt-2 border-t border-hairline">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-foreground">TCLK Kind</label>
+                    <label className="text-xs font-semibold text-ink">TCLK Kind</label>
                     <select
                       value={tclkKind}
                       onChange={(e) => setTclkKind(e.target.value as "TCLK_RFQ_V1" | "TCLK_QUOTE_V1" | "TCLK_ACCEPT_V1" | "TCLK_SETTLE_V1")}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-border bg-background text-foreground"
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-hairline bg-void text-ink focus:border-signal focus:outline-none font-mono"
                     >
                       <option value="TCLK_RFQ_V1">TCLK_RFQ_V1</option>
                       <option value="TCLK_QUOTE_V1">TCLK_QUOTE_V1</option>
@@ -306,39 +309,39 @@ export const PayloadForgeView: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">Counterparty DID</label>
+                    <label className="text-xs font-semibold text-ink">Counterparty DID</label>
                     <input
                       type="text"
                       value={tclkToDid}
                       onChange={(e) => setTclkToDid(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-border bg-background text-foreground font-mono"
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">SKU</label>
+                    <label className="text-xs font-semibold text-ink">SKU</label>
                     <input
                       type="text"
                       value={tclkSku}
                       onChange={(e) => setTclkSku(e.target.value)}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-border bg-background text-foreground font-mono"
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-hairline bg-void text-ink font-mono focus:border-signal focus:outline-none"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground">Units</label>
+                    <label className="text-xs font-semibold text-ink">Units</label>
                     <input
                       type="number"
                       value={tclkUnits}
                       onChange={(e) => setTclkUnits(Number(e.target.value))}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-border bg-background text-foreground"
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-hairline bg-void text-ink focus:border-signal focus:outline-none font-mono"
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="text-xs font-medium text-foreground">Price per Unit (Sats)</label>
+                    <label className="text-xs font-semibold text-ink">Price per Unit (Sats)</label>
                     <input
                       type="number"
                       value={tclkPrice}
                       onChange={(e) => setTclkPrice(Number(e.target.value))}
-                      className="w-full px-2.5 py-1.5 text-xs rounded border border-border bg-background text-foreground"
+                      className="w-full px-2.5 py-1.5 text-xs rounded border border-hairline bg-void text-ink focus:border-signal focus:outline-none font-mono"
                     />
                   </div>
                 </div>
@@ -347,12 +350,12 @@ export const PayloadForgeView: React.FC = () => {
 
             {/* Validation Issues Alert */}
             {canonicalResult.validationIssues.length > 0 && (
-              <div className="p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs space-y-1">
-                <div className="font-semibold flex items-center gap-1.5">
+              <div className="p-3.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
                   <span>⚠ Protocol Validation Notice:</span>
                 </div>
                 {canonicalResult.validationIssues.map((issue, idx) => (
-                  <div key={idx}>• {issue.field}: {issue.message}</div>
+                  <div key={idx} className="font-mono">• {issue.field}: {issue.message}</div>
                 ))}
               </div>
             )}
@@ -360,35 +363,35 @@ export const PayloadForgeView: React.FC = () => {
 
           {/* Unicode Normalization Inspector */}
           {canonicalResult.unicodeSweep && (
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-3">
+            <div className="bg-panel border border-hairline rounded-xl p-6 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <h3 className="text-sm font-bold text-ink flex items-center gap-2">
                   <span>Unicode Normalization Sweep Inspector</span>
                   {canonicalResult.unicodeSweep.hasModifications ? (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
                       Modifications Applied
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30">
                       Clean (0 Swept)
                     </span>
                   )}
                 </h3>
-                <span className="text-xs text-muted-foreground font-mono">
+                <span className="text-xs text-faint font-mono">
                   {canonicalResult.unicodeSweep.canonicalCodePoints} code pts / {canonicalResult.unicodeSweep.utf8ByteLength} bytes
                 </span>
               </div>
 
               {canonicalResult.unicodeSweep.sweptCharacters.length > 0 && (
-                <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-xs space-y-2">
-                  <div className="font-semibold text-amber-900 dark:text-amber-200">
+                <div className="p-3 rounded-lg bg-amber-500/10 dark:bg-amber-950/40 border border-amber-500/30 text-xs space-y-2">
+                  <div className="font-bold text-amber-900 dark:text-amber-200">
                     Swept Non-Printable / Control Characters:
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {canonicalResult.unicodeSweep.sweptCharacters.map((s, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-1 rounded bg-background border border-amber-300 dark:border-amber-700 font-mono text-[11px] text-amber-900 dark:text-amber-100"
+                        className="px-2 py-1 rounded bg-void border border-amber-400 dark:border-amber-700 font-mono text-[11px] text-amber-900 dark:text-amber-100"
                         title={`${s.category} at index ${s.index}`}
                       >
                         Pos {s.index}: {s.codePoint} ({s.category}) → Space
@@ -399,8 +402,8 @@ export const PayloadForgeView: React.FC = () => {
               )}
 
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground font-medium">Canonical Sanitized Text:</div>
-                <div className="p-2.5 rounded-lg bg-muted/60 font-mono text-xs text-foreground break-all border border-border/50">
+                <div className="text-xs text-muted font-semibold">Canonical Sanitized Text:</div>
+                <div className="p-2.5 rounded-lg bg-void font-mono text-xs text-ink break-all border border-hairline">
                   {canonicalResult.unicodeSweep.canonicalText}
                 </div>
               </div>
@@ -411,89 +414,93 @@ export const PayloadForgeView: React.FC = () => {
         {/* 4. Output & Wire Representation */}
         <div className="lg:col-span-6 space-y-6">
           {/* Canonical Payload Display */}
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <div className="bg-panel border border-hairline rounded-xl p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">Exact Canonical Wire Payload</h2>
+              <h2 className="text-base font-bold text-ink">Exact Canonical Wire Payload</h2>
               <button
+                type="button"
                 onClick={() => handleCopy(canonicalResult.canonicalPayload, "payload")}
-                className="px-2.5 py-1 text-xs rounded border border-border bg-background hover:bg-muted text-foreground transition-colors font-medium"
+                className="px-2.5 py-1 text-xs rounded border border-hairline bg-void hover:bg-graphite text-ink transition-colors font-semibold"
               >
                 {copiedTab === "payload" ? "✔ Copied" : "Copy Payload"}
               </button>
             </div>
 
-            <div className="p-3.5 rounded-lg bg-slate-950 text-emerald-400 font-mono text-xs break-all border border-slate-800 leading-relaxed">
+            <div className="p-3.5 rounded-lg bg-void text-signal font-mono text-xs break-all border border-hairline leading-relaxed shadow-inner">
               {canonicalResult.canonicalPayload}
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="p-2 rounded bg-muted border border-border">
-                <div className="text-muted-foreground text-[10px] uppercase font-semibold">Destination</div>
-                <div className="font-mono font-medium text-foreground truncate mt-0.5">{canonicalResult.destination.path}</div>
+            {/* 3 Metric Cards - High Contrast in both Light & Dark modes */}
+            <div className="grid grid-cols-3 gap-2.5 text-center">
+              <div className="p-2.5 rounded-lg bg-void border border-hairline shadow-sm">
+                <div className="text-faint text-[10px] uppercase font-bold tracking-wider mono">Destination</div>
+                <div className="font-mono font-semibold text-ink text-xs truncate mt-1">{canonicalResult.destination.path}</div>
               </div>
-              <div className="p-2 rounded bg-muted border border-border">
-                <div className="text-muted-foreground text-[10px] uppercase font-semibold">Code Points</div>
-                <div className="font-mono font-medium text-foreground mt-0.5">{canonicalResult.codePointLength}</div>
+              <div className="p-2.5 rounded-lg bg-void border border-hairline shadow-sm">
+                <div className="text-faint text-[10px] uppercase font-bold tracking-wider mono">Code Points</div>
+                <div className="font-mono font-semibold text-ink text-xs mt-1">{canonicalResult.codePointLength}</div>
               </div>
-              <div className="p-2 rounded bg-muted border border-border">
-                <div className="text-muted-foreground text-[10px] uppercase font-semibold">UTF-8 Bytes</div>
-                <div className="font-mono font-medium text-foreground mt-0.5">{canonicalResult.utf8ByteLength} B</div>
+              <div className="p-2.5 rounded-lg bg-void border border-hairline shadow-sm">
+                <div className="text-faint text-[10px] uppercase font-bold tracking-wider mono">UTF-8 Bytes</div>
+                <div className="font-mono font-semibold text-ink text-xs mt-1">{canonicalResult.utf8ByteLength} B</div>
               </div>
             </div>
 
             {/* Hex Bytes */}
             <div className="space-y-1">
-              <div className="text-xs font-medium text-muted-foreground flex justify-between">
+              <div className="text-xs font-semibold text-ink flex justify-between">
                 <span>UTF-8 Hex Representation</span>
-                <span className="font-mono text-[11px]">{canonicalResult.utf8ByteLength} bytes</span>
+                <span className="font-mono text-[11px] text-faint">{canonicalResult.utf8ByteLength} bytes</span>
               </div>
-              <div className="p-2.5 rounded bg-muted/40 font-mono text-[11px] text-muted-foreground break-all max-h-20 overflow-y-auto border border-border/50">
+              <div className="p-3 rounded-lg bg-void font-mono text-[11px] text-signal break-all max-h-24 overflow-y-auto border border-hairline leading-relaxed shadow-inner">
                 {canonicalResult.hexBytes}
               </div>
             </div>
           </div>
 
           {/* Dry-Run Signature */}
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-3">
+          <div className="bg-panel border border-hairline rounded-xl p-6 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <h3 className="text-sm font-bold text-ink flex items-center gap-2">
                 <span>Dry-Run Ed25519 Signature</span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-signal/15 text-signal border border-signal/30">
                   Unpadded Base64URL (86 Chars)
                 </span>
               </h3>
               <button
+                type="button"
                 onClick={() => handleCopy(mockSignature, "sig")}
-                className="px-2.5 py-1 text-xs rounded border border-border bg-background hover:bg-muted text-foreground transition-colors font-medium"
+                className="px-2.5 py-1 text-xs rounded border border-hairline bg-void hover:bg-graphite text-ink transition-colors font-semibold"
               >
                 {copiedTab === "sig" ? "✔ Copied" : "Copy Sig"}
               </button>
             </div>
 
-            <div className="p-2.5 rounded bg-slate-950 text-amber-300 font-mono text-xs break-all border border-slate-800">
+            <div className="p-2.5 rounded-lg bg-void text-amber-600 dark:text-amber-300 font-mono text-xs break-all border border-hairline font-semibold">
               {mockSignature}
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-xs text-muted">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
               <span>Local verification: Matches <code>room|nonce|text</code> signing invariant.</span>
             </div>
           </div>
 
           {/* Multi-Language Code Generation */}
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4">
+          <div className="bg-panel border border-hairline rounded-xl p-6 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-semibold text-foreground">Generated Client Snippets</h3>
+              <h3 className="text-base font-bold text-ink">Generated Client Snippets</h3>
               <button
+                type="button"
                 onClick={() => handleCopy(snippets[selectedLang], `code-${selectedLang}`)}
-                className="px-2.5 py-1 text-xs rounded border border-border bg-background hover:bg-muted text-foreground transition-colors font-medium"
+                className="px-2.5 py-1 text-xs rounded border border-hairline bg-void hover:bg-graphite text-ink transition-colors font-semibold"
               >
                 {copiedTab === `code-${selectedLang}` ? "✔ Copied" : `Copy ${selectedLang.toUpperCase()}`}
               </button>
             </div>
 
             {/* Language Selector */}
-            <div className="flex gap-2 border-b border-border pb-2">
+            <div className="flex gap-2 border-b border-hairline pb-2">
               {[
                 { id: "curl", label: "cURL" },
                 { id: "python", label: "Python (PyNaCl)" },
@@ -502,11 +509,12 @@ export const PayloadForgeView: React.FC = () => {
               ].map((lang) => (
                 <button
                   key={lang.id}
+                  type="button"
                   onClick={() => setSelectedLang(lang.id as "curl" | "python" | "typescript" | "golang")}
-                  className={`px-3 py-1 text-xs rounded-md font-medium transition-colors ${
+                  className={`px-3 py-1 text-xs rounded-md font-semibold transition-colors ${
                     selectedLang === lang.id
-                      ? "bg-primary text-primary-foreground font-semibold"
-                      : "bg-muted text-muted-foreground hover:text-foreground"
+                      ? "bg-signal text-void font-bold shadow-sm"
+                      : "bg-void text-muted hover:text-ink border border-hairline"
                   }`}
                 >
                   {lang.label}
@@ -514,7 +522,7 @@ export const PayloadForgeView: React.FC = () => {
               ))}
             </div>
 
-            <pre className="p-4 rounded-lg bg-slate-950 text-slate-100 font-mono text-xs overflow-x-auto max-h-72 border border-slate-800 leading-relaxed">
+            <pre className="p-4 rounded-lg bg-void text-ink font-mono text-xs overflow-x-auto max-h-72 border border-hairline leading-relaxed shadow-inner">
               <code>{snippets[selectedLang]}</code>
             </pre>
           </div>
