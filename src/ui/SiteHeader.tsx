@@ -35,20 +35,28 @@ export function SiteHeader() {
           technocore<span className="text-faint">/</span>starter
         </Link>
 
-        <nav aria-label="Main" className="flex items-center gap-1.5 sm:gap-2">
-          {LINKS.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="text-muted hover:text-ink hover:bg-panel rounded-md px-3 py-1.5 text-sm transition-colors"
-            >
-              {label}
-            </Link>
-          ))}
-          <Link href="/onboarding/identity" className={buttonClasses("primary", "sm", "ml-1")}>
+        <nav aria-label="Main" className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="hidden md:flex items-center gap-1">
+            {LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="text-muted hover:text-ink hover:bg-panel rounded-md px-2.5 py-1.5 text-sm transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+          <Link
+            href="/import"
+            className="md:hidden text-muted hover:text-ink hover:bg-panel rounded-md px-2 py-1 text-xs font-medium transition-colors"
+          >
+            Import
+          </Link>
+          <Link href="/onboarding/identity" className={buttonClasses("primary", "sm", "text-xs sm:text-sm px-2.5 sm:px-3 py-1 sm:py-1.5")}>
             Create identity
           </Link>
-          <ThemeToggle className="ml-1" />
+          <ThemeToggle />
         </nav>
       </div>
     </header>
