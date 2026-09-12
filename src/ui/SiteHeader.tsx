@@ -15,8 +15,10 @@ import { buttonClasses } from "./buttonStyles.ts";
 import { ThemeToggle } from "./ThemeToggle.tsx";
 
 const LINKS = [
+  { href: "/observatory", label: "Observatory" },
+  { href: "/doctor", label: "Doctor" },
+  { href: "/testkit", label: "TestKit" },
   { href: "/civilization", label: "Civilization" },
-  { href: "/agent", label: "Agent" },
   { href: "/import", label: "Import" },
 ] as const;
 

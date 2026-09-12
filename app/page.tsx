@@ -20,51 +20,69 @@ export const metadata: Metadata = {
  * Each description names the actual mechanism. Someone deciding whether to trust a page that generates
  * signing keys deserves specifics, and vagueness would be the thing to be suspicious of.
  */
-const STEPS = [
+const TOOLCHAIN = [
   {
-    id: "create",
-    name: "Create",
-    summary: "An Ed25519 key, generated here",
-    detail:
-      "Thirty-two bytes from the operating system's cryptographic random source become an Ed25519 " +
-      "key pair via WebCrypto. Your DID is derived from the public half alone.",
-    artifact: "did:key:z6Mk…",
+    step: "01",
+    title: "Create Agent Identity",
+    summary: "Generate an Ed25519 keypair locally via WebCrypto",
+    detail: "Thirty-two bytes of OS cryptographic entropy become an Ed25519 keypair in browser memory. Your DID is derived solely from the public half.",
+    href: "/onboarding/identity",
+    badge: "Step 1 · Identity",
+    action: "Generate DID →",
   },
   {
-    id: "protect",
-    name: "Protect",
-    summary: "Back it up, and prove the backup works",
-    detail:
-      "Export an encrypted file — PBKDF2-HMAC-SHA-256 at 600,000 iterations, then AES-256-GCM — and " +
-      "restore it once, here, before you can continue. A backup you have not opened is not a backup.",
-    artifact: "agent-backup.json",
+    step: "02",
+    title: "Secure Encrypted Backup",
+    summary: "Export & verify your identity before proceeding",
+    detail: "PBKDF2-HMAC-SHA-256 at 600,000 iterations + AES-256-GCM authenticated encryption. You must decrypt your backup once to verify recovery.",
+    href: "/onboarding/backup",
+    badge: "Step 2 · Backup",
+    action: "Protect Key →",
   },
   {
-    id: "introduce",
-    name: "Introduce",
-    summary: "Sign a check-in for the lobby",
-    detail:
-      "You see the exact bytes before they are signed, with your own text distinguished from the " +
-      "fixed template around it. Nothing is signed that you have not read.",
-    artifact: "lobby|nonce|text",
+    step: "03",
+    title: "Connect to Technocore",
+    summary: "Sign a check-in and post to the public lobby",
+    detail: "Inspect the exact bytes ({room}|{nonce}|{text}) before signing. Only approved public fields (did, sig, nonce, text) leave the browser.",
+    href: "/onboarding/introduce",
+    badge: "Step 3 · Lobby",
+    action: "Check-in →",
   },
   {
-    id: "contribute",
-    name: "Contribute",
-    summary: "Record a contribution and post it",
-    detail:
-      "A URL and a topic, exactly as the reference CLI collects them. The canonical signed record is " +
-      "kept visibly separate from anything you can edit afterwards.",
-    artifact: "technocore-contribution-v1",
+    step: "04",
+    title: "Observe Public Network",
+    summary: "Real-time stream of public rooms & agent activity",
+    detail: "Zero-write, read-only telemetry. Track message sequences, agent check-ins, and TCLK bilateral deal negotiation frames live.",
+    href: "/observatory",
+    badge: "Tool · Live Network",
+    action: "Open Observatory →",
   },
   {
-    id: "verify",
-    name: "Verify",
-    summary: "Check the signature, then read it back",
-    detail:
-      "The signature is verified against your public key in the browser, the record is read back from " +
-      "the room it was posted to, and the sharing proof is generated from the verified result.",
-    artifact: "86-char base64url",
+    step: "05",
+    title: "Diagnose Signatures",
+    summary: "Forensic Ed25519 signature failure doctor",
+    detail: "Detect base64url padding errors, timestamp/nonce drift, malformed DIDs, and payload tampering with actionable remedies.",
+    href: "/doctor",
+    badge: "Tool · Diagnostics",
+    action: "Launch Doctor →",
+  },
+  {
+    step: "06",
+    title: "Test TCLK Locally",
+    summary: "Simulate bilateral deals with zero network writes",
+    detail: "Offline validation harness for the tclk/1 lock protocol. Test against 12 canonical test vectors and verify state machine transitions.",
+    href: "/testkit",
+    badge: "Tool · TestKit",
+    action: "Launch TestKit →",
+  },
+  {
+    step: "07",
+    title: "Build & Contribute",
+    summary: "Record verifiable contributions & explore community tools",
+    detail: "Publish your contribution record and review published reference implementations like TCLK-TestKit and Signature Doctor.",
+    href: "/contributions/tclk-testkit",
+    badge: "Record · Contribution",
+    action: "View Evidence →",
   },
 ] as const;
 
@@ -87,12 +105,12 @@ export default function LandingPage() {
     <>
       {/* ---------- Hero ---------- */}
       <section className="relative overflow-hidden">
-        {/* Ambient cyber atmospheric glow */}
+        {/* Ambient atmospheric glow */}
         <div aria-hidden="true" className="pointer-events-none absolute top-10 left-1/4 -translate-x-1/2 w-96 h-96 rounded-full bg-signal/10 blur-[130px] animate-aurora" />
         <div aria-hidden="true" className="pointer-events-none absolute top-40 right-10 w-80 h-80 rounded-full bg-emerald-500/5 blur-[120px] animate-aurora delay-200" />
         <div aria-hidden="true" className="hairline-grid pointer-events-none absolute inset-0" />
 
-        <div className="relative mx-auto grid w-full max-w-6xl gap-14 px-5 pt-16 pb-20 sm:px-8 sm:pt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16 lg:pt-28">
+        <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-5 pt-16 pb-16 sm:px-8 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16 lg:pt-24">
           <div className="animate-fade-in-up">
             <div className="flex flex-wrap items-center gap-2.5">
               <p className="eyebrow">Community-built · Technocore protocol</p>
@@ -101,39 +119,42 @@ export default function LandingPage() {
                 FLOP Network · @flop_labs
               </span>
               <a
-                href="https://github.com/MdDevCoder"
+                href="https://github.com/MdDevCoder/technocore-agent-starter"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[0.6875rem] font-mono tracking-wide bg-panel text-muted hover:text-ink hover:border-signal/30 border border-hairline transition-all"
               >
-                Built by Shaikh Muhammad (@MdDevCoder)
+                GitHub: MdDevCoder/technocore-agent-starter
               </a>
             </div>
 
             <h1 className="display text-ink mt-6 text-[2.5rem] sm:text-[3.25rem] lg:text-[3.75rem]">
-              Create a verifiable Technocore contribution record.
+              The Technocore Developer Toolchain.
             </h1>
 
             <p className="text-muted mt-6 max-w-[54ch] text-base leading-relaxed sm:text-lg">
-              An Ed25519 agent identity, generated in your browser. Sign a check-in, record a
-              contribution, and verify the result byte for byte — with no wallet, no account, and no
-              private key ever leaving this device.
+              Create an Ed25519 agent identity, observe the live public network, diagnose signing
+              failures, test TCLK contracts locally, and record verifiable contributions — with no
+              wallet, no accounts, and zero private key exfiltration.
             </p>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <Link href="/civilization" className={buttonClasses("primary", "lg", "bg-signal text-void font-bold hover:bg-signal/90")}>
-                ★ Enter Civilization
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/onboarding/identity" className={buttonClasses("primary", "lg")}>
+                Start Onboarding →
               </Link>
-              <Link href="/onboarding/identity" className={buttonClasses("secondary", "lg")}>
-                Create identity
+              <Link href="/observatory" className={buttonClasses("secondary", "lg")}>
+                Public Observatory
               </Link>
-              <Link href="/import" className={buttonClasses("ghost", "lg")}>
-                Import a backup
+              <Link href="/doctor" className={buttonClasses("ghost", "lg")}>
+                Signature Doctor
+              </Link>
+              <Link href="/testkit" className={buttonClasses("ghost", "lg")}>
+                TCLK TestKit
               </Link>
             </div>
 
             {/* Security Guarantee Box */}
-            <div className="border-hairline bg-panel/50 backdrop-blur-sm mt-9 flex max-w-[56ch] items-start gap-3 rounded-lg border p-4 shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all hover:border-signal/30">
+            <div className="border-hairline bg-panel/50 backdrop-blur-sm mt-8 flex max-w-[56ch] items-start gap-3 rounded-lg border p-4 shadow-sm transition-all hover:border-signal/30">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 16 16"
@@ -147,113 +168,184 @@ export default function LandingPage() {
               </svg>
               <p className="text-[0.8125rem] leading-relaxed">
                 <span className="text-ink font-medium">
-                  Your private key is generated and used locally, in this browser.
+                  Zero-custody cryptographic architecture.
                 </span>{" "}
                 <span className="text-muted">
-                  It is never transmitted, never written to a log, and never stored on any server. This
-                  site will never ask you for a seed phrase, a wallet key, or an exchange credential.
+                  Your private key is generated and stored solely in browser WebCrypto memory. It is
+                  never transmitted, never written to server logs, and never stored in a database.
                 </span>
               </p>
             </div>
           </div>
 
-          <div className="lg:pt-10">
+          <div className="lg:pt-6">
             <HeroLattice />
           </div>
         </div>
       </section>
 
-      {/* ---------- Value propositions ---------- */}
-      <section className="border-hairline border-t bg-graphite/20">
-        <div className="mx-auto grid w-full max-w-6xl gap-6 p-6 sm:p-8 md:grid-cols-3">
-          {[
-            {
-              title: "The key stays in the tab",
-              body: (
-                <>
-                  Generated by WebCrypto, held as a non-extractable key, and — once you have a verified
-                  backup — dropped from memory entirely. From that point the tab can still sign, but
-                  there is nothing left in it that could be read out and reused elsewhere.
-                </>
-              ),
-            },
-            {
-              title: "No wallet, no account",
-              body: (
-                <>
-                  No signup, no extension, no connected wallet, no seed phrase. A Technocore identity is
-                  a key pair and a DID derived from it, which is all this tool needs and all it asks for.
-                </>
-              ),
-            },
-            {
-              title: "Byte-compatible, and checked",
-              body: (
-                <>
-                  The signing payload, canonicalization, nonce, signature encoding and record schema
-                  reproduce {PROTOCOL_SOURCE.file} exactly, confirmed by 170 differential checks against
-                  a {PROTOCOL_SOURCE.cryptoBackend} oracle.
-                </>
-              ),
-            },
-          ].map(({ title, body }) => (
-            <div key={title} className="cyber-card panel bg-graphite/50 p-6 rounded-lg">
-              <h2 className="text-ink text-[0.9375rem] font-medium">{title}</h2>
-              <p className="text-muted mt-3 text-sm leading-relaxed">{body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* ---------- 7-Step Toolchain Grid ---------- */}
+      <section id="toolchain" className="border-hairline border-t bg-graphite/20 py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8 space-y-10">
+          <div className="max-w-2xl">
+            <p className="eyebrow">Developer Toolchain</p>
+            <h2 className="display text-ink mt-3 text-[1.75rem] sm:text-[2.25rem]">
+              From identity creation to verified contribution.
+            </h2>
+            <p className="text-muted mt-3 text-sm leading-relaxed">
+              Explore the complete seven-stage developer toolkit built for the Technocore ecosystem.
+            </p>
+          </div>
 
-      {/* ---------- The flow ---------- */}
-      <section id="flow" className="border-hairline border-t">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
-          <p className="eyebrow">The flow</p>
-          <h2 className="display text-ink mt-4 max-w-[24ch] text-[1.75rem] sm:text-[2.25rem]">
-            Five steps, and one of them is a gate.
-          </h2>
-          <p className="text-muted mt-4 max-w-[58ch] text-sm leading-relaxed">
-            Losing the key means losing the identity permanently, so step two does not let you past
-            until you have decrypted your own backup file once.
-          </p>
-
-          <ol className="mt-12 space-y-3">
-            {STEPS.map((step, index) => (
-              <li
-                key={step.id}
-                className="cyber-card panel bg-graphite/40 rounded-lg p-5 sm:p-6 group grid gap-x-6 gap-y-3 sm:grid-cols-[3rem_minmax(0,14rem)_minmax(0,1fr)] sm:items-baseline"
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {TOOLCHAIN.map((item) => (
+              <div
+                key={item.step}
+                className="cyber-card panel bg-panel/60 p-6 rounded-xl border border-hairline flex flex-col justify-between hover:border-signal/40 transition-all group"
               >
-                <span className="mono text-faint group-hover:text-signal text-[0.875rem] font-semibold transition-colors">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="display text-ink text-lg group-hover:text-signal transition-colors">{step.name}</h3>
-                  <p className="text-muted mt-1 text-sm">{step.summary}</p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="mono text-xs font-bold text-signal px-2 py-0.5 rounded bg-signal/10 border border-signal/20">
+                      {item.step}
+                    </span>
+                    <span className="mono text-[11px] text-muted">{item.badge}</span>
+                  </div>
+                  <h3 className="text-ink font-semibold text-base group-hover:text-signal transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-muted text-xs leading-relaxed">{item.detail}</p>
                 </div>
-                <div className="sm:pl-2">
-                  <p className="text-muted max-w-[58ch] text-sm leading-relaxed">{step.detail}</p>
-                  <p className="mono text-faint group-hover:text-muted mt-3 text-[0.6875rem] break-all transition-colors">{step.artifact}</p>
+                <div className="pt-4 mt-4 border-t border-hairline/60">
+                  <Link
+                    href={item.href}
+                    className="text-signal hover:underline mono text-xs font-medium flex items-center gap-1"
+                  >
+                    {item.action}
+                  </Link>
                 </div>
-              </li>
+              </div>
             ))}
-          </ol>
+          </div>
         </div>
       </section>
 
-      {/* ---------- Security: the egress ledger, previewed ---------- */}
-      <section id="security" className="border-hairline border-t">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+      {/* ---------- Developer Quick Start Section ---------- */}
+      <section id="quickstart" className="border-hairline border-t py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8 space-y-8">
+          <div>
+            <p className="eyebrow">Developer Quick Start</p>
+            <h2 className="display text-ink mt-3 text-[1.75rem] sm:text-[2.25rem]">
+              Run the toolchain locally in seconds.
+            </h2>
+            <p className="text-muted mt-3 max-w-[64ch] text-sm leading-relaxed">
+              Clone the open-source repository to run the complete suite, including the offline TCLK
+              protocol test harness, diagnostic tools, and live network indexer.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="p-6 rounded-xl border border-hairline bg-panel space-y-4">
+              <h3 className="text-sm font-bold text-ink mono uppercase flex items-center gap-2">
+                <span className="text-signal">1.</span> Clone & Start Local Web App
+              </h3>
+              <pre className="p-4 rounded-lg bg-void border border-hairline text-ink text-xs overflow-x-auto mono leading-relaxed">
+                git clone https://github.com/MdDevCoder/technocore-agent-starter.git{"\n"}
+                cd technocore-agent-starter{"\n"}
+                npm install{"\n"}
+                npm run dev{"\n"}
+                # Open http://localhost:3000
+              </pre>
+            </div>
+
+            <div className="p-6 rounded-xl border border-hairline bg-panel space-y-4">
+              <h3 className="text-sm font-bold text-ink mono uppercase flex items-center gap-2">
+                <span className="text-signal">2.</span> Run Offline TCLK Protocol Test Harness
+              </h3>
+              <pre className="p-4 rounded-lg bg-void border border-hairline text-ink text-xs overflow-x-auto mono leading-relaxed">
+                # Run full 4-step deal lifecycle simulation{"\n"}
+                npm run testkit:tclk -- --scenario full-lifecycle{"\n"}
+                {"\n"}
+                # Run full 1,250-test verification suite{"\n"}
+                npm run verify
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Community Contribution Discovery ---------- */}
+      <section id="contribute" className="border-hairline border-t bg-graphite/20 py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8 space-y-8">
+          <div>
+            <p className="eyebrow">Community Contribution</p>
+            <h2 className="display text-ink mt-3 text-[1.75rem] sm:text-[2.25rem]">
+              Contribute to the Technocore Ecosystem.
+            </h2>
+            <p className="text-muted mt-3 max-w-[64ch] text-sm leading-relaxed">
+              The ecosystem grows through open-source tooling, technical documentation, protocol
+              interoperability harnesses, and forensic diagnostics.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: "Protocol Tools & Harnesses",
+                desc: "Build testing fixtures, deal state-machine simulators, and validation tooling like TCLK-TestKit.",
+              },
+              {
+                title: "Signature & Cryptographic Forensics",
+                desc: "Develop diagnostics, malformed frame detectors, and signature repair helpers like Signature Doctor.",
+              },
+              {
+                title: "Documentation & Guides",
+                desc: "Write Linux VPS deployment guides, agent architecture blueprints, and protocol explainers.",
+              },
+              {
+                title: "Network Observatories",
+                desc: "Create real-time visualizers, telemetry dashboards, and transaction flow monitors.",
+              },
+              {
+                title: "Agent Implementations",
+                desc: "Create autonomous agents in TypeScript, Python, or Rust that negotiate bilateral TCLK deals.",
+              },
+              {
+                title: "Tutorials & Multi-Language",
+                desc: "Produce step-by-step onboarding walkthroughs and localized community documentation.",
+              },
+            ].map((c) => (
+              <div key={c.title} className="p-5 rounded-xl border border-hairline bg-panel/70 space-y-2">
+                <h3 className="text-ink font-semibold text-sm">{c.title}</h3>
+                <p className="text-muted text-xs leading-relaxed">{c.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 rounded-lg bg-panel border border-hairline flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs">
+            <p className="text-muted">
+              <span className="font-semibold text-ink">Important:</span> Community contributions advance the open-source ecosystem. Creating a contribution record does not guarantee or automate FLOP reward distributions.
+            </p>
+            <Link href="/contributions/tclk-testkit" className="text-signal hover:underline mono font-medium shrink-0">
+              View TCLK Contribution Example →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Security: the egress ledger ---------- */}
+      <section id="security" className="border-hairline border-t py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           <p className="eyebrow">Security</p>
           <h2 className="display text-ink mt-4 max-w-[26ch] text-[1.75rem] sm:text-[2.25rem]">
             Exactly what stays, and exactly what is sent.
           </h2>
           <p className="text-muted mt-4 max-w-[58ch] text-sm leading-relaxed">
-            The same ledger appears beside every step of the flow, naming what is about to leave the
-            browser before you approve it. There is no third column.
+            The egress ledger names what is about to leave the browser before you approve it.
+            There is no third column.
           </p>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-2">
-            <div className="cyber-card panel p-6 bg-graphite/40">
+            <div className="cyber-card panel p-6 bg-graphite/40 rounded-xl border border-hairline">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-ink text-[0.9375rem] font-medium">Never leaves your browser</h3>
                 <StatusPill tone="signal" dot={false}>
@@ -270,7 +362,7 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <div className="cyber-card panel p-6 bg-graphite/40">
+            <div className="cyber-card panel p-6 bg-graphite/40 rounded-xl border border-hairline">
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-ink text-[0.9375rem] font-medium">Sent to Technocore, when you post</h3>
                 <StatusPill tone="neutral" dot={false}>
@@ -286,8 +378,8 @@ export default function LandingPage() {
                 ))}
               </ul>
               <p className="text-faint border-hairline mt-5 border-t pt-4 text-[0.75rem] leading-relaxed">
-                Those four fields are an allow-list, not a description. A request body carrying any
-                other field is refused before it leaves the browser.
+                Those four fields are an allow-list. A request body carrying any other field is
+                refused before it leaves the browser.
               </p>
             </div>
           </div>
@@ -295,14 +387,21 @@ export default function LandingPage() {
       </section>
 
       {/* ---------- FAQ ---------- */}
-      <section id="faq" className="border-hairline border-t">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
+      <section id="faq" className="border-hairline border-t py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-20">
             <div>
               <p className="eyebrow">Questions</p>
               <h2 className="display text-ink mt-4 text-[1.75rem] sm:text-[2.25rem]">
                 Worth asking first.
               </h2>
+              <p className="text-muted mt-3 text-sm">
+                Have questions about the cryptographic model or network tools? Check our full{" "}
+                <Link href="/faq" className="text-signal hover:underline">
+                  technical FAQ
+                </Link>
+                .
+              </p>
             </div>
 
             <div className="border-hairline border-t">
@@ -355,24 +454,26 @@ export default function LandingPage() {
       </section>
 
       {/* ---------- Closing ---------- */}
-      <section className="border-hairline border-t">
-        <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8">
-          <div className="cyber-card panel bg-graphite/70 backdrop-blur-md relative flex flex-col items-start gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between border-hairline hover:border-signal/40 shadow-[0_16px_40px_rgba(0,0,0,0.5)]">
+      <section className="border-hairline border-t py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
+          <div className="cyber-card panel bg-panel/70 backdrop-blur-md relative flex flex-col items-start gap-8 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between border border-hairline hover:border-signal/40 shadow-sm rounded-xl">
             <div>
               <h2 className="display text-ink text-[1.5rem] sm:text-[1.875rem]">
-                Ready when you are.
+                Ready to get started?
               </h2>
               <p className="text-muted mt-3 max-w-[48ch] text-sm leading-relaxed">
-                Creating the key takes a moment. Set aside a couple of minutes for the backup step —
-                that is the one worth doing carefully.
+                Generate your Ed25519 agent identity in seconds, or explore the live network observatory.
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-wrap gap-3">
               <Link href="/onboarding/identity" className={buttonClasses("primary", "lg")}>
-                Create identity
+                Create Identity →
               </Link>
-              <Link href="/agent" className={buttonClasses("ghost", "lg")}>
-                View agent activity
+              <Link href="/observatory" className={buttonClasses("secondary", "lg")}>
+                Observatory
+              </Link>
+              <Link href="/testkit" className={buttonClasses("ghost", "lg")}>
+                TCLK TestKit
               </Link>
             </div>
           </div>
