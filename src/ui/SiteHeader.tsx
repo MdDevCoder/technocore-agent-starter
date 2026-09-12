@@ -16,6 +16,7 @@ import { ThemeToggle } from "./ThemeToggle.tsx";
 
 const LINKS = [
   { href: "/workspace", label: "Workspace" },
+  { href: "/readiness", label: "Readiness" },
   { href: "/health", label: "Health" },
   { href: "/start", label: "Builder" },
   { href: "/trace", label: "Trace" },

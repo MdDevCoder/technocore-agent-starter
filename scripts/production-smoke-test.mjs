@@ -66,6 +66,7 @@ const ROUTES_TO_TEST = [
   { path: "/start", type: "html", name: "First Agent Builder" },
   { path: "/trace", type: "html", name: "Agent Trace Studio" },
   { path: "/workspace", type: "html", name: "Agent Workspace" },
+  { path: "/readiness", type: "html", name: "Agent Readiness Flow" },
   { path: "/health", type: "html", name: "Agent Health Monitor" },
   { path: "/faq", type: "html", name: "FAQ" },
   { path: "/privacy", type: "html", name: "Privacy Policy" },

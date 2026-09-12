@@ -37,8 +37,17 @@ const TOOLCHAIN = [
     summary: "Evidence-driven runtime health & diagnostic console",
     detail: "Factual runtime diagnostic evaluating real signals across Identity, Backup, Network, Signing, Protocol, Observatory, Trace, Workspace, and Project with zero fake scores.",
     href: "/health",
-    badge: "New · Diagnostic",
+    badge: "Tool · Diagnostic",
     action: "Check Health →",
+  },
+  {
+    step: "00",
+    title: "Agent Readiness Flow",
+    summary: "7-stage evidence-driven readiness checklist & certification",
+    detail: "Step-by-step developer readiness checklist certifying Identity, Backup, Network, Dry-Run, TCLK, Observatory, and Trace with actionable blocker diagnostics.",
+    href: "/readiness",
+    badge: "New · Checklist",
+    action: "Verify Readiness →",
   },
   {
     step: "01",
