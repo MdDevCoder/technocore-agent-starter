@@ -129,9 +129,9 @@ export function AgentHealthView() {
                 overall === "HEALTHY"
                   ? "bg-signal shadow-[0_0_12px_var(--color-signal)]"
                   : overall === "ATTENTION"
-                  ? "bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.5)]"
+                  ? "bg-attention shadow-[0_0_12px_var(--color-attention)]"
                   : overall === "DEGRADED"
-                  ? "bg-fault shadow-[0_0_12px_rgba(239,68,68,0.5)]"
+                  ? "bg-fault shadow-[0_0_12px_var(--color-fault)]"
                   : "bg-muted"
               }`}
             />
@@ -153,7 +153,7 @@ export function AgentHealthView() {
               <div className="text-xs font-mono text-ink mt-0.5">
                 <span className="text-signal font-semibold">{healthyCount} healthy</span>
                 {" · "}
-                <span className={attentionCount > 0 ? "text-amber-400 font-semibold" : "text-muted"}>
+                <span className={attentionCount > 0 ? "text-attention font-semibold" : "text-muted"}>
                   {attentionCount} attention
                 </span>
                 {" · "}
@@ -189,8 +189,8 @@ export function AgentHealthView() {
 
       {/* 2. Actionable Remediation Panel (Visible if attention or failure exists) */}
       {attentionItems.length > 0 && (
-        <section className="border-amber-500/30 bg-amber-500/5 rounded-xl border p-5 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2 text-amber-400 font-semibold text-sm">
+        <section className="border-attention/30 bg-panel rounded-xl border p-5 sm:p-6 space-y-4 shadow-xs">
+          <div className="flex items-center gap-2 text-attention font-bold text-sm">
             <span>⚠</span>
             <span>Recommended Actions ({attentionItems.length})</span>
           </div>
@@ -202,11 +202,11 @@ export function AgentHealthView() {
             {attentionItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-panel border-hairline rounded-lg border p-4 flex flex-col justify-between gap-3 shadow-xs"
+                className="bg-panel-high border-hairline hover:border-attention/40 rounded-lg border p-4 flex flex-col justify-between gap-3 shadow-xs transition-colors"
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="mono text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                    <span className="mono text-[10px] font-bold text-attention uppercase tracking-wider">
                       {item.category}
                     </span>
                     <span className="mono text-[11px] text-muted">{item.statusLabel}</span>
@@ -225,7 +225,7 @@ export function AgentHealthView() {
                   <div className="pt-2 border-t border-hairline/60 flex justify-end">
                     <Link
                       href={item.remediation.actionHref}
-                      className="text-signal hover:underline mono text-xs font-medium inline-flex items-center gap-1"
+                      className="text-signal hover:underline mono text-xs font-semibold inline-flex items-center gap-1"
                     >
                       {item.remediation.actionLabel || "Resolve Issue →"}
                     </Link>
@@ -359,7 +359,7 @@ function HealthCard({ item, isExpanded, onToggle }: HealthCardProps) {
     item.status === "HEALTHY"
       ? "text-signal bg-signal/10 border-signal/20"
       : item.status === "ATTENTION"
-      ? "text-amber-400 bg-amber-400/10 border-amber-400/20"
+      ? "text-attention bg-attention/10 border-attention/20"
       : item.status === "FAILED"
       ? "text-fault bg-fault/10 border-fault/20"
       : "text-muted bg-panel border-hairline";
@@ -368,9 +368,9 @@ function HealthCard({ item, isExpanded, onToggle }: HealthCardProps) {
     item.status === "HEALTHY"
       ? "bg-signal shadow-[0_0_8px_var(--color-signal)]"
       : item.status === "ATTENTION"
-      ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+      ? "bg-attention shadow-[0_0_8px_var(--color-attention)]"
       : item.status === "FAILED"
-      ? "bg-fault shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+      ? "bg-fault shadow-[0_0_8px_var(--color-fault)]"
       : "bg-muted";
 
   return (

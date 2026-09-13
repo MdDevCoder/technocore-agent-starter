@@ -315,17 +315,17 @@ export const ContributionCenterView: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 mono">
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wide uppercase bg-signal/10 text-signal border border-signal/20 mono">
                 EVIDENCE-DRIVEN WORKFLOW
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-sky-500/15 text-sky-700 dark:text-sky-400 border border-sky-500/30 mono">
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wide uppercase bg-panel text-muted border border-hairline mono">
                 READ-ONLY GET FETCH
               </span>
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase bg-panel-high text-muted border border-hairline mono">
+              <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wide uppercase bg-panel text-muted border border-hairline mono">
                 ZERO BROWSER CUSTODY
               </span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-ink">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-ink display">
               Technocore Contribution Center
             </h1>
             <p className="text-muted text-sm md:text-base max-w-3xl leading-relaxed">
@@ -356,7 +356,7 @@ export const ContributionCenterView: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setShowClearModal(true)}
-                  className="px-3 py-2 rounded-lg bg-panel border border-rose-500/30 text-rose-600 dark:text-rose-400 font-semibold text-xs hover:bg-rose-500/10 transition-colors mono"
+                  className="px-3 py-2 rounded-lg bg-panel border border-fault/30 text-fault font-semibold text-xs hover:bg-fault/10 transition-colors mono"
                 >
                   Clear All
                 </button>
@@ -366,23 +366,41 @@ export const ContributionCenterView: React.FC = () => {
         </div>
 
         {/* Web Read-Only Boundary Visual Banner */}
-        <div className="p-3.5 rounded-xl border border-sky-500/30 bg-sky-500/10 text-xs flex items-start gap-3">
-          <span className="text-base leading-none">🛡️</span>
-          <div className="space-y-0.5">
-            <span className="font-bold uppercase tracking-wider mono text-[11px] block text-sky-900 dark:text-sky-200">
-              Web Read-Only Security Boundary
-            </span>
-            <p className="text-[12px] text-sky-800 dark:text-sky-100 leading-relaxed">
+        <div className="p-4 rounded-xl border border-hairline bg-panel shadow-xs flex items-start gap-3.5 transition-all hover:border-signal/30">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className="text-signal mt-0.5 size-5 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.3"
+          >
+            <rect x="3" y="7" width="10" height="7" rx="1.5" />
+            <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" strokeLinecap="round" />
+          </svg>
+          <div className="space-y-1 text-xs leading-relaxed">
+            <div className="flex items-center gap-2">
+              <span className="font-bold uppercase tracking-wider mono text-[11px] text-ink">
+                Web Read-Only Security Boundary
+              </span>
+              <span className="mono text-[10px] px-1.5 py-0.5 rounded bg-signal/10 text-signal border border-signal/20 font-semibold">
+                ZERO-CUSTODY
+              </span>
+            </div>
+            <p className="text-muted text-[12px] leading-relaxed">
               The web Contribution Center is strictly read-only and does not submit or sign contributions from the browser. It validates public artifacts, explains the local CLI workflow, retrieves public records via GET, and verifies signatures locally using WebCrypto.
             </p>
           </div>
         </div>
 
         {/* Retention Warning Notice */}
-        <div className="p-3 rounded-lg border border-hairline bg-panel text-[11px] text-muted flex items-center justify-between gap-4">
-          <span className="mono">
-            ⚠️ <strong>Retention Limit:</strong> Technocore room records may leave the live retained window as newer traffic advances. Preserve evidence when the record is available.
-          </span>
+        <div className="p-3.5 rounded-lg border border-hairline bg-panel text-xs text-muted flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="text-attention font-bold">⚠</span>
+            <span className="mono text-[11px]">
+              <strong className="text-ink">Retention Limit:</strong> Technocore room records may leave the live retained window as newer traffic advances. Preserve evidence when the record is available.
+            </span>
+          </div>
           <Link href="/evidence" className="text-signal font-semibold hover:underline shrink-0 mono text-[11px]">
             Evidence Vault →
           </Link>
@@ -391,25 +409,25 @@ export const ContributionCenterView: React.FC = () => {
 
       {/* 2. Summary Metric Cards */}
       <section className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-sm">
+        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-xs">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono">TOTAL</span>
           <p className="text-2xl font-black text-ink mono">{stats.totalContributions}</p>
         </div>
-        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-sm">
+        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-xs">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono">VERIFIED</span>
-          <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mono">{stats.verifiedContributions}</p>
+          <p className="text-2xl font-black text-verified mono">{stats.verifiedContributions}</p>
         </div>
-        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-sm">
+        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-xs">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono">PRESERVED</span>
-          <p className="text-2xl font-black text-sky-600 dark:text-sky-400 mono">{stats.preservedContributions}</p>
+          <p className="text-2xl font-black text-signal mono">{stats.preservedContributions}</p>
         </div>
-        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-sm">
+        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-xs">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono">COMPLETE</span>
-          <p className="text-2xl font-black text-purple-600 dark:text-purple-400 mono">{stats.completeContributions}</p>
+          <p className="text-2xl font-black text-ink mono">{stats.completeContributions}</p>
         </div>
-        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-sm col-span-2 sm:col-span-1">
+        <div className="p-4 rounded-xl border border-hairline bg-panel space-y-1 shadow-xs col-span-2 sm:col-span-1">
           <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono">PENDING</span>
-          <p className="text-2xl font-black text-amber-600 dark:text-amber-400 mono">{stats.pendingContributions}</p>
+          <p className="text-2xl font-black text-attention mono">{stats.pendingContributions}</p>
         </div>
       </section>
 
@@ -418,10 +436,10 @@ export const ContributionCenterView: React.FC = () => {
         <div
           className={`p-3 rounded-xl border text-xs mono flex items-center justify-between ${
             operationMsg.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
+              ? "bg-verified/10 border-verified/30 text-verified"
               : operationMsg.type === "error"
-              ? "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300"
-              : "bg-sky-500/10 border-sky-500/30 text-sky-700 dark:text-sky-300"
+              ? "bg-fault/10 border-fault/30 text-fault"
+              : "bg-signal/10 border-signal/30 text-signal"
           }`}
         >
           <span>{operationMsg.text}</span>
@@ -432,7 +450,7 @@ export const ContributionCenterView: React.FC = () => {
       )}
 
       {/* 3. Stepper Visualization (when a contribution or draft is active) */}
-      <section className="p-4 rounded-xl border border-hairline bg-panel space-y-3 shadow-sm">
+      <section className="p-4 rounded-xl border border-hairline bg-panel space-y-3 shadow-xs">
         <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono block">
           7-STAGE CONTRIBUTION LIFECYCLE
         </span>
@@ -471,10 +489,10 @@ export const ContributionCenterView: React.FC = () => {
                 key={step.id}
                 className={`p-2.5 rounded-lg border transition-colors ${
                   isDone
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 font-bold"
+                    ? "bg-verified/10 border-verified/30 text-verified font-bold"
                     : isActive
-                    ? "bg-signal/10 border-signal text-signal font-bold shadow-sm"
-                    : "bg-void border-hairline text-muted opacity-70"
+                    ? "bg-signal/10 border-signal text-signal font-bold shadow-xs"
+                    : "bg-void border-hairline text-muted opacity-80"
                 }`}
               >
                 <div className="flex items-center justify-between">

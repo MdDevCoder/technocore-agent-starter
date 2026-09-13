@@ -131,6 +131,12 @@ const NAV_GROUPS: readonly NavGroup[] = [
   },
 ];
 
+function isPathActive(pathname: string | null, href: string): boolean {
+  if (!pathname) return false;
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(href + "/");
+}
+
 export function SiteHeader() {
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -200,7 +206,8 @@ export function SiteHeader() {
         <div ref={navRef} className="hidden lg:flex items-center gap-1.5 xl:gap-2">
           {NAV_GROUPS.map((group) => {
             const isOpen = openDropdown === group.id;
-            const isGroupActive = group.items.some((item) => pathname?.startsWith(item.href));
+            const activeItem = group.items.find((item) => isPathActive(pathname, item.href));
+            const isGroupActive = Boolean(activeItem);
 
             return (
               <div
@@ -215,14 +222,26 @@ export function SiteHeader() {
                   aria-expanded={isOpen}
                   aria-haspopup="true"
                   className={`flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium tracking-wide transition-all duration-150 ${
-                    isOpen || isGroupActive
-                      ? "bg-panel text-ink shadow-sm"
-                      : "text-muted hover:text-ink hover:bg-panel/70"
+                    isGroupActive
+                      ? "bg-panel border border-signal/40 text-ink shadow-xs"
+                      : isOpen
+                      ? "bg-panel text-ink shadow-xs border border-hairline"
+                      : "text-muted hover:text-ink hover:bg-panel/70 border border-transparent"
                   }`}
                 >
-                  <span>{group.title}</span>
+                  {activeItem ? (
+                    <span className="flex items-center gap-1.5">
+                      <span className="size-1.5 rounded-full bg-signal shadow-[0_0_6px_var(--color-signal)] shrink-0" />
+                      <span className="text-muted font-normal hidden xl:inline">{group.title.split(" ")[0]}:</span>
+                      <span className="text-signal font-semibold">{activeItem.label}</span>
+                    </span>
+                  ) : (
+                    <span>{group.title}</span>
+                  )}
                   <svg
-                    className={`size-3 text-muted transition-transform duration-200 ${isOpen ? "rotate-180 text-signal" : ""}`}
+                    className={`size-3 transition-transform duration-200 ${
+                      isOpen ? "rotate-180 text-signal" : isGroupActive ? "text-signal" : "text-muted"
+                    }`}
                     viewBox="0 0 12 12"
                     fill="none"
                     stroke="currentColor"
@@ -239,29 +258,46 @@ export function SiteHeader() {
                   <div className="border-hairline bg-void/95 absolute top-full left-0 mt-1.5 w-64 rounded-xl border p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-1 duration-150 z-50">
                     <div className="space-y-0.5">
                       {group.items.map((item) => {
-                        const isActive = pathname === item.href;
+                        const isActive = isPathActive(pathname, item.href);
                         return (
                           <Link
                             key={item.href}
                             href={item.href}
                             className={`group flex flex-col rounded-lg px-3 py-2 transition-all duration-150 ${
                               isActive
-                                ? "bg-panel border border-signal/30 text-ink"
-                                : "text-muted hover:bg-panel/80 hover:text-ink"
+                                ? "bg-panel border border-signal/40 text-ink shadow-xs"
+                                : "text-muted hover:bg-panel/80 hover:text-ink border border-transparent"
                             }`}
                           >
-                            <div className="flex items-center justify-between">
-                              <span className={`text-xs font-medium ${isActive ? "text-signal font-semibold" : "group-hover:text-signal"}`}>
-                                {item.label}
-                              </span>
-                              {item.badge && (
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5">
+                                {isActive && (
+                                  <span className="size-1.5 rounded-full bg-signal shadow-[0_0_6px_var(--color-signal)] shrink-0" />
+                                )}
+                                <span
+                                  className={`text-xs font-medium ${
+                                    isActive ? "text-signal font-bold" : "group-hover:text-signal"
+                                  }`}
+                                >
+                                  {item.label}
+                                </span>
+                              </div>
+                              {isActive ? (
+                                <span className="mono text-[0.625rem] font-bold text-signal bg-signal/15 px-1.5 py-0.5 rounded border border-signal/30">
+                                  CURRENT
+                                </span>
+                              ) : item.badge ? (
                                 <span className="mono text-[0.625rem] font-semibold text-signal bg-signal/10 px-1.5 py-0.5 rounded border border-signal/20">
                                   {item.badge}
                                 </span>
-                              )}
+                              ) : null}
                             </div>
                             {item.description && (
-                              <span className="text-[0.6875rem] text-faint line-clamp-1 mt-0.5 group-hover:text-muted">
+                              <span
+                                className={`text-[0.6875rem] line-clamp-1 mt-0.5 ${
+                                  isActive ? "text-muted" : "text-faint group-hover:text-muted"
+                                }`}
+                              >
                                 {item.description}
                               </span>
                             )}
@@ -281,15 +317,28 @@ export function SiteHeader() {
           {/* Import link (Desktop) */}
           <Link
             href="/import"
-            className="hidden sm:inline-flex text-muted hover:text-ink hover:bg-panel rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors"
+            className={`hidden sm:inline-flex rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors ${
+              isPathActive(pathname, "/import")
+                ? "bg-panel border border-signal/40 text-signal font-semibold shadow-xs"
+                : "text-muted hover:text-ink hover:bg-panel border border-transparent"
+            }`}
           >
+            {isPathActive(pathname, "/import") && (
+              <span className="size-1.5 rounded-full bg-signal shadow-[0_0_6px_var(--color-signal)] mr-1.5 self-center" />
+            )}
             Import
           </Link>
 
           {/* Primary CTA */}
           <Link
             href="/onboarding/identity"
-            className={buttonClasses("primary", "sm", "text-xs sm:text-[0.8125rem] px-2.5 sm:px-3 py-1 sm:py-1.5 shadow-sm")}
+            className={buttonClasses(
+              "primary",
+              "sm",
+              `text-xs sm:text-[0.8125rem] px-2.5 sm:px-3 py-1 sm:py-1.5 shadow-sm ${
+                isPathActive(pathname, "/onboarding") ? "ring-2 ring-signal/60" : ""
+              }`
+            )}
           >
             Create identity
           </Link>
@@ -324,35 +373,55 @@ export function SiteHeader() {
       {mobileMenuOpen && (
         <div className="lg:hidden border-hairline bg-void/98 border-t px-4 py-5 shadow-2xl backdrop-blur-2xl animate-in slide-in-from-top duration-200">
           <div className="max-w-md mx-auto space-y-5">
-            {NAV_GROUPS.map((group) => (
-              <div key={group.id} className="space-y-1.5">
-                <p className="eyebrow px-2 text-[0.6875rem] text-faint">{group.title}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                  {group.items.map((item) => {
-                    const isActive = pathname === item.href;
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center justify-between rounded-lg px-2.5 py-2 transition-colors ${
-                          isActive
-                            ? "bg-panel border border-signal/30 text-signal font-semibold"
-                            : "text-muted hover:bg-panel hover:text-ink"
-                        }`}
-                      >
-                        <span className="text-xs">{item.label}</span>
-                        {item.badge && (
-                          <span className="mono text-[0.625rem] font-semibold text-signal bg-signal/10 px-1.5 py-0.5 rounded border border-signal/20">
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
+            {NAV_GROUPS.map((group) => {
+              const activeItem = group.items.find((item) => isPathActive(pathname, item.href));
+              return (
+                <div key={group.id} className="space-y-1.5">
+                  <div className="flex items-center justify-between px-2">
+                    <p className="eyebrow text-[0.6875rem] text-faint">{group.title}</p>
+                    {activeItem && (
+                      <span className="text-[0.625rem] mono text-signal font-semibold flex items-center gap-1">
+                        <span className="size-1.5 rounded-full bg-signal shadow-[0_0_4px_var(--color-signal)]" />
+                        {activeItem.label}
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                    {group.items.map((item) => {
+                      const isActive = isPathActive(pathname, item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`flex items-center justify-between rounded-lg px-2.5 py-2 transition-colors ${
+                            isActive
+                              ? "bg-panel border border-signal/40 text-signal font-bold shadow-xs"
+                              : "text-muted hover:bg-panel hover:text-ink border border-transparent"
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            {isActive && (
+                              <span className="size-1.5 rounded-full bg-signal shadow-[0_0_6px_var(--color-signal)]" />
+                            )}
+                            <span className="text-xs">{item.label}</span>
+                          </div>
+                          {isActive ? (
+                            <span className="mono text-[0.625rem] font-bold text-signal bg-signal/15 px-1.5 py-0.5 rounded border border-signal/30">
+                              CURRENT
+                            </span>
+                          ) : item.badge ? (
+                            <span className="mono text-[0.625rem] font-semibold text-signal bg-signal/10 px-1.5 py-0.5 rounded border border-signal/20">
+                              {item.badge}
+                            </span>
+                          ) : null}
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* Identity & Actions Group */}
             <div className="space-y-1.5 border-t border-hairline pt-4">
@@ -361,14 +430,18 @@ export function SiteHeader() {
                 <Link
                   href="/import"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="border-hairline bg-panel hover:bg-panel-high text-ink flex items-center justify-center rounded-lg border py-2 text-xs font-medium transition-colors"
+                  className={`border-hairline bg-panel hover:bg-panel-high text-ink flex items-center justify-center rounded-lg border py-2 text-xs font-medium transition-colors ${
+                    isPathActive(pathname, "/import") ? "border-signal/40 text-signal font-bold" : ""
+                  }`}
                 >
                   Import backup
                 </Link>
                 <Link
                   href="/onboarding/identity"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="bg-signal text-void hover:bg-signal-bright flex items-center justify-center rounded-lg py-2 text-xs font-semibold transition-colors"
+                  className={`bg-signal text-void hover:bg-signal-bright flex items-center justify-center rounded-lg py-2 text-xs font-semibold transition-colors ${
+                    isPathActive(pathname, "/onboarding") ? "ring-2 ring-signal/60" : ""
+                  }`}
                 >
                   Create identity
                 </Link>

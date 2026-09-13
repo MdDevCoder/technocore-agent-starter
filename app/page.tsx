@@ -248,7 +248,7 @@ export default function LandingPage() {
                 Import Existing Agent
               </Link>
               <span>·</span>
-              <Link href="/demo" className="text-purple-700 dark:text-purple-300 hover:underline font-mono">
+              <Link href="/demo" className="text-signal hover:underline font-mono">
                 Guided Demo Tour
               </Link>
             </div>
