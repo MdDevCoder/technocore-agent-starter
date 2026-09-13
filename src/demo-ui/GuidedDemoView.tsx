@@ -431,58 +431,60 @@ export const GuidedDemoView: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-hairline">
-                    {/* Language Selector */}
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted mono block">
-                        2. Target Language:
-                      </span>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleStage1SelectLanguage("TYPESCRIPT")}
-                          className={`flex-1 py-1.5 px-3 rounded-lg border text-center transition-all mono text-xs ${
-                            stage1Language === "TYPESCRIPT"
-                              ? "border-signal bg-signal/15 text-signal font-bold"
-                              : "border-hairline bg-panel text-muted hover:text-ink"
-                          }`}
-                        >
-                          TypeScript
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleStage1SelectLanguage("PYTHON")}
-                          className={`flex-1 py-1.5 px-3 rounded-lg border text-center transition-all mono text-xs ${
-                            stage1Language === "PYTHON"
-                              ? "border-signal bg-signal/15 text-signal font-bold"
-                              : "border-hairline bg-panel text-muted hover:text-ink"
-                          }`}
-                        >
-                          Python
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Room Target Selector */}
-                    <div className="space-y-1">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-muted mono block">
-                        3. Target Room:
-                      </span>
-                      <div className="flex gap-1.5">
-                        {["tclk-offers", "events", "lobby", "technocore"].map((r) => (
+                  <div className="space-y-3 pt-2 border-t border-hairline">
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                      {/* Language Selector */}
+                      <div className="sm:col-span-4 space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted mono block">
+                          2. Target Language:
+                        </span>
+                        <div className="grid grid-cols-2 gap-1.5">
                           <button
-                            key={r}
                             type="button"
-                            onClick={() => setStage1Room(r)}
-                            className={`px-2 py-1.5 rounded-lg border text-center transition-all mono text-[11px] ${
-                              stage1Room === r
-                                ? "border-signal bg-signal/15 text-signal font-bold"
+                            onClick={() => handleStage1SelectLanguage("TYPESCRIPT")}
+                            className={`py-1.5 px-2 rounded-lg border text-center transition-all mono text-xs whitespace-nowrap ${
+                              stage1Language === "TYPESCRIPT"
+                                ? "border-signal bg-signal/15 text-signal font-bold shadow-sm"
                                 : "border-hairline bg-panel text-muted hover:text-ink"
                             }`}
                           >
-                            /r/{r}
+                            TypeScript
                           </button>
-                        ))}
+                          <button
+                            type="button"
+                            onClick={() => handleStage1SelectLanguage("PYTHON")}
+                            className={`py-1.5 px-2 rounded-lg border text-center transition-all mono text-xs whitespace-nowrap ${
+                              stage1Language === "PYTHON"
+                                ? "border-signal bg-signal/15 text-signal font-bold shadow-sm"
+                                : "border-hairline bg-panel text-muted hover:text-ink"
+                            }`}
+                          >
+                            Python
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Room Target Selector */}
+                      <div className="sm:col-span-8 space-y-1">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted mono block">
+                          3. Target Room:
+                        </span>
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                          {["tclk-offers", "events", "lobby", "technocore"].map((r) => (
+                            <button
+                              key={r}
+                              type="button"
+                              onClick={() => setStage1Room(r)}
+                              className={`px-1.5 py-1.5 rounded-lg border text-center transition-all mono text-[11px] whitespace-nowrap ${
+                                stage1Room === r
+                                  ? "border-signal bg-signal/15 text-signal font-bold shadow-sm"
+                                  : "border-hairline bg-panel text-muted hover:text-ink"
+                              }`}
+                            >
+                              /r/{r}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -672,16 +674,16 @@ export const GuidedDemoView: React.FC = () => {
                 </div>
 
                 {/* Simulation Parameter Controls */}
-                <div className="grid grid-cols-3 gap-2 p-3 rounded-lg bg-surface border border-hairline text-xs mono">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 p-3 rounded-lg bg-surface border border-hairline text-xs mono">
                   <div>
                     <span className="text-faint text-[9px] uppercase block">Trade Asset:</span>
-                    <div className="flex gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1 mt-1">
                       {["FLOP", "COMPUTE", "DATA"].map((a) => (
                         <button
                           key={a}
                           type="button"
                           onClick={() => setStage3Asset(a)}
-                          className={`px-1.5 py-0.5 rounded border text-[10px] ${
+                          className={`px-2 py-0.5 rounded border text-[10px] whitespace-nowrap ${
                             stage3Asset === a ? "border-signal bg-signal/15 text-signal font-bold" : "border-hairline bg-panel text-muted"
                           }`}
                         >
@@ -692,13 +694,13 @@ export const GuidedDemoView: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-faint text-[9px] uppercase block">Amount:</span>
-                    <div className="flex gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1 mt-1">
                       {["250", "500", "1000"].map((amt) => (
                         <button
                           key={amt}
                           type="button"
                           onClick={() => setStage3Amount(amt)}
-                          className={`px-1.5 py-0.5 rounded border text-[10px] ${
+                          className={`px-2 py-0.5 rounded border text-[10px] whitespace-nowrap ${
                             stage3Amount === amt ? "border-signal bg-signal/15 text-signal font-bold" : "border-hairline bg-panel text-muted"
                           }`}
                         >
@@ -709,13 +711,13 @@ export const GuidedDemoView: React.FC = () => {
                   </div>
                   <div>
                     <span className="text-faint text-[9px] uppercase block">Settlement Rail:</span>
-                    <div className="flex gap-1 mt-1">
+                    <div className="flex flex-wrap gap-1 mt-1">
                       {["flop-htlc", "paper"].map((rail) => (
                         <button
                           key={rail}
                           type="button"
                           onClick={() => setStage3Rail(rail)}
-                          className={`px-1.5 py-0.5 rounded border text-[10px] ${
+                          className={`px-2 py-0.5 rounded border text-[10px] whitespace-nowrap ${
                             stage3Rail === rail ? "border-signal bg-signal/15 text-signal font-bold" : "border-hairline bg-panel text-muted"
                           }`}
                         >
@@ -859,7 +861,7 @@ export const GuidedDemoView: React.FC = () => {
                   <span className="text-[10px] font-bold uppercase tracking-wider text-muted mono block">
                     Execution Environment & CLI Tool:
                   </span>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     {[
                       { id: "python", label: "Python CLI (flop_agent.py)", cmd: "python3 flop_agent.py contribute" },
                       { id: "node", label: "TypeScript / Node.js CLI", cmd: "npm run contribute" },
@@ -869,7 +871,7 @@ export const GuidedDemoView: React.FC = () => {
                         key={envItem.id}
                         type="button"
                         onClick={() => setStage6Env(envItem.id as "python" | "node" | "curl")}
-                        className={`flex-1 p-2 rounded-lg border text-center transition-all mono text-xs ${
+                        className={`p-2 rounded-lg border text-center transition-all mono text-xs whitespace-nowrap ${
                           stage6Env === envItem.id
                             ? "border-signal bg-signal/15 text-signal font-bold"
                             : "border-hairline bg-void text-muted hover:text-ink"
