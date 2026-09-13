@@ -51,6 +51,12 @@ export default function TclkTestKitContributionPage() {
             GitHub Repo ↗
           </a>
           <Link
+            href="/contributions"
+            className="px-4 py-2.5 rounded-lg bg-panel border border-signal/40 text-signal font-semibold text-sm hover:bg-signal/5 transition-colors mono"
+          >
+            Manage in Contribution Center →
+          </Link>
+          <Link
             href="/doctor"
             className="px-4 py-2.5 rounded-lg bg-panel border border-hairline text-ink font-semibold text-sm hover:border-hairline-bright transition-colors mono"
           >

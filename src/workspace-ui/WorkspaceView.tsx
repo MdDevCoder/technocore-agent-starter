@@ -29,6 +29,8 @@ import { buttonClasses } from "../ui/buttonStyles.ts";
 import { loadAllActivities } from "../activity/storage.ts";
 import { recordWorkspaceAction } from "../activity/recorder.ts";
 import type { AgentActivityEventV1 } from "../activity/types.ts";
+import { loadAllContributions } from "../contributions/storage.ts";
+import type { ContributionItemV1 } from "../contributions/types.ts";
 
 const PUBLIC_ROOMS = [
   "events",
@@ -129,18 +131,21 @@ export const WorkspaceView: React.FC = () => {
   }, [workspace.project.publicDid]);
 
   const [recentActivities, setRecentActivities] = useState<AgentActivityEventV1[]>([]);
+  const [recentContributions, setRecentContributions] = useState<ContributionItemV1[]>([]);
 
-  // Load latest activities
-  const refreshRecentActivities = useCallback(() => {
-    const list = loadAllActivities();
-    setRecentActivities(list.slice(0, 5));
+  // Load latest activities and contributions
+  const refreshRecentData = useCallback(() => {
+    const actList = loadAllActivities();
+    setRecentActivities(actList.slice(0, 5));
+    const contribList = loadAllContributions();
+    setRecentContributions(contribList.slice(0, 3));
   }, []);
 
   useEffect(() => {
-    refreshRecentActivities();
+    refreshRecentData();
 
     const handleUpdate = () => {
-      refreshRecentActivities();
+      refreshRecentData();
     };
 
     window.addEventListener("technocore:activity:updated", handleUpdate);
@@ -149,7 +154,7 @@ export const WorkspaceView: React.FC = () => {
       window.removeEventListener("technocore:activity:updated", handleUpdate);
       window.removeEventListener("storage", handleUpdate);
     };
-  }, [refreshRecentActivities]);
+  }, [refreshRecentData]);
 
   // Save Project Settings
   const handleSaveProject = useCallback(
@@ -998,8 +1003,89 @@ export const WorkspaceView: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Activity Timeline & Safe Storage */}
+        {/* Right Column: Contributions, Activity Timeline & Safe Storage */}
         <div className="space-y-8 lg:col-span-5">
+          {/* Card: Recent Contributions */}
+          <div className="border-hairline bg-panel rounded-xl border p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-ink text-base font-bold tracking-tight">
+                  Contributions
+                </h2>
+                <p className="text-muted text-xs leading-relaxed mt-0.5">
+                  Track, verify, and preserve your Technocore contributions.
+                </p>
+              </div>
+              <Link
+                href="/contributions"
+                className="mono text-xs font-semibold text-signal hover:underline shrink-0"
+              >
+                Open Center →
+              </Link>
+            </div>
+
+            {recentContributions.length === 0 ? (
+              <div className="p-4 rounded-lg border border-dashed border-hairline bg-void/40 text-center space-y-2 text-xs text-muted">
+                <p>No contributions recorded yet.</p>
+                <Link href="/contributions" className="text-signal hover:underline block font-mono text-[11px]">
+                  Start First Contribution →
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {recentContributions.map((contrib) => (
+                  <div
+                    key={contrib.id}
+                    className="border-hairline bg-surface hover:border-signal/30 rounded-lg border p-3 transition-colors text-xs space-y-1.5"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <h4 className="font-bold text-ink truncate text-xs">{contrib.topic}</h4>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase mono ${
+                          contrib.status === "COMPLETE"
+                            ? "bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30"
+                            : contrib.status === "CRYPTOGRAPHICALLY_VERIFIED"
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                            : "bg-panel-high text-muted border border-hairline"
+                        }`}
+                      >
+                        {contrib.status.replace(/_/g, " ")}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] mono text-muted pt-1 border-t border-hairline/40">
+                      <div className="flex items-center gap-2">
+                        {contrib.isVerified ? (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Verified</span>
+                        ) : (
+                          <span className="text-muted">Unverified</span>
+                        )}
+                        {contrib.isEvidencePreserved && (
+                          <span className="text-sky-600 dark:text-sky-400 font-semibold">✓ Preserved</span>
+                        )}
+                      </div>
+                      <Link
+                        href="/contributions"
+                        className="text-signal hover:underline font-medium"
+                      >
+                        Manage →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="pt-1 text-center">
+                  <Link
+                    href="/contributions"
+                    className="inline-flex items-center gap-1 text-xs font-mono font-bold text-signal hover:underline"
+                  >
+                    <span>Open Contribution Center →</span>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Card: Recent Activity Timeline */}
           <div className="border-hairline bg-panel rounded-xl border p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">

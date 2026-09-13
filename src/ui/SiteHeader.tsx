@@ -54,6 +54,11 @@ const NAV_GROUPS: readonly NavGroup[] = [
         description: "Runtime signals, signing & network health",
       },
       {
+        href: "/contributions",
+        label: "Contributions",
+        description: "Publish, record, verify & preserve contributions",
+      },
+      {
         href: "/evidence",
         label: "Evidence Vault",
         description: "Preserve & verify signed contribution proofs",

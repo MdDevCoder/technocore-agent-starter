@@ -134,6 +134,16 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/contributions" className="text-muted hover:text-ink transition-colors">
+                    Contributions
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/evidence" className="text-muted hover:text-ink transition-colors">
+                    Evidence Vault
+                  </Link>
+                </li>
+                <li>
                   <Link href="/activity" className="text-muted hover:text-ink transition-colors">
                     Activity history
                   </Link>
