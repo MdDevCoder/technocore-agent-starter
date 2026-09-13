@@ -141,20 +141,20 @@ export function AgentReadinessView() {
       {/* Header & Breadcrumbs */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
-          <nav aria-label="Breadcrumb" className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">
-            <Link href="/" className="hover:text-slate-900 dark:hover:text-slate-100">
+          <nav aria-label="Breadcrumb" className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
+            <Link href="/" className="hover:text-slate-900 dark:hover:text-white">
               Home
             </Link>{" "}
             /{" "}
-            <Link href="/workspace" className="hover:text-slate-900 dark:hover:text-slate-100">
+            <Link href="/workspace" className="hover:text-slate-900 dark:hover:text-white">
               Workspace
             </Link>{" "}
-            / <span className="text-slate-900 dark:text-slate-100 font-semibold">Readiness</span>
+            / <span className="text-slate-900 dark:text-white font-semibold">Readiness</span>
           </nav>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Agent Readiness Flow
           </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+          <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
             Guided 7-stage evidence-driven verification console certifying your agent is development-ready.
           </p>
         </div>
@@ -218,7 +218,7 @@ export function AgentReadinessView() {
                   {report.overallLabel}
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm opacity-90">
+              <p className="text-xs sm:text-sm opacity-95 text-slate-800 dark:text-slate-100">
                 {report.overall === "READY_FOR_DEVELOPMENT"
                   ? "All 7 stages verified with factual cryptographic and network evidence. Agent is certified for development."
                   : report.overall === "READY_LOCAL_NETWORK_ATTENTION"
@@ -233,11 +233,11 @@ export function AgentReadinessView() {
             <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-current/20 pt-3 md:pt-0 md:pl-6 shrink-0">
               <div>
                 <div className="text-2xl font-bold">{report.readyCount} / {report.totalStages}</div>
-                <div className="text-xs uppercase tracking-wider font-semibold opacity-75">Stages Ready</div>
+                <div className="text-xs uppercase tracking-wider font-semibold opacity-85">Stages Ready</div>
               </div>
               <div>
                 <div className="text-2xl font-bold">{report.blockers.length}</div>
-                <div className="text-xs uppercase tracking-wider font-semibold opacity-75">Blockers</div>
+                <div className="text-xs uppercase tracking-wider font-semibold opacity-85">Blockers</div>
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@ export function AgentReadinessView() {
               <span className="w-2 h-2 rounded-full bg-rose-500" />
               Actionable Blockers ({report.blockers.length})
             </h2>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs text-slate-600 dark:text-slate-300">
               Resolve these items to achieve full readiness certification
             </span>
           </div>
@@ -273,11 +273,11 @@ export function AgentReadinessView() {
                 </div>
 
                 <div className="space-y-1 text-xs">
-                  <p className="text-slate-700 dark:text-slate-300">
+                  <p className="text-slate-800 dark:text-slate-200">
                     <span className="font-semibold text-rose-800 dark:text-rose-400">Why: </span>
                     {blocker.why}
                   </p>
-                  <p className="text-slate-700 dark:text-slate-300">
+                  <p className="text-slate-800 dark:text-slate-200">
                     <span className="font-semibold text-rose-800 dark:text-rose-400">What to do: </span>
                     {blocker.whatToDo}
                   </p>
@@ -354,7 +354,7 @@ export function AgentReadinessView() {
                           {stage.isLocalStage ? "Local" : "Network"}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400">
+                      <p className="text-xs text-slate-700 dark:text-slate-300">
                         {stage.summary}
                       </p>
                     </div>
@@ -365,7 +365,7 @@ export function AgentReadinessView() {
                     <button
                       type="button"
                       onClick={() => toggleEvidence(stage.id)}
-                      className="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors"
+                      className="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition-colors"
                     >
                       {isExpanded ? "Hide Evidence ▲" : "View Evidence ▼"}
                     </button>
@@ -384,7 +384,7 @@ export function AgentReadinessView() {
                 {/* Evidence Accordion Panel */}
                 {isExpanded && (
                   <div className="border-t border-slate-200 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-950/40 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
                       <span className="font-semibold uppercase tracking-wider">Factual Evidence Log</span>
                       <span>Checked: {stage.lastChecked}</span>
                     </div>
@@ -417,7 +417,7 @@ export function AgentReadinessView() {
               <span className="w-2 h-2 rounded-full bg-amber-500" />
               Observed Network Anomalies ({report.findings.length})
             </h2>
-            <span className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-xs text-slate-600 dark:text-slate-300">
               Trace stage is READY; anomalous events surfaced for inspection
             </span>
           </div>
@@ -436,15 +436,15 @@ export function AgentReadinessView() {
                     {finding.severity}
                   </span>
                 </div>
-                <p className="text-slate-700 dark:text-slate-300">
+                <p className="text-slate-800 dark:text-slate-200">
                   <span className="font-semibold">What: </span>
                   {finding.what}
                 </p>
-                <p className="text-slate-700 dark:text-slate-300">
+                <p className="text-slate-800 dark:text-slate-200">
                   <span className="font-semibold">Why: </span>
                   {finding.why}
                 </p>
-                <p className="text-slate-700 dark:text-slate-300">
+                <p className="text-slate-800 dark:text-slate-200">
                   <span className="font-semibold">Impact: </span>
                   {finding.impact}
                 </p>
@@ -455,7 +455,7 @@ export function AgentReadinessView() {
       )}
 
       {/* Safe Context & Security Guarantee Footer */}
-      <section className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-xs text-slate-600 dark:text-slate-400 space-y-2">
+      <section className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-xs text-slate-700 dark:text-slate-300 space-y-2">
         <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
           <span>🔒</span> Security & Zero-Secret Guarantee
         </h3>

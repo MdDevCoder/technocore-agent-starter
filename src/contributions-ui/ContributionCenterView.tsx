@@ -365,13 +365,13 @@ export const ContributionCenterView: React.FC = () => {
         </div>
 
         {/* Web Read-Only Boundary Visual Banner */}
-        <div className="p-3.5 rounded-xl border border-sky-500/30 bg-sky-500/10 text-xs text-sky-950 dark:text-sky-100 flex items-start gap-3">
+        <div className="p-3.5 rounded-xl border border-sky-500/30 bg-sky-500/10 text-xs flex items-start gap-3">
           <span className="text-base leading-none">🛡️</span>
           <div className="space-y-0.5">
-            <span className="font-bold uppercase tracking-wider mono text-[11px] block">
+            <span className="font-bold uppercase tracking-wider mono text-[11px] block text-sky-900 dark:text-sky-200">
               Web Read-Only Security Boundary
             </span>
-            <p className="text-[12px] opacity-90 leading-relaxed">
+            <p className="text-[12px] text-sky-800 dark:text-sky-100 leading-relaxed">
               The web Contribution Center is strictly read-only and does not submit or sign contributions from the browser. It validates public artifacts, explains the local CLI workflow, retrieves public records via GET, and verifies signatures locally using WebCrypto.
             </p>
           </div>
