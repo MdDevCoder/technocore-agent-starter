@@ -6,6 +6,8 @@
  * Provides a guided, evidence-driven checklist that certifies an agent's
  * development readiness across 7 stages with zero fake scores, zero secret leaks,
  * factual blocker diagnostics, safe resume/reset support, and direct tool handoffs.
+ *
+ * Fully unified with platform design system: Light Mode = DEFAULT, Dark Mode = PARITY.
  */
 
 import { useState, useEffect, useCallback } from "react";
@@ -100,36 +102,36 @@ export function AgentReadinessView() {
     switch (status) {
       case "READY":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold mono bg-verified/10 text-verified border border-verified/30">
+            <span className="size-1.5 rounded-full bg-verified" />
             READY
           </span>
         );
       case "ATTENTION":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-600 dark:bg-amber-400 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold mono bg-attention/10 text-attention border border-attention/30">
+            <span className="size-1.5 rounded-full bg-attention animate-pulse" />
             ATTENTION
           </span>
         );
       case "FAILED":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 dark:bg-rose-950/80 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-600 dark:bg-rose-400" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold mono bg-fault/10 text-fault border border-fault/30">
+            <span className="size-1.5 rounded-full bg-fault" />
             FAILED
           </span>
         );
       case "IN_PROGRESS":
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-950/80 text-blue-800 dark:text-blue-300 border border-blue-300 dark:border-blue-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-spin" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold mono bg-signal/10 text-signal border border-signal/30">
+            <span className="size-1.5 rounded-full bg-signal animate-spin" />
             IN PROGRESS
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold mono bg-panel text-muted border border-hairline">
+            <span className="size-1.5 rounded-full bg-faint" />
             NOT STARTED
           </span>
         );
@@ -137,24 +139,33 @@ export function AgentReadinessView() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8 bg-void text-ink min-h-screen">
       {/* Header & Breadcrumbs */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-hairline pb-6">
         <div>
-          <nav aria-label="Breadcrumb" className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-2">
-            <Link href="/" className="hover:text-slate-900 dark:hover:text-white">
+          <nav aria-label="Breadcrumb" className="mono text-xs text-muted mb-2 flex items-center gap-1.5">
+            <Link href="/" className="hover:text-ink transition-colors">
               Home
-            </Link>{" "}
-            /{" "}
-            <Link href="/workspace" className="hover:text-slate-900 dark:hover:text-white">
+            </Link>
+            <span className="text-faint">/</span>
+            <Link href="/workspace" className="hover:text-ink transition-colors">
               Workspace
-            </Link>{" "}
-            / <span className="text-slate-900 dark:text-white font-semibold">Readiness</span>
+            </Link>
+            <span className="text-faint">/</span>
+            <span className="text-signal font-semibold">Readiness</span>
           </nav>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+            <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wide uppercase bg-signal/10 text-signal border border-signal/20 mono">
+              7-STAGE VERIFICATION
+            </span>
+            <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wide uppercase bg-panel text-muted border border-hairline mono">
+              ZERO FAKE SCORES
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-ink display">
             Agent Readiness Flow
           </h1>
-          <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
+          <p className="text-sm text-muted mt-1 max-w-2xl leading-relaxed">
             Guided 7-stage evidence-driven verification console certifying your agent is development-ready.
           </p>
         </div>
@@ -165,21 +176,21 @@ export function AgentReadinessView() {
             type="button"
             onClick={() => void runEvaluation()}
             disabled={isRunning}
-            className={buttonClasses("primary", "sm")}
+            className={buttonClasses("primary", "sm", "mono text-xs")}
           >
             {isRunning ? "Evaluating..." : "↻ Run Readiness Check"}
           </button>
           <button
             type="button"
             onClick={() => void handleCopyLink()}
-            className={buttonClasses("secondary", "sm")}
+            className={buttonClasses("secondary", "sm", "mono text-xs")}
           >
             {copiedLink ? "✓ Link Copied" : "Copy Share Link"}
           </button>
           <button
             type="button"
             onClick={() => setShowResetModal(true)}
-            className={buttonClasses("secondary", "sm")}
+            className={buttonClasses("secondary", "sm", "mono text-xs")}
           >
             Reset Flow
           </button>
@@ -190,35 +201,35 @@ export function AgentReadinessView() {
       {report && (
         <section
           aria-live="polite"
-          className={`p-6 rounded-2xl border transition-all ${
+          className={`p-6 rounded-2xl border shadow-xs transition-all bg-panel ${
             report.overall === "READY_FOR_DEVELOPMENT"
-              ? "bg-emerald-50/80 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100"
+              ? "border-verified/40 text-ink"
               : report.overall === "READY_LOCAL_NETWORK_ATTENTION"
-                ? "bg-blue-50/80 dark:bg-blue-950/40 border-blue-300 dark:border-blue-800 text-blue-900 dark:text-blue-100"
+                ? "border-signal/40 text-ink"
                 : report.overall === "IN_PROGRESS"
-                  ? "bg-amber-50/80 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-100"
-                  : "bg-rose-50/80 dark:bg-rose-950/40 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-100"
+                  ? "border-attention/40 text-ink"
+                  : "border-fault/40 text-ink"
           }`}
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2.5">
                 <span
-                  className={`w-3 h-3 rounded-full ${
+                  className={`size-3 rounded-full shrink-0 ${
                     report.overall === "READY_FOR_DEVELOPMENT"
-                      ? "bg-emerald-500"
+                      ? "bg-verified shadow-[0_0_8px_var(--color-verified)]"
                       : report.overall === "READY_LOCAL_NETWORK_ATTENTION"
-                        ? "bg-blue-500 animate-pulse"
+                        ? "bg-signal animate-pulse shadow-[0_0_8px_var(--color-signal)]"
                         : report.overall === "IN_PROGRESS"
-                          ? "bg-amber-500"
-                          : "bg-rose-500"
+                          ? "bg-attention shadow-[0_0_8px_var(--color-attention)]"
+                          : "bg-fault shadow-[0_0_8px_var(--color-fault)]"
                   }`}
                 />
-                <h2 className="text-lg sm:text-xl font-bold tracking-tight">
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight text-ink mono">
                   {report.overallLabel}
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm opacity-95 text-slate-800 dark:text-slate-100">
+              <p className="text-xs sm:text-sm text-muted leading-relaxed max-w-2xl">
                 {report.overall === "READY_FOR_DEVELOPMENT"
                   ? "All 7 stages verified with factual cryptographic and network evidence. Agent is certified for development."
                   : report.overall === "READY_LOCAL_NETWORK_ATTENTION"
@@ -230,14 +241,16 @@ export function AgentReadinessView() {
             </div>
 
             {/* Factual Progress Stats (Zero Fake Scores) */}
-            <div className="flex items-center gap-4 border-t md:border-t-0 md:border-l border-current/20 pt-3 md:pt-0 md:pl-6 shrink-0">
-              <div>
-                <div className="text-2xl font-bold">{report.readyCount} / {report.totalStages}</div>
-                <div className="text-xs uppercase tracking-wider font-semibold opacity-85">Stages Ready</div>
+            <div className="flex items-center gap-5 border-t md:border-t-0 md:border-l border-hairline pt-3 md:pt-0 md:pl-6 shrink-0">
+              <div className="space-y-0.5">
+                <div className="text-2xl font-black mono text-ink">{report.readyCount} / {report.totalStages}</div>
+                <div className="text-[10px] uppercase tracking-wider font-semibold mono text-muted">Stages Ready</div>
               </div>
-              <div>
-                <div className="text-2xl font-bold">{report.blockers.length}</div>
-                <div className="text-xs uppercase tracking-wider font-semibold opacity-85">Blockers</div>
+              <div className="space-y-0.5">
+                <div className={`text-2xl font-black mono ${report.blockers.length > 0 ? "text-attention" : "text-verified"}`}>
+                  {report.blockers.length}
+                </div>
+                <div className="text-[10px] uppercase tracking-wider font-semibold mono text-muted">Blockers</div>
               </div>
             </div>
           </div>
@@ -248,11 +261,11 @@ export function AgentReadinessView() {
       {report && report.blockers.length > 0 && (
         <section aria-labelledby="blocker-heading" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 id="blocker-heading" className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
+            <h2 id="blocker-heading" className="text-base font-bold text-ink display flex items-center gap-2">
+              <span className="size-2 rounded-full bg-fault shadow-[0_0_6px_var(--color-fault)]" />
               Actionable Blockers ({report.blockers.length})
             </h2>
-            <span className="text-xs text-slate-600 dark:text-slate-300">
+            <span className="text-xs text-muted mono">
               Resolve these items to achieve full readiness certification
             </span>
           </div>
@@ -261,33 +274,33 @@ export function AgentReadinessView() {
             {report.blockers.map((blocker: ReadinessBlocker) => (
               <div
                 key={blocker.stageId}
-                className="p-4 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20 space-y-3"
+                className="p-5 rounded-xl border border-fault/30 hover:border-fault/50 bg-panel space-y-3 shadow-xs transition-all"
               >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-rose-900 dark:text-rose-200">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-fault mono">
                     {blocker.title}
                   </h3>
-                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider bg-rose-200/60 dark:bg-rose-900/60 text-rose-800 dark:text-rose-300">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider mono bg-fault/10 text-fault border border-fault/20 shrink-0">
                     {blocker.isLocal ? "Local Dependency" : "Network Dependency"}
                   </span>
                 </div>
 
-                <div className="space-y-1 text-xs">
-                  <p className="text-slate-800 dark:text-slate-200">
-                    <span className="font-semibold text-rose-800 dark:text-rose-400">Why: </span>
+                <div className="space-y-1.5 text-xs text-muted leading-relaxed">
+                  <p>
+                    <strong className="text-ink font-semibold">Why: </strong>
                     {blocker.why}
                   </p>
-                  <p className="text-slate-800 dark:text-slate-200">
-                    <span className="font-semibold text-rose-800 dark:text-rose-400">What to do: </span>
+                  <p>
+                    <strong className="text-ink font-semibold">What to do: </strong>
                     {blocker.whatToDo}
                   </p>
                 </div>
 
                 {blocker.actionHref && (
-                  <div className="pt-1">
+                  <div className="pt-2 border-t border-hairline/60 flex justify-end">
                     <Link
                       href={blocker.actionHref}
-                      className={buttonClasses("secondary", "sm")}
+                      className={buttonClasses("secondary", "sm", "mono text-xs")}
                     >
                       {blocker.actionLabel ?? "Open Tool →"}
                     </Link>
@@ -302,10 +315,10 @@ export function AgentReadinessView() {
       {/* 7-Stage Interactive Checklist */}
       <section aria-labelledby="stages-heading" className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 id="stages-heading" className="text-lg font-bold text-slate-900 dark:text-white">
+          <h2 id="stages-heading" className="text-lg font-bold text-ink display">
             7-Stage Readiness Checklist
           </h2>
-          <span className="text-xs text-slate-500 dark:text-slate-400">
+          <span className="text-xs text-muted mono">
             Evaluated at {report?.evaluatedAt ? new Date(report.evaluatedAt).toLocaleTimeString() : "..."} ({report?.durationMs ?? 0}ms)
           </span>
         </div>
@@ -317,28 +330,28 @@ export function AgentReadinessView() {
             return (
               <div
                 key={stage.id}
-                className={`rounded-xl border transition-all ${
+                className={`rounded-xl border transition-all bg-panel shadow-xs ${
                   stage.status === "READY"
-                    ? "bg-white dark:bg-slate-900/80 border-slate-200 dark:border-slate-800"
+                    ? "border-hairline hover:border-verified/40"
                     : stage.status === "ATTENTION"
-                      ? "bg-amber-50/30 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/60"
+                      ? "border-attention/40 hover:border-attention/60"
                       : stage.status === "FAILED"
-                        ? "bg-rose-50/30 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/60"
-                        : "bg-slate-50/50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 opacity-90"
+                        ? "border-fault/40 hover:border-fault/60"
+                        : "border-hairline opacity-80"
                 }`}
               >
                 <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   {/* Left: Stage Index & Title */}
-                  <div className="flex items-start sm:items-center gap-3">
+                  <div className="flex items-start sm:items-center gap-3.5">
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      className={`size-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mono ${
                         stage.status === "READY"
-                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800"
+                          ? "bg-verified/15 text-verified border border-verified/30"
                           : stage.status === "ATTENTION"
-                            ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800"
+                            ? "bg-attention/15 text-attention border border-attention/30"
                             : stage.status === "FAILED"
-                              ? "bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 dark:border-rose-800"
-                              : "bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400"
+                              ? "bg-fault/15 text-fault border border-fault/30"
+                              : "bg-panel-high text-muted border border-hairline"
                       }`}
                     >
                       {stage.stageNumber}
@@ -346,15 +359,15 @@ export function AgentReadinessView() {
 
                     <div className="space-y-0.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-sm font-bold text-ink mono">
                           {stage.title}
                         </h3>
                         {getStatusBadge(stage.status)}
-                        <span className="text-[10px] uppercase tracking-wider font-semibold text-slate-500 dark:text-slate-400">
+                        <span className="text-[10px] uppercase tracking-wider font-semibold text-muted mono">
                           {stage.isLocalStage ? "Local" : "Network"}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-700 dark:text-slate-300">
+                      <p className="text-xs text-muted">
                         {stage.summary}
                       </p>
                     </div>
@@ -365,7 +378,7 @@ export function AgentReadinessView() {
                     <button
                       type="button"
                       onClick={() => toggleEvidence(stage.id)}
-                      className="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 transition-colors"
+                      className="text-xs font-semibold px-2.5 py-1 rounded bg-panel-high hover:bg-surface border border-hairline text-ink transition-colors mono"
                     >
                       {isExpanded ? "Hide Evidence ▲" : "View Evidence ▼"}
                     </button>
@@ -373,7 +386,7 @@ export function AgentReadinessView() {
                     {stage.actionHref && (
                       <Link
                         href={stage.actionHref}
-                        className={buttonClasses("secondary", "sm")}
+                        className={buttonClasses("secondary", "sm", "mono text-xs")}
                       >
                         {stage.actionLabel ?? "Open →"}
                       </Link>
@@ -383,22 +396,22 @@ export function AgentReadinessView() {
 
                 {/* Evidence Accordion Panel */}
                 {isExpanded && (
-                  <div className="border-t border-slate-200 dark:border-slate-800 p-4 bg-slate-50/50 dark:bg-slate-950/40 space-y-3">
-                    <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
+                  <div className="border-t border-hairline p-4 bg-panel-high space-y-3 rounded-b-xl">
+                    <div className="flex items-center justify-between text-xs text-muted mono">
                       <span className="font-semibold uppercase tracking-wider">Factual Evidence Log</span>
                       <span>Checked: {stage.lastChecked}</span>
                     </div>
 
-                    <pre className="p-3 rounded-lg bg-slate-900 text-slate-100 text-[11px] font-mono overflow-x-auto leading-relaxed border border-slate-800">
+                    <pre className="p-3 rounded-lg bg-void text-signal text-[11px] font-mono overflow-x-auto leading-relaxed border border-hairline">
                       {JSON.stringify(stage.evidence, null, 2)}
                     </pre>
 
                     {stage.remediation && (
-                      <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs space-y-1">
-                        <p className="font-semibold text-amber-900 dark:text-amber-200">
+                      <div className="p-3 rounded-lg bg-panel border border-attention/30 text-xs space-y-1">
+                        <p className="font-bold text-attention mono">
                           Remediation Guidance:
                         </p>
-                        <p className="text-amber-800 dark:text-amber-300">{stage.remediation.whatToDo}</p>
+                        <p className="text-muted leading-relaxed">{stage.remediation.whatToDo}</p>
                       </div>
                     )}
                   </div>
@@ -413,11 +426,11 @@ export function AgentReadinessView() {
       {report && report.findings.length > 0 && (
         <section aria-labelledby="findings-heading" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 id="findings-heading" className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <h2 id="findings-heading" className="text-lg font-bold text-ink display flex items-center gap-2">
+              <span className="size-2 rounded-full bg-attention" />
               Observed Network Anomalies ({report.findings.length})
             </h2>
-            <span className="text-xs text-slate-600 dark:text-slate-300">
+            <span className="text-xs text-muted mono">
               Trace stage is READY; anomalous events surfaced for inspection
             </span>
           </div>
@@ -426,26 +439,26 @@ export function AgentReadinessView() {
             {report.findings.map((finding) => (
               <div
                 key={finding.id}
-                className="p-4 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/30 dark:bg-amber-950/20 space-y-2 text-xs"
+                className="p-4 rounded-xl border border-attention/30 bg-panel space-y-2 text-xs shadow-xs"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-amber-900 dark:text-amber-200">
+                  <span className="font-bold text-attention mono">
                     {finding.title} ({finding.ruleKey})
                   </span>
-                  <span className="font-semibold px-2 py-0.5 rounded text-[10px] bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-200 uppercase">
+                  <span className="font-bold px-2 py-0.5 rounded text-[10px] bg-attention/10 text-attention border border-attention/20 uppercase mono">
                     {finding.severity}
                   </span>
                 </div>
-                <p className="text-slate-800 dark:text-slate-200">
-                  <span className="font-semibold">What: </span>
+                <p className="text-muted">
+                  <strong className="text-ink">What: </strong>
                   {finding.what}
                 </p>
-                <p className="text-slate-800 dark:text-slate-200">
-                  <span className="font-semibold">Why: </span>
+                <p className="text-muted">
+                  <strong className="text-ink">Why: </strong>
                   {finding.why}
                 </p>
-                <p className="text-slate-800 dark:text-slate-200">
-                  <span className="font-semibold">Impact: </span>
+                <p className="text-muted">
+                  <strong className="text-ink">Impact: </strong>
                   {finding.impact}
                 </p>
               </div>
@@ -455,11 +468,22 @@ export function AgentReadinessView() {
       )}
 
       {/* Safe Context & Security Guarantee Footer */}
-      <section className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-xs text-slate-700 dark:text-slate-300 space-y-2">
-        <h3 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-          <span>🔒</span> Security & Zero-Secret Guarantee
+      <section className="p-4 rounded-xl border border-hairline bg-panel text-xs text-muted space-y-1.5 shadow-xs">
+        <h3 className="font-bold text-ink flex items-center gap-2">
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            className="text-signal size-4 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.3"
+          >
+            <rect x="3" y="7" width="10" height="7" rx="1.5" />
+            <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" strokeLinecap="round" />
+          </svg>
+          Security & Zero-Secret Guarantee
         </h3>
-        <p>
+        <p className="leading-relaxed">
           The Agent Readiness Flow operates strictly as a read-only diagnostic orchestration layer. Ephemeral keypairs are used for dry-run verification and wiped immediately from memory. No private keys, seed phrases, passwords, or encrypted backup contents are ever read, exported, or persisted.
         </p>
       </section>
@@ -470,17 +494,17 @@ export function AgentReadinessView() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void/80 backdrop-blur-md"
         >
-          <div className="w-full max-w-md p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-            <h3 id="modal-title" className="text-lg font-bold text-slate-900 dark:text-white">
+          <div className="w-full max-w-md p-6 rounded-2xl bg-panel border border-hairline shadow-2xl space-y-4">
+            <h3 id="modal-title" className="text-lg font-bold text-ink display">
               Reset Readiness Flow?
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            <p className="text-xs text-muted leading-relaxed">
               This action clears cached readiness checklist results and re-runs evaluation from fresh state.
             </p>
-            <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] text-slate-700 dark:text-slate-300 space-y-1">
-              <p className="font-semibold text-emerald-700 dark:text-emerald-400">✓ Preserved Safely:</p>
+            <div className="p-3 rounded-lg bg-panel-high border border-hairline text-xs text-muted space-y-1">
+              <p className="font-bold text-verified mono">✓ Preserved Safely:</p>
               <ul className="list-disc list-inside space-y-0.5">
                 <li>Your in-memory identity keypair</li>
                 <li>Your encrypted backup files</li>
@@ -492,14 +516,14 @@ export function AgentReadinessView() {
               <button
                 type="button"
                 onClick={() => setShowResetModal(false)}
-                className={buttonClasses("secondary", "sm")}
+                className={buttonClasses("secondary", "sm", "mono text-xs")}
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleReset}
-                className={buttonClasses("danger", "sm")}
+                className={buttonClasses("danger", "sm", "mono text-xs")}
               >
                 Confirm Reset
               </button>

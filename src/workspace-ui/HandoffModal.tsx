@@ -133,13 +133,13 @@ export function HandoffModal({ metadata, isOpen, onClose }: HandoffModalProps) {
           {/* NOT SHARED Guaranteed */}
           <div className="rounded-lg border border-hairline bg-void/50 p-3.5 space-y-2.5">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-muted">
-              <span className="size-2 rounded-full bg-slate-400"></span>
+              <span className="size-2 rounded-full bg-faint"></span>
               NEVER SHARED
             </div>
             <ul className="space-y-1 text-[11px] text-muted">
               {metadata.notSharedFields.map((field) => (
                 <li key={field} className="flex items-center gap-1.5">
-                  <span className="text-rose-500">✕</span> {field}
+                  <span className="text-fault">✕</span> {field}
                 </li>
               ))}
             </ul>
