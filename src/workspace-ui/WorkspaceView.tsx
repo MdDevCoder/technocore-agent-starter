@@ -11,7 +11,7 @@
  * Light Mode = DEFAULT, Dark Mode = OPTIONAL
  */
 
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { useWorkspace } from "../hooks/useWorkspace.ts";
 import {
@@ -26,6 +26,9 @@ import type {
 } from "../workspace/types.ts";
 import { HandoffModal } from "./HandoffModal.tsx";
 import { buttonClasses } from "../ui/buttonStyles.ts";
+import { loadAllActivities } from "../activity/storage.ts";
+import { recordWorkspaceAction } from "../activity/recorder.ts";
+import type { AgentActivityEventV1 } from "../activity/types.ts";
 
 const PUBLIC_ROOMS = [
   "events",
@@ -125,6 +128,29 @@ export const WorkspaceView: React.FC = () => {
     setTimeout(() => setCopiedDid(false), 2000);
   }, [workspace.project.publicDid]);
 
+  const [recentActivities, setRecentActivities] = useState<AgentActivityEventV1[]>([]);
+
+  // Load latest activities
+  const refreshRecentActivities = useCallback(() => {
+    const list = loadAllActivities();
+    setRecentActivities(list.slice(0, 5));
+  }, []);
+
+  useEffect(() => {
+    refreshRecentActivities();
+
+    const handleUpdate = () => {
+      refreshRecentActivities();
+    };
+
+    window.addEventListener("technocore:activity:updated", handleUpdate);
+    window.addEventListener("storage", handleUpdate);
+    return () => {
+      window.removeEventListener("technocore:activity:updated", handleUpdate);
+      window.removeEventListener("storage", handleUpdate);
+    };
+  }, [refreshRecentActivities]);
+
   // Save Project Settings
   const handleSaveProject = useCallback(
     (e: React.FormEvent) => {
@@ -142,6 +168,7 @@ export const WorkspaceView: React.FC = () => {
         detail: `Updated language to ${editLang} and archetype to ${editArch}`,
         toolHref: "/workspace",
       });
+      recordWorkspaceAction(editName, editRoom);
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2500);
     },
@@ -974,43 +1001,72 @@ export const WorkspaceView: React.FC = () => {
         {/* Right Column: Activity Timeline & Safe Storage */}
         <div className="space-y-8 lg:col-span-5">
           {/* Card: Recent Activity Timeline */}
-          <div className="border-hairline bg-panel rounded-xl border p-6 shadow-xs">
+          <div className="border-hairline bg-panel rounded-xl border p-6 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-ink text-base font-bold tracking-tight">
-                Recent Local Activity
-              </h2>
-              <span className="mono text-muted text-xs">
-                {workspace.activities.length} event{workspace.activities.length === 1 ? "" : "s"}
-              </span>
+              <div>
+                <h2 className="font-display text-ink text-base font-bold tracking-tight">
+                  Recent Local Activity
+                </h2>
+                <p className="text-muted text-xs leading-relaxed mt-0.5">
+                  Latest meaningful events across the Technocore toolchain.
+                </p>
+              </div>
+              <Link
+                href="/activity"
+                className="mono text-xs font-semibold text-signal hover:underline shrink-0"
+              >
+                View All →
+              </Link>
             </div>
-            <p className="text-muted mt-1 text-xs leading-relaxed">
-              Real chronological log of your local session actions.
-            </p>
 
-            <div className="mt-4 max-h-96 overflow-y-auto space-y-3 pr-1">
-              {workspace.activities.map((act) => (
-                <div
-                  key={act.id}
-                  className="border-hairline bg-surface hover:border-signal/30 rounded-lg border p-3 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="text-ink text-xs font-semibold">{act.label}</div>
-                    <span className="mono text-faint shrink-0 text-[0.625rem]">
-                      {act.timestamp.slice(11, 19)} UTC
-                    </span>
+            {recentActivities.length === 0 ? (
+              <div className="p-4 rounded-lg border border-dashed border-hairline bg-void/40 text-center space-y-2 text-xs text-muted">
+                <p>No activity events recorded yet.</p>
+                <Link href="/activity" className="text-signal hover:underline block font-mono text-[11px]">
+                  Open Activity Center →
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {recentActivities.map((act) => (
+                  <div
+                    key={act.id}
+                    className="border-hairline bg-surface hover:border-signal/30 rounded-lg border p-3 transition-colors text-xs"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="mono text-[10px] font-bold px-1.5 py-0.2 rounded bg-void border border-hairline text-ink">
+                          {act.source}
+                        </span>
+                        <span className="text-ink font-semibold">{act.action}</span>
+                      </div>
+                      <span className="mono text-faint shrink-0 text-[10px]">
+                        {new Date(act.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })}
+                      </span>
+                    </div>
+                    <p className="text-muted mt-1 leading-snug line-clamp-2">{act.summary}</p>
+                    <div className="mt-2 flex items-center justify-between pt-1 border-t border-hairline/40">
+                      <span className="mono text-[10px] text-faint uppercase">{act.provenance}</span>
+                      <Link
+                        href={act.destinationRoute}
+                        className="text-signal hover:underline text-[11px] font-mono font-medium"
+                      >
+                        Open Tool →
+                      </Link>
+                    </div>
                   </div>
-                  <p className="text-muted mt-1 text-xs leading-snug">{act.detail}</p>
-                  <div className="mt-2 text-right">
-                    <Link
-                      href={act.toolHref}
-                      className="text-signal hover:underline text-[0.6875rem] font-medium"
-                    >
-                      Open Tool →
-                    </Link>
-                  </div>
+                ))}
+
+                <div className="pt-1 text-center">
+                  <Link
+                    href="/activity"
+                    className="inline-flex items-center gap-1 text-xs font-mono font-bold text-signal hover:underline"
+                  >
+                    <span>View All Activity ({recentActivities.length}) →</span>
+                  </Link>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* Card: Zero-Custody Guarantee Notice */}

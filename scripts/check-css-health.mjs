@@ -22,6 +22,7 @@ const ROUTES_TO_CHECK = [
   "/forge",
   "/civilization",
   "/evidence",
+  "/activity",
 ];
 
 const REQUIRED_CSS_TOKENS = [

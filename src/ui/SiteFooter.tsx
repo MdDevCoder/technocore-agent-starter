@@ -134,8 +134,13 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/activity" className="text-muted hover:text-ink transition-colors">
+                    Activity history
+                  </Link>
+                </li>
+                <li>
                   <Link href="/agent" className="text-muted hover:text-ink transition-colors">
-                    Agent activity
+                    Agent dashboard
                   </Link>
                 </li>
                 <li>

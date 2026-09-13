@@ -14,6 +14,7 @@ import type {
 } from "../evidence/types.ts";
 import { createContributionEvidence } from "../evidence/verify.ts";
 import { extractSafeHandoffParams } from "../workspace/handoff.ts";
+import { recordEvidenceAction } from "../activity/recorder.ts";
 
 export const EvidenceVaultView: React.FC = () => {
   const searchParams = useSearchParams();
@@ -198,6 +199,13 @@ export const EvidenceVaultView: React.FC = () => {
     const res = saveEvidence(activeEvidence);
     if (res.success) {
       setSaveFeedback("✓ Evidence record successfully preserved in local vault!");
+      recordEvidenceAction(
+        "Evidence Preserved",
+        activeEvidence.room,
+        activeEvidence.seq,
+        activeEvidence.verificationStatus === "VERIFIED",
+        activeEvidence.provenance,
+      );
       refreshVault();
     } else {
       setSaveFeedback(`✕ Failed to save: ${res.reason}`);

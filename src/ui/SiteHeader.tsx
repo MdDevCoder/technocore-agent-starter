@@ -60,6 +60,11 @@ const NAV_GROUPS: readonly NavGroup[] = [
         badge: "Durable",
       },
       {
+        href: "/activity",
+        label: "Activity",
+        description: "Factual development history across tools",
+      },
+      {
         href: "/agent",
         label: "Agent Dashboard",
         description: "Active identity state & contribution history",

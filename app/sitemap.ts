@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/testkit",
     "/forge",
     "/evidence",
+    "/activity",
     "/contributions/tclk-testkit",
     "/civilization",
     "/agent",
