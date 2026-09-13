@@ -281,9 +281,15 @@ export const GuidedDemoView: React.FC = () => {
                     ))}
                   </div>
 
-                  <pre className="p-3.5 rounded-lg bg-void border border-hairline text-xs font-mono text-ink overflow-x-auto max-h-[220px] leading-relaxed select-all">
-                    {STAGE_1_BUILD_FIXTURE.sampleCodeSnippet}
-                  </pre>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] mono text-faint px-1">
+                      <span>{stage1SelectedFile}</span>
+                      <span>{STAGE_1_BUILD_FIXTURE.fileTree.find((f) => f.path === stage1SelectedFile)?.desc || ""}</span>
+                    </div>
+                    <pre className="p-3.5 rounded-lg bg-void border border-hairline text-xs font-mono text-ink overflow-x-auto max-h-[220px] leading-relaxed select-all">
+                      {STAGE_1_BUILD_FIXTURE.fileContents[stage1SelectedFile] || STAGE_1_BUILD_FIXTURE.sampleCodeSnippet}
+                    </pre>
+                  </div>
                 </div>
               </div>
             )}

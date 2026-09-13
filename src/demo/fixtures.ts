@@ -232,6 +232,119 @@ export const STAGE_1_BUILD_FIXTURE = {
     { path: "package.json", size: "1.2 KB", desc: "Dependencies: @flop-labs/tclk" },
     { path: "README.md", size: "2.4 KB", desc: "Setup, verification & execution instructions" },
   ],
+  fileContents: {
+    "src/agent.ts": `// src/agent.ts — Deterministic TCLK Bilateral Trader
+import { createTclkOffer, verifyTclkPayload } from "./tclk/protocol.ts";
+import { signCanonicalMessage } from "./crypto/signing.ts";
+
+export class AlphaTraderAgent {
+  constructor(public readonly did: string) {}
+
+  async createDealOffer(amount: number, asset: string) {
+    const offer = createTclkOffer({
+      role: "payer",
+      amount: String(amount),
+      asset,
+      lock: "hash",
+      rails: ["paper", "flop-htlc"],
+      expiresMs: Date.now() + 3600000,
+    });
+    return offer;
+  }
+
+  async handleIncomingMessage(room: string, nonce: string, text: string, sig: string) {
+    const isValid = await verifyTclkPayload(room, nonce, text, sig);
+    if (!isValid) return { ok: false, error: "SIGNATURE_INVALID" };
+    return { ok: true, room, nonce };
+  }
+}`,
+    "src/tclk/protocol.ts": `// src/tclk/protocol.ts — TCLK Bilateral Negotiation Wire Encoders
+export interface TclkOfferParams {
+  role: "payer" | "payee";
+  amount: string;
+  asset: string;
+  lock: "hash" | "time";
+  rails: string[];
+  expiresMs: number;
+}
+
+export function createTclkOffer(params: TclkOfferParams) {
+  return {
+    type: "offer",
+    from: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    ...params,
+    nonce: "0102030405060708090a0b0c0d0e0f10",
+    id: "0x0e59221032b0fb4ad0bd8300322c726f46b5dec5103a75ac02df05c4c9116079",
+  };
+}
+
+export async function verifyTclkPayload(room: string, nonce: string, text: string, sig: string) {
+  if (!room || !nonce || !text || !sig) return false;
+  return sig.length >= 43;
+}`,
+    "src/crypto/signing.ts": `// src/crypto/signing.ts — Zero-Custody Canonical Room Message Signer
+export function buildCanonicalPayload(room: string, nonce: string, text: string): string {
+  const cleanRoom = room.replace(/^\\/r\\//, "").trim();
+  return \`\${cleanRoom}|\${nonce}|\${text}\`;
+}
+
+export async function signCanonicalMessage(
+  room: string,
+  nonce: string,
+  text: string,
+  signingKeyHandle: CryptoKey
+): Promise<string> {
+  const canonical = buildCanonicalPayload(room, nonce, text);
+  const encoder = new TextEncoder();
+  const signatureBytes = await crypto.subtle.sign(
+    "Ed25519",
+    signingKeyHandle,
+    encoder.encode(canonical)
+  );
+  return Buffer.from(signatureBytes).toString("base64url");
+}`,
+    "package.json": `{
+  "name": "alpha-trader",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Technocore Autonomous Agent — TCLK Bilateral Negotiation",
+  "scripts": {
+    "start": "node --experimental-strip-types src/agent.ts",
+    "test": "node --test tests/**/*.test.ts"
+  },
+  "dependencies": {
+    "@flop-labs/tclk": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.0"
+  }
+}`,
+    "README.md": `# AlphaTrader — Technocore Autonomous Agent
+
+Built with the **Technocore Agent Starter** using the **TCLK Bilateral Negotiation & Trading Protocol** archetype.
+
+## Setup & Verification
+
+1. Install dependencies:
+   \`\`\`bash
+   npm install
+   \`\`\`
+
+2. Run offline deal simulator tests:
+   \`\`\`bash
+   npm test
+   \`\`\`
+
+3. Launch agent daemon:
+   \`\`\`bash
+   npm start
+   \`\`\`
+
+## Zero-Custody Security
+
+All signing keys are generated locally in your terminal. Private keys are never uploaded or shared.`,
+  } as Record<string, string>,
   sampleCodeSnippet: `// src/agent.ts — Deterministic TCLK Bilateral Trader
 import { createTclkOffer, verifyTclkPayload } from "./tclk/protocol.ts";
 import { signCanonicalMessage } from "./crypto/signing.ts";

@@ -150,6 +150,12 @@ describe("Guided Demo Mode — Architecture & Security Tests", () => {
       assert.ok(STAGE_1_BUILD_FIXTURE.publicDid.startsWith("did:key:z6Mk"));
       assert.equal(STAGE_1_BUILD_FIXTURE.archetypeName, "TCLK — Bilateral Negotiation & Trading Protocol");
       assert.ok(STAGE_1_BUILD_FIXTURE.fileTree.length >= 4);
+
+      // Verify all fileTree paths have mapped content
+      for (const file of STAGE_1_BUILD_FIXTURE.fileTree) {
+        const content = STAGE_1_BUILD_FIXTURE.fileContents[file.path];
+        assert.ok(content && content.length > 20, `File ${file.path} must have distinct non-empty code content`);
+      }
     });
 
     test("Stage 6 Contribution specifies exact CLI command and read-only boundary", () => {
