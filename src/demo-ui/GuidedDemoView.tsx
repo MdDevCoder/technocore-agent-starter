@@ -530,7 +530,7 @@ export const GuidedDemoView: React.FC = () => {
                       </div>
                       <CopyButton value={stage1ActiveFile.content} label="Copy File Content" variant="secondary" />
                     </div>
-                    <pre className="p-4 rounded-b-lg bg-void border border-hairline text-xs font-mono text-ink whitespace-pre-wrap break-words leading-relaxed select-all overflow-visible">
+                    <pre className="p-4 rounded-b-lg bg-void border border-hairline text-xs font-mono text-ink leading-relaxed select-all overflow-auto max-h-80 whitespace-pre">
                       {stage1ActiveFile.content}
                     </pre>
                   </div>
@@ -741,7 +741,7 @@ export const GuidedDemoView: React.FC = () => {
                     <span>Author: </span>
                     <span className="text-ink select-all">{stage3DynamicStep.author}</span>
                   </div>
-                  <pre className="p-3 rounded bg-panel border border-hairline text-[11px] font-mono text-ink whitespace-pre-wrap break-words leading-relaxed select-all overflow-visible">
+                  <pre className="p-3 rounded bg-panel border border-hairline text-[11px] font-mono text-ink leading-relaxed select-all overflow-auto max-h-60 whitespace-pre">
                     {JSON.stringify(stage3DynamicStep.payload, null, 2)}
                   </pre>
                 </div>
@@ -1082,7 +1082,7 @@ export const GuidedDemoView: React.FC = () => {
                   <div className="text-[11px] text-muted truncate">
                     Author: <span className="text-ink select-all">{stage8ActiveMessage.authorDid}</span>
                   </div>
-                  <pre className="p-2 rounded bg-void border border-hairline text-ink text-[11px] whitespace-pre-wrap break-words overflow-visible">
+                  <pre className="p-2.5 rounded bg-void border border-hairline text-ink text-[11px] leading-relaxed select-all overflow-auto max-h-36 whitespace-pre">
                     {stage8ActiveMessage.text}
                   </pre>
                 </div>
@@ -1156,7 +1156,7 @@ export const GuidedDemoView: React.FC = () => {
                     <span>Hash: <code className="text-ink">{stage9ActiveFrame.payloadHash}</code></span>
                   </div>
                   {stage9ActiveFrame.details && (
-                    <pre className="p-2.5 rounded bg-panel border border-hairline text-[11px] font-mono text-ink whitespace-pre-wrap break-words leading-relaxed select-all overflow-visible">
+                    <pre className="p-2.5 rounded bg-panel border border-hairline text-[11px] font-mono text-ink leading-relaxed select-all overflow-auto max-h-60 whitespace-pre">
                       {JSON.stringify(stage9ActiveFrame.details, null, 2)}
                     </pre>
                   )}
