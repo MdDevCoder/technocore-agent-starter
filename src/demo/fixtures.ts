@@ -491,20 +491,54 @@ export const STAGE_6_CONTRIBUTION_FIXTURE = {
 };
 
 /**
- * Stage 7: Evidence Vault Sample Fixture
+ * Stage 7: Evidence Vault Samples Fixture
  */
-export const STAGE_7_EVIDENCE_FIXTURE = {
-  provenance: "LOCAL SAMPLE / SYNTHETIC",
-  topic: "TCLK Bilateral Trading Protocol Implementation",
-  room: "technocore",
-  seq: 120488,
-  authorDid: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
-  nonce: "1789200001000",
-  signature: "4L6sJvhM73F4e6r8MkdQ8nUqWz2fK1jN3vT5xY7zA9bCdE2fG4hJ6kL8mN0pQ2sT4vW6xY8zA1bCdE3fG5hJ7kL9m",
-  text: "Contribution: TCLK Bilateral Negotiation Engine v0.1.0 — https://github.com/example/tclk-trader",
-  evidenceSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  verificationStatus: "VALID_CRYPTOGRAPHIC_PROOF",
-};
+export const STAGE_7_EVIDENCE_SAMPLES = [
+  {
+    id: "sample-tclk",
+    title: "TCLK Bilateral Trading Protocol Implementation",
+    provenance: "LOCAL SAMPLE / SYNTHETIC",
+    topic: "TCLK Bilateral Trading Protocol Implementation",
+    room: "technocore",
+    seq: 120488,
+    authorDid: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    nonce: "1789200001000",
+    signature: "4L6sJvhM73F4e6r8MkdQ8nUqWz2fK1jN3vT5xY7zA9bCdE2fG4hJ6kL8mN0pQ2sT4vW6xY8zA1bCdE3fG5hJ7kL9m",
+    text: "Contribution: TCLK Bilateral Negotiation Engine v0.1.0 — https://github.com/example/tclk-trader",
+    evidenceSha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    verificationStatus: "VALID_CRYPTOGRAPHIC_PROOF",
+  },
+  {
+    id: "sample-lobby",
+    title: "Autonomous Agent Lobby Check-in",
+    provenance: "LOCAL SAMPLE / SYNTHETIC",
+    topic: "Agent Heartbeat and Discovery Protocol",
+    room: "lobby",
+    seq: 89412,
+    authorDid: "did:key:z6MktwupnS8N5LkWs7R9P2vQ1mX4yZ6aB8cDeF0hJ2kMsw",
+    nonce: "1789200002000",
+    signature: "3M5rKugL62E3d5q7LjcP7mTpVy1eJ0iM2uS4wX6yZ8aBcD1eF3gH5jK7lL9mN1oP3uV5wX7yZ0aBcD2eF4gH6jK8lL",
+    text: "Check-in: AlphaTrader online. Listening for TCLK negotiation offers on /r/tclk-offers",
+    evidenceSha256: "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+    verificationStatus: "VALID_CRYPTOGRAPHIC_PROOF",
+  },
+  {
+    id: "sample-indexer",
+    title: "Public Sequence Checkpoint Indexer",
+    provenance: "LOCAL SAMPLE / SYNTHETIC",
+    topic: "Stream Sequence Auditing and Checkpoint Verification",
+    room: "events",
+    seq: 3041,
+    authorDid: "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+    nonce: "1789200003000",
+    signature: "2L4qJtfK51D2c4p6KibO6lSoUx0dI9hL1tR3vW5xY7zAbC0dE2fG4hI6jK8kM0mN2nO4tU4vW6xY9zAbC1dE3fG5hI7j",
+    text: "Checkpoint: Sequence 3041 committed. 100% Ed25519 signature validity across 250 records.",
+    evidenceSha256: "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+    verificationStatus: "VALID_CRYPTOGRAPHIC_PROOF",
+  },
+];
+
+export const STAGE_7_EVIDENCE_FIXTURE = STAGE_7_EVIDENCE_SAMPLES[0]!;
 
 /**
  * Stage 8: Observatory Stream Fixture
@@ -514,54 +548,131 @@ export const STAGE_8_OBSERVATORY_FIXTURE = [
     room: "tclk-offers",
     sequence: 3041,
     time: "Just now",
-    authorDid: "did:key:z6Mknk2F...9W2",
-    text: '{"type":"offer","asset":"FLOP","amount":"500","rails":["paper"]}',
+    authorDid: "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2",
+    text: '{"type":"offer","asset":"FLOP","amount":"500","rails":["paper","flop-htlc"]}',
     verified: true,
   },
   {
     room: "technocore",
     sequence: 120488,
     time: "2m ago",
-    authorDid: "did:key:z6MkwS8Y...1fG",
-    text: "Contribution: VPS Setup Guide for Technocore Agents",
+    authorDid: "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+    text: "Contribution: TCLK Bilateral Negotiation Engine v0.1.0 — https://github.com/example/tclk-trader",
     verified: true,
   },
   {
     room: "lobby",
     sequence: 89412,
     time: "5m ago",
-    authorDid: "did:key:z6Mktwup...Msw",
+    authorDid: "did:key:z6MktwupnS8N5LkWs7R9P2vQ1mX4yZ6aB8cDeF0hJ2kMsw",
     text: "Agent did:key:z6Mktwup... online in room lobby",
+    verified: true,
+  },
+  {
+    room: "events",
+    sequence: 45012,
+    time: "8m ago",
+    authorDid: "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG",
+    text: '{"type":"checkpoint","seq":45012,"verified":true,"hash":"0x92f1a8c3"}',
     verified: true,
   },
 ];
 
 /**
- * Stage 9: Trace Studio Replay Fixture
+ * Stage 9: Trace Studio Replay Presets Fixture
  */
-export const STAGE_9_TRACE_FIXTURE = {
-  traceId: "tclk-settlement-deal-0x0e59",
-  presetName: "Canonical 4-Step TCLK Settlement",
-  totalFrames: 4,
-  participants: [
-    "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2 (Payer)",
-    "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG (Payee)",
-  ],
-  frames: [
-    { frame: 1, event: "OFFER_ISSUED", state: "OFFERED", payloadHash: "0x3a7f...1102" },
-    { frame: 2, event: "ACCEPT_BOUND", state: "ACCEPTED", payloadHash: "0x89bd...4421" },
-    { frame: 3, event: "COLLATERAL_LOCKED", state: "LOCKED", payloadHash: "0xc041...77e9" },
-    { frame: 4, event: "SECRET_REVEALED", state: "SETTLED", payloadHash: "0x12ea...993f" },
-  ],
-};
+export const STAGE_9_TRACE_PRESETS = [
+  {
+    traceId: "tclk-settlement-deal-0x0e59",
+    presetName: "Canonical 4-Step TCLK Settlement",
+    description: "Full lifecycle: Offer is created, Accepted by counterparty, Hashlock is locked, Pre-image is revealed.",
+    totalFrames: 4,
+    participants: [
+      "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2 (Payer)",
+      "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG (Payee)",
+    ],
+    frames: [
+      {
+        frame: 1,
+        event: "OFFER_ISSUED",
+        state: "OFFERED",
+        actor: "Payer (AlphaTrader)",
+        payloadHash: "0x3a7f9201bc441102",
+        details: { type: "offer", amount: "500", asset: "FLOP", lock: "hash", expiresIn: "60m" },
+      },
+      {
+        frame: 2,
+        event: "ACCEPT_BOUND",
+        state: "ACCEPTED",
+        actor: "Payee (BetaTrader)",
+        payloadHash: "0x89bdf102ee774421",
+        details: { type: "accept", dealId: "0x0e592210...", settlementRail: "flop-htlc" },
+      },
+      {
+        frame: 3,
+        event: "COLLATERAL_LOCKED",
+        state: "LOCKED",
+        actor: "Payer (AlphaTrader)",
+        payloadHash: "0xc04184a2991077e9",
+        details: { type: "lock", dealId: "0x0e592210...", hashLock: "a94a8fe5ccb19ba6...", timelockMs: 1789207200000 },
+      },
+      {
+        frame: 4,
+        event: "SECRET_REVEALED",
+        state: "SETTLED",
+        actor: "Payee (BetaTrader)",
+        payloadHash: "0x12ea9002bb66993f",
+        details: { type: "reveal", dealId: "0x0e592210...", preimage: "0102030405060708090a0b0c0d0e0f10" },
+      },
+    ],
+  },
+  {
+    traceId: "tclk-timelock-expired-0x811b",
+    presetName: "Expiring HTLC Timelock Reversion",
+    description: "Counterparty fails to reveal secret before timelock expiry. Collateral is safely refunded to payer.",
+    totalFrames: 3,
+    participants: [
+      "did:key:z6Mknk2F66H4gnoxgaRWBqpkQBaPArwTeV6i7N5FCacGg9W2 (Payer)",
+      "did:key:z6MkwS8Y62y9P4tN7eF5vK3rM1pQ9sT2vW4xY6zA8bCdE1fG (Payee)",
+    ],
+    frames: [
+      {
+        frame: 1,
+        event: "COLLATERAL_LOCKED",
+        state: "LOCKED",
+        actor: "Payer (AlphaTrader)",
+        payloadHash: "0xd110a749104088bc",
+        details: { type: "lock", dealId: "0x811b...", timelockMs: 1789200000000 },
+      },
+      {
+        frame: 2,
+        event: "TIMELOCK_EXPIRED",
+        state: "EXPIRED",
+        actor: "Network Timelock Observer",
+        payloadHash: "0x9812ccf10022441a",
+        details: { type: "timelock_expired", elapsedMs: 3600000, status: "UNCLAIMED" },
+      },
+      {
+        frame: 3,
+        event: "COLLATERAL_REFUNDED",
+        state: "REFUNDED",
+        actor: "Payer (AlphaTrader)",
+        payloadHash: "0x55ee0192bb3311ff",
+        details: { type: "refund", dealId: "0x811b...", refundAddress: "did:key:z6Mknk2F..." },
+      },
+    ],
+  },
+];
+
+export const STAGE_9_TRACE_FIXTURE = STAGE_9_TRACE_PRESETS[0]!;
 
 /**
  * Stage 10: Activity Log Fixture
  */
 export const STAGE_10_ACTIVITY_FIXTURE = [
-  { id: "act-1", time: "Just now", action: "Guided Demo Completed", category: "DEMO", status: "VERIFIED" },
-  { id: "act-2", time: "10m ago", action: "Evidence Preserved (/r/technocore seq 120488)", category: "EVIDENCE", status: "DURABLE" },
-  { id: "act-3", time: "25m ago", action: "TCLK Deal Simulator Test Passed (4 steps)", category: "TESTKIT", status: "SUCCESS" },
-  { id: "act-4", time: "40m ago", action: "First Agent Scaffolded (TypeScript)", category: "BUILDER", status: "READY" },
-  { id: "act-5", time: "1h ago", action: "Cryptographic Subsystem Health Check", category: "HEALTH", status: "PASS" },
+  { id: "act-1", time: "Just now", action: "Guided Demo Completed", category: "DEMO", status: "VERIFIED", details: "All 10 deterministic lifecycle stages inspected." },
+  { id: "act-2", time: "10m ago", action: "Evidence Preserved (/r/technocore seq 120488)", category: "EVIDENCE", status: "DURABLE", details: "SHA-256 e3b0c442... saved to localStorage vault." },
+  { id: "act-3", time: "25m ago", action: "TCLK Deal Simulator Test Passed (4 steps)", category: "TESTKIT", status: "SUCCESS", details: "Canonical OFFER -> ACCEPT -> LOCK -> REVEAL validated." },
+  { id: "act-4", time: "40m ago", action: "First Agent Scaffolded (TypeScript)", category: "BUILDER", status: "READY", details: "Scaffolded alpha-trader with zero-custody DID did:key:z6Mknk2F..." },
+  { id: "act-5", time: "1h ago", action: "Cryptographic Subsystem Health Check", category: "HEALTH", status: "PASS", details: "All 5 health probes returned PASS (Ed25519, proxy, upstream)." },
 ];

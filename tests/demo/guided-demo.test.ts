@@ -21,8 +21,10 @@ import {
   STAGE_5_HEALTH_FIXTURE,
   STAGE_6_CONTRIBUTION_FIXTURE,
   STAGE_7_EVIDENCE_FIXTURE,
+  STAGE_7_EVIDENCE_SAMPLES,
   STAGE_8_OBSERVATORY_FIXTURE,
   STAGE_9_TRACE_FIXTURE,
+  STAGE_9_TRACE_PRESETS,
   STAGE_10_ACTIVITY_FIXTURE,
 } from "../../src/demo/fixtures.ts";
 import { extractSafeHandoffParams } from "../../src/workspace/handoff.ts";
@@ -201,6 +203,31 @@ describe("Guided Demo Mode — Architecture & Security Tests", () => {
           const safe = extractSafeHandoffParams(params, "builder");
           assert.ok(typeof safe === "object", "Must parse safely without error");
         }
+      });
+    });
+  });
+
+  describe("5. Dynamic Option Generation & Multi-Sample Fixtures", () => {
+    test("Stage 7 defines multiple distinct evidence samples with provenance", () => {
+      assert.ok(STAGE_7_EVIDENCE_SAMPLES.length >= 3, "Must have at least 3 evidence samples");
+      STAGE_7_EVIDENCE_SAMPLES.forEach((sample) => {
+        assert.equal(sample.provenance, "LOCAL SAMPLE / SYNTHETIC");
+        assert.ok(sample.evidenceSha256.length === 64);
+        assert.ok(sample.authorDid.startsWith("did:key:z6Mk"));
+      });
+    });
+
+    test("Stage 9 defines multi-frame trace presets with state invariant validation", () => {
+      assert.ok(STAGE_9_TRACE_PRESETS.length >= 2, "Must have at least 2 trace presets");
+      STAGE_9_TRACE_PRESETS.forEach((preset) => {
+        assert.ok(preset.frames.length >= 3, "Preset must have at least 3 frames");
+        assert.equal(preset.totalFrames, preset.frames.length);
+        preset.frames.forEach((frame) => {
+          assert.ok(frame.frame >= 1);
+          assert.ok(frame.event.length > 3);
+          assert.ok(frame.state.length > 2);
+          assert.ok(frame.payloadHash.startsWith("0x"));
+        });
       });
     });
   });
