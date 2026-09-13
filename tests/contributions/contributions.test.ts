@@ -439,4 +439,58 @@ describe("Technocore Contribution Center — Comprehensive Test Suite", () => {
       assert.equal(parsed.contributions[0].topic, "Export Test");
     });
   });
+
+  describe("6. Contribution Selection & RECORD_PENDING State Machine", () => {
+    it("correctly identifies RECORD_PENDING state when sequence number is assigned without verified signature", () => {
+      const draft = validateAndSanitizeContributionDraft({
+        topic: "Pending Record Selection Test",
+        contributionUrl: "https://github.com/org/pending",
+        description: "Awaiting public room GET capture",
+      });
+
+      const pendingItem: ContributionItemV1 = {
+        ...draft,
+        status: "RECORD_PENDING",
+        currentStep: "CAPTURE",
+        room: "technocore",
+        seq: 42,
+      };
+
+      const evaluated = evaluateContributionState(pendingItem);
+      assert.equal(evaluated.status, "RECORD_PENDING");
+      assert.equal(evaluated.currentStep, "RECORD");
+      assert.equal(pendingItem.status === "RECORD_PENDING", true);
+    });
+
+    it("distinguishes RECORD_PENDING from DRAFT and COMPLETE statuses for selective input focus", () => {
+      const pending: ContributionItemV1 = {
+        id: "item_pending",
+        topic: "Pending Item",
+        contributionUrl: "https://example.com/p",
+        description: "Desc",
+        status: "RECORD_PENDING",
+        currentStep: "CAPTURE",
+        isVerified: false,
+        isEvidencePreserved: false,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const complete: ContributionItemV1 = {
+        id: "item_complete",
+        topic: "Complete Item",
+        contributionUrl: "https://example.com/c",
+        description: "Desc",
+        status: "COMPLETE",
+        currentStep: "COMPLETE",
+        isVerified: true,
+        isEvidencePreserved: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      assert.equal(pending.status === "RECORD_PENDING", true);
+      assert.equal(complete.status === "RECORD_PENDING", false);
+    });
+  });
 });

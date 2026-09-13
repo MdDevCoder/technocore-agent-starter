@@ -14,7 +14,7 @@
  * Light Mode = DEFAULT, Dark Mode = OPTIONAL
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import Link from "next/link";
 import type {
   ContributionItemV1,
@@ -84,18 +84,52 @@ export const ContributionCenterView: React.FC = () => {
   const [showClearModal, setShowClearModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<string | null>(null);
 
+  // Focus Management Refs
+  const seqInputRef = useRef<HTMLInputElement>(null);
+  const lastFocusedIdRef = useRef<string | null>(null);
+
   // Initial load
   useEffect(() => {
     const loaded = loadAllContributions();
     setContributions(loaded);
     if (loaded.length > 0 && !selectedId && !isCreatingNew && loaded[0]) {
       setSelectedId(loaded[0].id);
+      if (loaded[0].seq !== undefined && loaded[0].seq !== null) {
+        setFetchSeq(String(loaded[0].seq));
+      }
+      if (loaded[0].room) {
+        setFetchRoom(loaded[0].room);
+      }
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedContribution = useMemo(() => {
     return contributions.find((c) => c.id === selectedId) || null;
   }, [contributions, selectedId]);
+
+  // Auto-focus sequence number input when selecting a RECORD_PENDING contribution
+  useEffect(() => {
+    if (
+      selectedContribution &&
+      selectedContribution.status === "RECORD_PENDING" &&
+      !isCreatingNew &&
+      !isManualEntry
+    ) {
+      if (lastFocusedIdRef.current !== selectedContribution.id) {
+        lastFocusedIdRef.current = selectedContribution.id;
+        const timer = setTimeout(() => {
+          if (seqInputRef.current && document.activeElement !== seqInputRef.current) {
+            seqInputRef.current.focus();
+          }
+        }, 50);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      if (selectedContribution?.id !== lastFocusedIdRef.current) {
+        lastFocusedIdRef.current = null;
+      }
+    }
+  }, [selectedContribution, isCreatingNew, isManualEntry]);
 
   const stats = useMemo(() => {
     return computeContributionStats(contributions);
@@ -492,12 +526,35 @@ export const ContributionCenterView: React.FC = () => {
                 return (
                   <div
                     key={item.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Select contribution: ${item.topic}`}
                     onClick={() => {
                       setSelectedId(item.id);
                       setIsCreatingNew(false);
                       setOperationMsg(null);
+                      if (item.seq !== undefined && item.seq !== null) {
+                        setFetchSeq(String(item.seq));
+                      }
+                      if (item.room) {
+                        setFetchRoom(item.room);
+                      }
                     }}
-                    className={`p-3.5 rounded-xl border cursor-pointer transition-all space-y-2 ${
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setSelectedId(item.id);
+                        setIsCreatingNew(false);
+                        setOperationMsg(null);
+                        if (item.seq !== undefined && item.seq !== null) {
+                          setFetchSeq(String(item.seq));
+                        }
+                        if (item.room) {
+                          setFetchRoom(item.room);
+                        }
+                      }
+                    }}
+                    className={`p-3.5 rounded-xl border cursor-pointer transition-all space-y-2 outline-none focus-visible:border-signal ${
                       isSelected
                         ? "bg-panel-high border-signal/60 shadow-sm"
                         : "bg-panel border-hairline hover:border-hairline-bright"
@@ -872,13 +929,16 @@ export const ContributionCenterView: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="text-muted block text-[10px]">Sequence Number</label>
+                        <label htmlFor="stage-4-seq-input" className="text-muted block text-[10px]">Sequence Number</label>
                         <input
+                          id="stage-4-seq-input"
+                          ref={seqInputRef}
                           type="number"
                           value={fetchSeq}
                           onChange={(e) => setFetchSeq(e.target.value)}
                           placeholder="e.g. 5"
-                          className="w-full p-2 rounded-lg bg-void border border-hairline text-ink"
+                          className="w-full p-2 rounded-lg bg-void border border-hairline text-ink focus:border-signal outline-none transition-colors"
+                          aria-label="Sequence Number"
                         />
                       </div>
                       <div className="flex items-end">

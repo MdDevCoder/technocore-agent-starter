@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { buttonClasses } from "../ui/buttonStyles.ts";
 import { CopyButton } from "../ui/copy.tsx";
 import { fetchLiveContributionRecord } from "../evidence/fetch.ts";
 import { formatEvidenceJson, formatEvidenceMarkdown, importAndVerifyEvidence } from "../evidence/format.ts";
 import { clearAllEvidence, deleteEvidence, getStorageSummary, loadAllEvidence, saveEvidence } from "../evidence/storage.ts";
+import { filterEvidenceRecords } from "../evidence/filter.ts";
 import type {
   ContributionEvidenceV1,
   EvidenceProvenance,
@@ -49,6 +50,12 @@ export const EvidenceVaultView: React.FC = () => {
   // Saved Vault Repository State
   const [savedRecords, setSavedRecords] = useState<ContributionEvidenceV1[]>([]);
   const [storageSummary, setStorageSummary] = useState(getStorageSummary());
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // Memoized case-insensitive filtered records
+  const filteredRecords = useMemo(() => {
+    return filterEvidenceRecords(savedRecords, searchQuery);
+  }, [savedRecords, searchQuery]);
 
   // Import Modal State
   const [importModalOpen, setImportModalOpen] = useState<boolean>(false);
@@ -764,78 +771,115 @@ export const EvidenceVaultView: React.FC = () => {
           )}
         </div>
 
-        {savedRecords.length > 0 ? (
-          <div className="space-y-3">
-            {savedRecords.map((item) => (
-              <div
-                key={item.evidenceSha256}
-                className="p-4 rounded-lg bg-void border border-hairline space-y-2 text-xs mono hover:border-signal/40 transition-all"
+        {savedRecords.length > 0 && (
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search evidence by SHA-256 hash (case-insensitive), topic, DID, or seq..."
+              className="w-full p-2.5 pl-8 rounded-lg bg-void border border-hairline text-ink text-xs mono focus:border-signal outline-none transition-colors"
+              aria-label="Search evidence records"
+            />
+            <span className="absolute left-2.5 top-2.5 text-muted text-xs">🔍</span>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-2.5 text-muted hover:text-ink text-xs mono"
+                aria-label="Clear search query"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-hairline/60 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-ink text-sm">
-                      /r/{item.room} <span className="text-signal">seq {item.seq}</span>
-                    </span>
-                    <span
-                      className={`text-[9px] px-2 py-0.2 rounded font-bold uppercase border ${
-                        item.provenance === "SERVER_RETRIEVED"
-                          ? "bg-teal-500/10 text-teal-800 dark:text-teal-300 border-teal-500/25"
-                          : "bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25"
-                      }`}
-                    >
-                      {item.provenance === "SERVER_RETRIEVED" ? "SERVER-RETRIEVED" : "MANUAL HISTORICAL"}
-                    </span>
-                    <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400">
-                      ✓ {item.verificationStatus}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleExportJson(item)}
-                      className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
-                    >
-                      JSON
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleExportMarkdown(item)}
-                      className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
-                    >
-                      MD
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteRecord(item.evidenceSha256)}
-                      className="px-2 py-1 rounded bg-panel border border-rose-500/30 text-[10px] text-rose-600 hover:bg-rose-500/10"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] text-muted">
-                  <div>
-                    <span className="text-faint block text-[9px] uppercase">Topic:</span>
-                    <span className="text-ink truncate block">{item.topic}</span>
-                  </div>
-                  <div>
-                    <span className="text-faint block text-[9px] uppercase">Agent DID:</span>
-                    <span className="text-ink truncate block select-all">{item.did}</span>
-                  </div>
-                  <div>
-                    <span className="text-faint block text-[9px] uppercase">Integrity SHA-256:</span>
-                    <span className="text-faint truncate block font-mono">{item.evidenceSha256}</span>
-                  </div>
-                </div>
-
-                <div className="p-2 rounded bg-panel/60 border border-hairline text-ink text-[11px] truncate">
-                  &ldquo;{item.text}&rdquo;
-                </div>
-              </div>
-            ))}
+                ✕
+              </button>
+            )}
           </div>
+        )}
+
+        {savedRecords.length > 0 ? (
+          filteredRecords.length > 0 ? (
+            <div className="space-y-3">
+              {filteredRecords.map((item) => (
+                <div
+                  key={item.evidenceSha256}
+                  className="p-4 rounded-lg bg-void border border-hairline space-y-2 text-xs mono hover:border-signal/40 transition-all"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-hairline/60 pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-ink text-sm">
+                        /r/{item.room} <span className="text-signal">seq {item.seq}</span>
+                      </span>
+                      <span
+                        className={`text-[9px] px-2 py-0.2 rounded font-bold uppercase border ${
+                          item.provenance === "SERVER_RETRIEVED"
+                            ? "bg-teal-500/10 text-teal-800 dark:text-teal-300 border-teal-500/25"
+                            : "bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25"
+                        }`}
+                      >
+                        {item.provenance === "SERVER_RETRIEVED" ? "SERVER-RETRIEVED" : "MANUAL HISTORICAL"}
+                      </span>
+                      <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400">
+                        ✓ {item.verificationStatus}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleExportJson(item)}
+                        className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
+                      >
+                        JSON
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleExportMarkdown(item)}
+                        className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
+                      >
+                        MD
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteRecord(item.evidenceSha256)}
+                        className="px-2 py-1 rounded bg-panel border border-rose-500/30 text-[10px] text-rose-600 hover:bg-rose-500/10"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] text-muted">
+                    <div>
+                      <span className="text-faint block text-[9px] uppercase">Topic:</span>
+                      <span className="text-ink truncate block">{item.topic}</span>
+                    </div>
+                    <div>
+                      <span className="text-faint block text-[9px] uppercase">Agent DID:</span>
+                      <span className="text-ink truncate block select-all">{item.did}</span>
+                    </div>
+                    <div>
+                      <span className="text-faint block text-[9px] uppercase">Integrity SHA-256:</span>
+                      <span className="text-faint truncate block font-mono">{item.evidenceSha256}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded bg-panel/60 border border-hairline text-ink text-[11px] truncate">
+                    &ldquo;{item.text}&rdquo;
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 text-center text-muted text-xs mono space-y-2 border border-hairline rounded-lg bg-void">
+              <p>No preserved evidence records match &ldquo;{searchQuery}&rdquo;.</p>
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="text-signal hover:underline text-[11px]"
+              >
+                Clear search filter
+              </button>
+            </div>
+          )
         ) : (
           <div className="p-8 text-center text-muted text-xs mono space-y-1">
             <p>No contribution evidence saved in local vault.</p>

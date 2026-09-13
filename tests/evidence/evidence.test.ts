@@ -22,6 +22,7 @@ import {
   containsSecrets,
   sanitizeString,
 } from "../../src/evidence/schema.ts";
+import { filterEvidenceRecords } from "../../src/evidence/filter.ts";
 import {
   createContributionEvidence,
   verifyEvidenceRecord,
@@ -344,5 +345,69 @@ describe("Evidence Vault — Formatting & Non-Permanent Disclaimers", () => {
     assert.doesNotMatch(md, /official archive/i);
     assert.doesNotMatch(md, /immutable proof/i);
     assert.doesNotMatch(md, /FLOP Labs certification/i);
+  });
+});
+
+describe("Evidence Vault — Case-Insensitive SHA-256 Hash & Metadata Search", () => {
+  it("matches lowercase SHA-256 query against stored evidence", async () => {
+    const raw = await generateValidRecord();
+    const { evidence } = await createContributionEvidence({
+      ...raw,
+      provenance: "SERVER_RETRIEVED",
+    });
+
+    const hashSub = evidence.evidenceSha256.slice(0, 16).toLowerCase();
+    const results = filterEvidenceRecords([evidence], hashSub);
+    assert.equal(results.length, 1);
+    assert.equal(results[0]?.evidenceSha256, evidence.evidenceSha256);
+    // Preserves canonical lowercase representation
+    assert.equal(results[0]?.evidenceSha256, evidence.evidenceSha256.toLowerCase());
+  });
+
+  it("matches uppercase SHA-256 query against stored evidence", async () => {
+    const raw = await generateValidRecord();
+    const { evidence } = await createContributionEvidence({
+      ...raw,
+      provenance: "SERVER_RETRIEVED",
+    });
+
+    const hashUpper = evidence.evidenceSha256.slice(0, 16).toUpperCase();
+    const results = filterEvidenceRecords([evidence], hashUpper);
+    assert.equal(results.length, 1);
+    assert.equal(results[0]?.evidenceSha256, evidence.evidenceSha256);
+    // Stored hash must NOT be mutated to uppercase
+    assert.equal(results[0]?.evidenceSha256, evidence.evidenceSha256.toLowerCase());
+  });
+
+  it("matches mixed-case SHA-256 query against stored evidence", async () => {
+    const raw = await generateValidRecord();
+    const { evidence } = await createContributionEvidence({
+      ...raw,
+      provenance: "SERVER_RETRIEVED",
+    });
+
+    const fullHash = evidence.evidenceSha256;
+    const mixedCase = fullHash
+      .split("")
+      .map((c, i) => (i % 2 === 0 ? c.toUpperCase() : c.toLowerCase()))
+      .join("");
+
+    const results = filterEvidenceRecords([evidence], mixedCase);
+    assert.equal(results.length, 1);
+    assert.equal(results[0]?.evidenceSha256, evidence.evidenceSha256);
+    // Stored hash remains canonical lowercase hexadecimal
+    assert.equal(/^[0-9a-f]{64}$/.test(results[0]?.evidenceSha256 || ""), true);
+  });
+
+  it("returns all records on empty query and empty list on non-matching query", async () => {
+    const raw = await generateValidRecord();
+    const { evidence } = await createContributionEvidence({
+      ...raw,
+      provenance: "SERVER_RETRIEVED",
+    });
+
+    assert.equal(filterEvidenceRecords([evidence], "").length, 1);
+    assert.equal(filterEvidenceRecords([evidence], "   ").length, 1);
+    assert.equal(filterEvidenceRecords([evidence], "NON_EXISTENT_HASH_12345").length, 0);
   });
 });
