@@ -5,6 +5,7 @@ import { CopyButton } from "@/ui/copy.tsx";
 import { Disclosure } from "@/ui/Disclosure.tsx";
 import { HeroLattice } from "@/ui/HeroLattice.tsx";
 import { StatusPill } from "@/ui/StatusPill.tsx";
+import { Sparkle3DIcon } from "@/ui/Sparkle3DIcon.tsx";
 import { PROTOCOL_SOURCE } from "@/technocore/profile.ts";
 
 export const metadata: Metadata = {
@@ -221,8 +222,12 @@ export default function LandingPage() {
               <Link href="/workspace" className={buttonClasses("secondary", "lg", "text-sm sm:text-base")}>
                 Open Agent Workspace →
               </Link>
-              <Link href="/demo" className={buttonClasses("secondary", "lg", "text-sm sm:text-base border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10")}>
-                Guided Demo Tour →
+              <Link
+                href="/demo"
+                className={buttonClasses("primary", "lg", "shadow-md hover:shadow-lg text-sm sm:text-base font-semibold flex items-center gap-2")}
+              >
+                <Sparkle3DIcon className="w-5 h-5 shrink-0" />
+                <span>Guided Demo Tour →</span>
               </Link>
               <Link href="/readiness" className={buttonClasses("ghost", "lg", "text-xs sm:text-sm text-muted hover:text-ink")}>
                 Readiness Flow
