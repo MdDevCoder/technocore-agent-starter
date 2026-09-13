@@ -144,9 +144,8 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/demo" className="text-muted hover:text-ink transition-colors flex items-center gap-1.5">
+                  <Link href="/demo" className="text-muted hover:text-ink transition-colors">
                     Guided Demo
-                    <span className="mono text-[0.625rem] text-purple-700 dark:text-purple-300 font-semibold bg-purple-500/10 px-1 py-0.2 rounded border border-purple-500/20">Tour</span>
                   </Link>
                 </li>
                 <li>

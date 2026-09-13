@@ -221,8 +221,8 @@ export default function LandingPage() {
               <Link href="/workspace" className={buttonClasses("secondary", "lg", "text-sm sm:text-base")}>
                 Open Agent Workspace →
               </Link>
-              <Link href="/demo" className={buttonClasses("secondary", "lg", "text-sm sm:text-base border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10")}>
-                ✨ Guided Demo Tour →
+              <Link href="/demo" className={buttonClasses("ghost", "lg", "text-xs sm:text-sm text-muted hover:text-ink")}>
+                Guided Demo
               </Link>
               <Link href="/readiness" className={buttonClasses("ghost", "lg", "text-xs sm:text-sm text-muted hover:text-ink")}>
                 Readiness Flow
@@ -243,8 +243,8 @@ export default function LandingPage() {
                 Import Existing Agent
               </Link>
               <span>·</span>
-              <Link href="/demo" className="text-purple-700 dark:text-purple-300 hover:underline font-mono">
-                Guided Demo Tour
+              <Link href="/demo" className="text-muted hover:text-ink transition-colors font-mono">
+                Guided Demo
               </Link>
             </div>
 
