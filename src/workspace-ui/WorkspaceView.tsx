@@ -232,6 +232,15 @@ export const WorkspaceView: React.FC = () => {
     [workspace.project.defaultRoom],
   );
 
+  const evidenceUrl = useMemo(
+    () =>
+      buildHandoffUrl("evidence", {
+        room: workspace.project.defaultRoom,
+        did: workspace.project.publicDid,
+      }),
+    [workspace.project],
+  );
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {/* 1. Header Overview & Hero */}
@@ -707,6 +716,42 @@ export const WorkspaceView: React.FC = () => {
               >
                 Open Checklist
               </Link>
+            </div>
+          </div>
+
+          {/* Action 9: Evidence Vault */}
+          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+            <div>
+              <div className="flex items-center justify-between">
+                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                  /evidence
+                </span>
+                <span className="text-muted text-xs">Preservation</span>
+              </div>
+              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                EVIDENCE VAULT
+              </h3>
+              <p className="text-muted mt-1 text-xs leading-relaxed">
+                Preserve and cryptographically verify signed contribution proofs before room retention advances.
+              </p>
+            </div>
+            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+              Deterministic SHA-256 · Local-First
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+              <Link
+                href={evidenceUrl}
+                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
+              >
+                Open Vault →
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleOpenHandoffModal("evidence")}
+                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+              >
+                Copy Link
+              </button>
             </div>
           </div>
         </div>

@@ -69,6 +69,7 @@ async function auditRoutes() {
     "/observatory",
     "/testkit",
     "/forge",
+    "/evidence",
     "/workspace",
     "/readiness",
     "/health",

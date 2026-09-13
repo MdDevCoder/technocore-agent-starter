@@ -26,6 +26,7 @@ export type ToolDestination =
   | "testkit"
   | "observatory"
   | "trace"
+  | "evidence"
   | "onboarding"
   | "workspace";
 
@@ -36,6 +37,7 @@ export const TOOL_BASE_PATHS: Record<ToolDestination, string> = {
   testkit: "/testkit",
   observatory: "/observatory",
   trace: "/trace",
+  evidence: "/evidence",
   onboarding: "/onboarding/identity",
   workspace: "/workspace",
 } as const;
@@ -47,6 +49,7 @@ export const TOOL_TITLES: Record<ToolDestination, string> = {
   testkit: "TCLK-TestKit",
   observatory: "Network Observatory",
   trace: "Agent Trace Studio",
+  evidence: "Contribution Evidence Vault",
   onboarding: "Identity Onboarding",
   workspace: "Agent Workspace",
 } as const;
@@ -62,6 +65,7 @@ export const TOOL_ALLOWLISTS: Record<ToolDestination, readonly string[]> = {
   testkit: ["project", "lang", "archetype", "preset"],
   observatory: ["room"],
   trace: ["project", "lang", "room", "preset", "source"],
+  evidence: ["project", "room", "seq", "did", "nonce", "sig"],
   onboarding: ["did"],
   workspace: ["project", "lang", "archetype", "did", "room"],
 } as const;

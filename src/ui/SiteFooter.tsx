@@ -170,6 +170,11 @@ export function SiteFooter() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/evidence" className="text-muted hover:text-ink transition-colors">
+                    Evidence Vault
+                  </Link>
+                </li>
+                <li>
                   <Link href="/import" className="text-muted hover:text-ink transition-colors">
                     Import backup
                   </Link>

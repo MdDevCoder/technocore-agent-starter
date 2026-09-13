@@ -75,6 +75,7 @@ const ROUTES_TO_TEST = [
   { path: "/observatory", type: "html", name: "Network Observatory" },
   { path: "/testkit", type: "html", name: "TCLK TestKit" },
   { path: "/forge", type: "html", name: "Technocore Payload Forge" },
+  { path: "/evidence", type: "html", name: "Contribution Evidence Vault" },
   { path: "/contributions/tclk-testkit", type: "html", name: "TCLK Contribution Proof" },
   { path: "/civilization", type: "html", name: "Civilization Protocol Dashboard" },
   { path: "/agent", type: "html", name: "Autonomous Agent Client" },

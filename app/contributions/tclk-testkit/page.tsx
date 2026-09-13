@@ -57,6 +57,12 @@ export default function TclkTestKitContributionPage() {
             Signature Doctor →
           </Link>
           <Link
+            href="/evidence"
+            className="px-4 py-2.5 rounded-lg bg-panel border border-hairline text-ink font-semibold text-sm hover:border-hairline-bright transition-colors mono"
+          >
+            Evidence Vault →
+          </Link>
+          <Link
             href="/observatory"
             className="px-4 py-2.5 rounded-lg bg-panel border border-hairline text-ink font-semibold text-sm hover:border-hairline-bright transition-colors mono"
           >

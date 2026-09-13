@@ -787,6 +787,22 @@ export const FirstAgentBuilderView: React.FC = () => {
               Simulate 5-state bilateral deal lifecycles and validate against 12 language-neutral fixtures.
             </p>
           </Link>
+
+          <Link
+            href="/evidence"
+            className="p-4 rounded-xl border border-hairline bg-void/60 hover:border-signal/40 hover:bg-void transition-all space-y-2 group"
+          >
+            <div className="flex items-center justify-between mono text-[10px] text-signal font-bold">
+              <span>05 · PRESERVE</span>
+              <span>↗</span>
+            </div>
+            <h3 className="text-ink font-bold text-sm group-hover:text-signal transition-colors">
+              Evidence Vault
+            </h3>
+            <p className="text-xs text-muted">
+              Preserve and cryptographically verify signed contribution proofs before room retention advances.
+            </p>
+          </Link>
         </div>
       </div>
     </div>
