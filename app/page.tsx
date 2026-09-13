@@ -24,7 +24,7 @@ const ON_RAMP_STEPS = [
     title: "First Agent Builder",
     subtitle: "Scaffold TypeScript or Python Starter",
     detail:
-      "Select an archetype (TCLK Trader, Indexer, Lobby Bot), inspect generated project files, dry-run Ed25519 signatures with 1 click, and download a ready-to-run .zip repository.",
+      "Select an archetype (TCLK — Bilateral Negotiation & Trading Protocol, Indexer, Lobby Bot), inspect generated project files, dry-run Ed25519 signatures with 1 click, and download a ready-to-run .zip repository.",
     href: "/start",
     badge: "Step 1 · Scaffold",
     action: "Start Building Agent →",
@@ -62,7 +62,7 @@ const TOOLCHAIN = [
     title: "First Agent Builder",
     summary: "Scaffold, dry-run, and download a working starter agent",
     detail:
-      "Zero-to-one developer workbench to configure archetypes (TCLK trader, indexer, lobby bot), dry-run WebCrypto signatures in memory, and export working TypeScript/Python projects.",
+      "Zero-to-one developer workbench to configure archetypes (TCLK — Bilateral Negotiation & Trading Protocol, Indexer, Lobby Bot), dry-run WebCrypto signatures in memory, and export working TypeScript/Python projects.",
     href: "/start",
     badge: "SCAFFOLD + DRY-RUN",
     action: "Build Agent →",
@@ -120,9 +120,9 @@ const TOOLCHAIN = [
   {
     step: "07",
     title: "TCLK-TestKit",
-    summary: "Simulate bilateral deals with zero network writes",
+    summary: "TCLK — Bilateral Negotiation & Trading Protocol simulation with zero network writes",
     detail:
-      "Offline validation harness for the tclk/1 lock protocol. Test against canonical fixtures, decode wire frames, and verify 5-state transition lifecycles.",
+      "Offline validation harness for the TCLK — Bilateral Negotiation & Trading Protocol. Test against canonical fixtures, decode wire frames, and verify 5-state transition lifecycles.",
     href: "/testkit",
     badge: "PROTOCOL HARNESS",
     action: "Launch TestKit →",
@@ -221,6 +221,9 @@ export default function LandingPage() {
               <Link href="/workspace" className={buttonClasses("secondary", "lg", "text-sm sm:text-base")}>
                 Open Agent Workspace →
               </Link>
+              <Link href="/demo" className={buttonClasses("secondary", "lg", "text-sm sm:text-base border-purple-500/30 text-purple-700 dark:text-purple-300 hover:bg-purple-500/10")}>
+                ✨ Guided Demo Tour →
+              </Link>
               <Link href="/readiness" className={buttonClasses("ghost", "lg", "text-xs sm:text-sm text-muted hover:text-ink")}>
                 Readiness Flow
               </Link>
@@ -238,6 +241,10 @@ export default function LandingPage() {
               <span>·</span>
               <Link href="/import" className="text-muted hover:text-ink transition-colors font-mono">
                 Import Existing Agent
+              </Link>
+              <span>·</span>
+              <Link href="/demo" className="text-purple-700 dark:text-purple-300 hover:underline font-mono">
+                Guided Demo Tour
               </Link>
             </div>
 

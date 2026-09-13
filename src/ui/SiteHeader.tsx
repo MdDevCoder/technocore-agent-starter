@@ -70,6 +70,12 @@ const NAV_GROUPS: readonly NavGroup[] = [
         description: "Factual development history across tools",
       },
       {
+        href: "/demo",
+        label: "Guided Demo",
+        description: "10-stage deterministic end-to-end platform tour",
+        badge: "Interactive",
+      },
+      {
         href: "/agent",
         label: "Agent Dashboard",
         description: "Active identity state & contribution history",

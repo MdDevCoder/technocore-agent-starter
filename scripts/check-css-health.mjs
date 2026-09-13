@@ -16,6 +16,7 @@ const BASE_URL = process.env.APP_URL || `http://${DEFAULT_HOST}:${DEFAULT_PORT}`
 
 const ROUTES_TO_CHECK = [
   "/",
+  "/demo",
   "/doctor",
   "/testkit",
   "/observatory",

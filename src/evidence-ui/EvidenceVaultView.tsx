@@ -16,6 +16,7 @@ import type {
 import { createContributionEvidence } from "../evidence/verify.ts";
 import { extractSafeHandoffParams } from "../workspace/handoff.ts";
 import { recordEvidenceAction } from "../activity/recorder.ts";
+import { executeEphemeralSigningDryRun } from "../crypto/dryRun.ts";
 
 export const EvidenceVaultView: React.FC = () => {
   const searchParams = useSearchParams();
@@ -277,6 +278,54 @@ export const EvidenceVaultView: React.FC = () => {
       });
     }
   }, [importJsonText, refreshVault]);
+
+  // Load verified local synthetic sample evidence
+  const handleLoadSampleEvidence = useCallback(async () => {
+    setIsVerifying(true);
+    setSaveFeedback(null);
+    try {
+      const sampleTopic = "[LOCAL SAMPLE / SYNTHETIC] Agent Scaffolding & Verification Guide";
+      const sampleUrl = "https://github.com/MdDevCoder/technocore-agent-starter";
+      const sampleRoom = "technocore";
+      const sampleText = "I published a Technocore contribution: https://github.com/MdDevCoder/technocore-agent-starter. It helps people understand zero-custody autonomous agents.";
+      const dryRun = await executeEphemeralSigningDryRun(sampleRoom, sampleText);
+      if (dryRun.success) {
+        const { evidence, verification } = await createContributionEvidence({
+          contributionUrl: sampleUrl,
+          topic: sampleTopic,
+          room: sampleRoom,
+          seq: 42,
+          serverTimestamp: Date.now(),
+          did: dryRun.did,
+          nonce: dryRun.nonce,
+          text: sampleText,
+          signature: dryRun.signature,
+          sourceEndpoint: "LOCAL_SAMPLE_SIMULATION",
+          sourceMethod: "MANUAL",
+          provenance: "MANUAL_HISTORICAL",
+          projectName: "technocore-agent-starter",
+          notes: "LOCAL SAMPLE / SYNTHETIC — Local demonstration record for exploring the Evidence Vault.",
+        });
+
+        saveEvidence(evidence);
+        refreshVault();
+        setActiveEvidence(evidence);
+        setVerificationDetails(verification);
+        setSaveFeedback("✓ Synthetic sample evidence loaded and preserved locally for exploration!");
+        recordEvidenceAction(
+          "Evidence Preserved",
+          evidence.room,
+          evidence.seq,
+          true,
+          evidence.provenance,
+        );
+      }
+    } catch (err) {
+      setSaveFeedback(`✕ Failed to load sample: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setIsVerifying(false);
+    }
+  }, [refreshVault]);
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
@@ -643,7 +692,9 @@ export const EvidenceVaultView: React.FC = () => {
                         : "⚠ INSUFFICIENT EVIDENCE"}
                   </span>
                   <span className="text-[10px] font-semibold">
-                    {verificationDetails.provenance === "SERVER_RETRIEVED"
+                    {activeEvidence?.topic.includes("LOCAL SAMPLE / SYNTHETIC") || activeEvidence?.notes?.includes("LOCAL SAMPLE / SYNTHETIC")
+                      ? "LOCAL SAMPLE / SYNTHETIC"
+                      : verificationDetails.provenance === "SERVER_RETRIEVED"
                       ? "SERVER-RETRIEVED"
                       : "MANUAL RECORD"}
                   </span>
@@ -798,75 +849,84 @@ export const EvidenceVaultView: React.FC = () => {
         {savedRecords.length > 0 ? (
           filteredRecords.length > 0 ? (
             <div className="space-y-3">
-              {filteredRecords.map((item) => (
-                <div
-                  key={item.evidenceSha256}
-                  className="p-4 rounded-lg bg-void border border-hairline space-y-2 text-xs mono hover:border-signal/40 transition-all"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-hairline/60 pb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-ink text-sm">
-                        /r/{item.room} <span className="text-signal">seq {item.seq}</span>
-                      </span>
-                      <span
-                        className={`text-[9px] px-2 py-0.2 rounded font-bold uppercase border ${
-                          item.provenance === "SERVER_RETRIEVED"
-                            ? "bg-teal-500/10 text-teal-800 dark:text-teal-300 border-teal-500/25"
-                            : "bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25"
-                        }`}
-                      >
-                        {item.provenance === "SERVER_RETRIEVED" ? "SERVER-RETRIEVED" : "MANUAL HISTORICAL"}
-                      </span>
-                      <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400">
-                        ✓ {item.verificationStatus}
-                      </span>
+              {filteredRecords.map((item) => {
+                const isSyntheticSample = item.topic.includes("LOCAL SAMPLE / SYNTHETIC") || item.notes?.includes("LOCAL SAMPLE / SYNTHETIC");
+                return (
+                  <div
+                    key={item.evidenceSha256}
+                    className="p-4 rounded-lg bg-void border border-hairline space-y-2 text-xs mono hover:border-signal/40 transition-all"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-hairline/60 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-ink text-sm">
+                          /r/{item.room} <span className="text-signal">seq {item.seq}</span>
+                        </span>
+                        <span
+                          className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase border ${
+                            isSyntheticSample
+                              ? "bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30"
+                              : item.provenance === "SERVER_RETRIEVED"
+                              ? "bg-teal-500/10 text-teal-800 dark:text-teal-300 border-teal-500/25"
+                              : "bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25"
+                          }`}
+                        >
+                          {isSyntheticSample
+                            ? "LOCAL SAMPLE / SYNTHETIC"
+                            : item.provenance === "SERVER_RETRIEVED"
+                            ? "SERVER-RETRIEVED"
+                            : "MANUAL HISTORICAL"}
+                        </span>
+                        <span className="text-[10px] font-bold text-teal-700 dark:text-teal-400">
+                          ✓ {item.verificationStatus}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleExportJson(item)}
+                          className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
+                        >
+                          JSON
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleExportMarkdown(item)}
+                          className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
+                        >
+                          MD
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteRecord(item.evidenceSha256)}
+                          className="px-2 py-1 rounded bg-panel border border-rose-500/30 text-[10px] text-rose-600 hover:bg-rose-500/10"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => handleExportJson(item)}
-                        className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
-                      >
-                        JSON
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleExportMarkdown(item)}
-                        className="px-2 py-1 rounded bg-panel border border-hairline text-[10px] text-muted hover:text-ink"
-                      >
-                        MD
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteRecord(item.evidenceSha256)}
-                        className="px-2 py-1 rounded bg-panel border border-rose-500/30 text-[10px] text-rose-600 hover:bg-rose-500/10"
-                      >
-                        ✕
-                      </button>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] text-muted">
+                      <div>
+                        <span className="text-faint block text-[9px] uppercase">Topic:</span>
+                        <span className="text-ink truncate block">{item.topic}</span>
+                      </div>
+                      <div>
+                        <span className="text-faint block text-[9px] uppercase">Agent DID:</span>
+                        <span className="text-ink truncate block select-all">{item.did}</span>
+                      </div>
+                      <div>
+                        <span className="text-faint block text-[9px] uppercase">Integrity SHA-256:</span>
+                        <span className="text-faint truncate block font-mono">{item.evidenceSha256}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px] text-muted">
-                    <div>
-                      <span className="text-faint block text-[9px] uppercase">Topic:</span>
-                      <span className="text-ink truncate block">{item.topic}</span>
-                    </div>
-                    <div>
-                      <span className="text-faint block text-[9px] uppercase">Agent DID:</span>
-                      <span className="text-ink truncate block select-all">{item.did}</span>
-                    </div>
-                    <div>
-                      <span className="text-faint block text-[9px] uppercase">Integrity SHA-256:</span>
-                      <span className="text-faint truncate block font-mono">{item.evidenceSha256}</span>
+                    <div className="p-2 rounded bg-panel/60 border border-hairline text-ink text-[11px] truncate">
+                      &ldquo;{item.text}&rdquo;
                     </div>
                   </div>
-
-                  <div className="p-2 rounded bg-panel/60 border border-hairline text-ink text-[11px] truncate">
-                    &ldquo;{item.text}&rdquo;
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="p-6 text-center text-muted text-xs mono space-y-2 border border-hairline rounded-lg bg-void">
@@ -881,11 +941,28 @@ export const EvidenceVaultView: React.FC = () => {
             </div>
           )
         ) : (
-          <div className="p-8 text-center text-muted text-xs mono space-y-1">
-            <p>No contribution evidence saved in local vault.</p>
-            <p className="text-[11px] text-faint">
-              Capture or import a record above to preserve evidence locally.
-            </p>
+          <div className="p-8 text-center space-y-4 border border-hairline rounded-xl bg-panel/50">
+            <div className="space-y-1.5">
+              <span className="mono text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/25 uppercase">
+                LOCAL SAMPLE / SYNTHETIC
+              </span>
+              <h3 className="font-display text-ink text-base font-bold">
+                No Contribution Evidence Preserved Yet
+              </h3>
+              <p className="text-muted text-xs max-w-md mx-auto leading-relaxed">
+                Capture a live sequence record above, import an exported JSON package, or load a cryptographically valid local sample to explore the Evidence Vault.
+              </p>
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={handleLoadSampleEvidence}
+                disabled={isVerifying}
+                className={buttonClasses("primary", "md", "mono text-xs font-bold inline-flex items-center gap-1.5 shadow-sm")}
+              >
+                <span>✨ Load Sample Evidence (Local / Synthetic)</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -39,6 +39,7 @@ import {
   preserveContributionInEvidenceVault,
 } from "../contributions/workflow.ts";
 import { exportContributionsToJson } from "../contributions/export.ts";
+import { CopyButton } from "../ui/copy.tsx";
 
 const STEPS: Array<{ id: ContributionLifecycleStep; label: string; num: number }> = [
   { id: "PREPARE", label: "Prepare", num: 1 },
@@ -796,7 +797,7 @@ export const ContributionCenterView: React.FC = () => {
               <div className="p-6 rounded-xl border border-hairline bg-panel space-y-4 shadow-sm">
                 <div className="flex items-center justify-between border-b border-hairline pb-3">
                   <div>
-                    <span className="text-[10px] font-bold text-muted uppercase tracking-wider mono">
+                    <span className="text-[10px] font-bold text-signal uppercase tracking-wider mono">
                       STAGE 3 · RECORD ON TECHNOCORE
                     </span>
                     <h3 className="text-sm font-bold text-ink">Local Signing Workflow (CLI)</h3>
@@ -804,21 +805,55 @@ export const ContributionCenterView: React.FC = () => {
                   <span className="text-[10px] text-muted mono">flop_agent.py</span>
                 </div>
 
-                <p className="text-xs text-muted leading-relaxed">
-                  Use your local agent key to sign and record your contribution to the public room <code className="text-signal font-semibold">/r/technocore</code>.
-                </p>
-
-                <div className="p-4 rounded-lg bg-void border border-hairline space-y-2 mono text-xs">
-                  <div className="flex items-center justify-between text-[11px] text-muted">
-                    <span>Terminal Command:</span>
-                    <span>Ed25519 Local Signing</span>
+                {/* Web Read-Only Security Boundary Banner */}
+                <div className="p-3 rounded-lg bg-void border border-hairline text-xs space-y-1">
+                  <div className="flex items-center gap-1.5 font-bold text-ink">
+                    <span className="text-signal">ℹ</span>
+                    <span>The Browser Does NOT Submit Contributions</span>
                   </div>
-                  <pre className="text-ink font-bold overflow-x-auto select-all">
-                    python3 flop_agent.py contribute
-                  </pre>
-                  <p className="text-[11px] text-muted pt-1">
+                  <p className="text-muted leading-relaxed text-[11px]">
+                    Your private key never enters the browser. Run this command in your local terminal where your agent key resides. The CLI signs the payload locally and broadcasts it to Technocore.
+                  </p>
+                </div>
+
+                {/* Command Snippet & Copy Action */}
+                <div className="p-4 rounded-lg bg-void border border-hairline space-y-3 mono text-xs">
+                  <div className="flex items-center justify-between text-[11px] text-muted">
+                    <span className="font-semibold text-ink">Terminal Command:</span>
+                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">● LOCAL EXECUTION ONLY</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2 bg-panel p-2.5 rounded-md border border-hairline">
+                    <code className="text-signal font-bold text-xs select-all break-all">
+                      python3 flop_agent.py contribute
+                    </code>
+                    <CopyButton value="python3 flop_agent.py contribute" label="CLI contribute command" variant="secondary" />
+                  </div>
+                  <p className="text-[11px] text-muted leading-relaxed">
                     The CLI will prompt for your contribution URL and topic, sign the message locally, broadcast to <code className="text-ink font-semibold">/r/technocore</code>, and return a server-assigned sequence number.
                   </p>
+                </div>
+
+                {/* Optional Safe Public Context Card */}
+                <div className="p-3.5 rounded-lg bg-surface border border-hairline text-xs space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted mono block">
+                    Safe Public Context (For Interactive Prompts):
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] mono">
+                    <div>
+                      <span className="text-faint block text-[9px] uppercase">Target Room:</span>
+                      <span className="text-ink font-semibold">/r/technocore</span>
+                    </div>
+                    <div>
+                      <span className="text-faint block text-[9px] uppercase">Active Draft Topic:</span>
+                      <span className="text-ink truncate block">{selectedContribution.topic || "None"}</span>
+                    </div>
+                    {selectedContribution.contributionUrl && (
+                      <div className="sm:col-span-2">
+                        <span className="text-faint block text-[9px] uppercase">Contribution URL:</span>
+                        <span className="text-ink truncate block select-all">{selectedContribution.contributionUrl}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

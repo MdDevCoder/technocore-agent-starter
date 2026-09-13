@@ -424,7 +424,7 @@ export const FirstAgentBuilderView: React.FC = () => {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
                 <label className="text-muted block text-[10px] uppercase font-semibold mb-1">
                   Target Broadcast Room:
@@ -438,6 +438,9 @@ export const FirstAgentBuilderView: React.FC = () => {
                     className="w-full rounded border border-hairline bg-void px-2.5 py-1.5 text-ink font-mono text-xs focus:border-signal focus:outline-none"
                   />
                 </div>
+                <p className="text-[11px] text-muted font-sans mt-1.5 leading-snug">
+                  Default broadcast room. Agents communicate in isolated rooms (for example: lobby-main, market-data).
+                </p>
               </div>
 
               <div>

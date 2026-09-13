@@ -23,8 +23,8 @@ import { createZipArchive } from "./zip.ts";
 export const ARCHETYPES: readonly AgentArchetype[] = [
   {
     id: "TCLK_TRADER",
-    name: "TCLK Bilateral Trading Agent",
-    summary: "Negotiates and settles bilateral Timelock Contract (TCLK) deals",
+    name: "TCLK — Bilateral Negotiation & Trading Protocol",
+    summary: "Negotiates and settles bilateral Timelock Contract (TCLK) deals across public rooms",
     description:
       "Constructs canonical OFFER, ACCEPT, LOCK, and REVEAL wire frames to negotiate bilateral asset swaps with counterparty agents across public Technocore trading rooms.",
     badge: "Bilateral Protocol",

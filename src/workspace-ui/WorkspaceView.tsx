@@ -449,341 +449,442 @@ export const WorkspaceView: React.FC = () => {
         </div>
       </section>
 
-      {/* 2. Quick Actions Grid */}
-      <section className="mb-10">
-        <div className="mb-4 flex items-center justify-between">
+      {/* 2. Quick Actions Grid with Lifecycle Grouping */}
+      <section className="mb-10 space-y-6">
+        <div className="flex items-center justify-between">
           <h2 className="font-display text-ink text-lg font-bold tracking-tight">
             Developer Toolchain Quick Actions
           </h2>
           <span className="mono text-muted text-xs">Safe shared context prefilled</span>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Action 1: Builder */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /start
-                </span>
-                <span className="text-muted text-xs">Builder</span>
+        {/* STAGE 1 · BUILD & SCAFFOLD */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-signal/15 text-signal border border-signal/30">
+              STAGE 1 · BUILD &amp; SCAFFOLD
+            </span>
+            <div className="h-px flex-1 bg-hairline" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Action 1: Builder */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /start
+                  </span>
+                  <span className="text-muted text-xs">Builder</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  BUILD AGENT
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Scaffold code, dry-run Ed25519 signatures, and package complete starter repositories.
+                </p>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                BUILD AGENT
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Scaffold code, dry-run Ed25519 signatures, and package complete starter repositories.
-              </p>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Preset: {workspace.project.language} · {workspace.project.archetype}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={builderUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleOpenHandoffModal("builder")}
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Preset: {workspace.project.language} · {workspace.project.archetype}
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={builderUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open →
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleOpenHandoffModal("builder")}
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
+
+            {/* Action 2: Forge */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /forge
+                  </span>
+                  <span className="text-muted text-xs">Forge</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  FORGE PAYLOAD
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Author byte-exact canonical room frames with Unicode sweep inspection.
+                </p>
+              </div>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Target: /r/{workspace.project.defaultRoom}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={forgeUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleOpenHandoffModal("forge")}
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Action 2: Forge */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /forge
-                </span>
-                <span className="text-muted text-xs">Forge</span>
+        {/* STAGE 2 · TEST & DEBUG */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-500/30">
+              STAGE 2 · TEST &amp; DEBUG
+            </span>
+            <div className="h-px flex-1 bg-hairline" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Action 3: TestKit */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /testkit
+                  </span>
+                  <span className="text-muted text-xs">Simulation</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  TEST TCLK
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Simulate bilateral timelock escrow state machines and hashlock claims offline.
+                </p>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                FORGE PAYLOAD
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Author byte-exact canonical room frames with Unicode sweep inspection.
-              </p>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Total simulated runs: {workspace.telemetry.testkit.totalSimulationsRun}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={testkitUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleOpenHandoffModal("testkit", { preset: "bilateral-settlement" })
+                  }
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Target: /r/{workspace.project.defaultRoom}
+
+            {/* Action 4: Doctor */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /doctor
+                  </span>
+                  <span className="text-muted text-xs">Diagnostics</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  CHECK SIGNATURE
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Diagnose bit-level wire corruption, nonce mismatches, and prefix defects.
+                </p>
+              </div>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Diagnostics: Ed25519 Canonical Rule Sweep
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={doctorUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleOpenHandoffModal("doctor")}
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={forgeUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open →
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleOpenHandoffModal("forge")}
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
+
+            {/* Action 5: Readiness Flow */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /readiness
+                  </span>
+                  <span className="text-muted text-xs">Checklist</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  VERIFY READINESS
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Guided 7-stage evidence-driven verification certifying your agent is ready for development.
+                </p>
+              </div>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                7 Stages · Blocker Diagnostics
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href="/readiness"
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Start Flow →
+                </Link>
+                <Link
+                  href="/readiness"
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Open Checklist
+                </Link>
+              </div>
+            </div>
+
+            {/* Action 6: Health Monitor */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /health
+                  </span>
+                  <span className="text-muted text-xs">Diagnostic</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  CHECK AGENT HEALTH
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Factual runtime evaluation across Identity, Backup, Network, Signing, Protocol, and Trace.
+                </p>
+              </div>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Factual Signals · Zero Secrets
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href="/health"
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Inspect Health →
+                </Link>
+                <Link
+                  href="/health"
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Run Check
+                </Link>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Action 3: Doctor */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /doctor
-                </span>
-                <span className="text-muted text-xs">Diagnostics</span>
-              </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                CHECK SIGNATURE
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Diagnose bit-level wire corruption, nonce mismatches, and prefix defects.
-              </p>
-            </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Diagnostics: Ed25519 Canonical Rule Sweep
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={doctorUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open →
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleOpenHandoffModal("doctor")}
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
-            </div>
+        {/* STAGE 3 · VERIFY & AUDIT */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30">
+              STAGE 3 · VERIFY &amp; AUDIT
+            </span>
+            <div className="h-px flex-1 bg-hairline" />
           </div>
-
-          {/* Action 4: TestKit */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /testkit
-                </span>
-                <span className="text-muted text-xs">Simulation</span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Action 7: Contribution Center */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /contributions
+                  </span>
+                  <span className="text-muted text-xs">Workflow</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  CONTRIBUTION CENTER
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Connect local CLI contribution broadcast to server capture, signature verification, and evidence vaulting.
+                </p>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                TEST TCLK
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Simulate bilateral timelock escrow state machines and hashlock claims offline.
-              </p>
-            </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Total simulated runs: {workspace.telemetry.testkit.totalSimulationsRun}
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={testkitUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open →
-              </Link>
-              <button
-                type="button"
-                onClick={() =>
-                  handleOpenHandoffModal("testkit", { preset: "bilateral-settlement" })
-                }
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
-            </div>
-          </div>
-
-          {/* Action 5: Observatory */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /observatory
-                </span>
-                <span className="text-muted text-xs">Observatory</span>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                6-Stage Lifecycle · Read-Only Web
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                OBSERVE NETWORK
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Stream live retain-window telemetry directly from public Technocore rooms.
-              </p>
-            </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Room: /r/{workspace.project.defaultRoom}
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={observatoryUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open →
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleOpenHandoffModal("observatory")}
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
-            </div>
-          </div>
-
-          {/* Action 6: Trace Studio */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /trace
-                </span>
-                <span className="text-muted text-xs">Forensics</span>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href="/contributions"
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open Center →
+                </Link>
+                <Link
+                  href="/contributions"
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  New Draft
+                </Link>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                TRACE INTERACTION
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Reconstruct timelines, verify cryptographic evidence, and detect wire anomalies.
-              </p>
             </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Live Source: https://technocore.chat
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={traceUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open →
-              </Link>
-              <button
-                type="button"
-                onClick={() =>
-                  handleOpenHandoffModal("trace", {
-                    preset: "live-public-network",
-                  })
-                }
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
-            </div>
-          </div>
 
-          {/* Action 7: Health Monitor */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /health
-                </span>
-                <span className="text-muted text-xs">Diagnostic</span>
+            {/* Action 8: Evidence Vault */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /evidence
+                  </span>
+                  <span className="text-muted text-xs">Preservation</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  EVIDENCE VAULT
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Preserve and cryptographically verify signed contribution proofs before room retention advances.
+                </p>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                CHECK AGENT HEALTH
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Factual runtime evaluation across Identity, Backup, Network, Signing, Protocol, and Trace.
-              </p>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Deterministic SHA-256 · Local-First
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={evidenceUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open Vault →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleOpenHandoffModal("evidence")}
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Factual Signals · Zero Secrets
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href="/health"
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Inspect Health →
-              </Link>
-              <Link
-                href="/health"
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Run Check
-              </Link>
-            </div>
-          </div>
 
-          {/* Action 8: Readiness Flow */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /readiness
-                </span>
-                <span className="text-muted text-xs">Checklist</span>
+            {/* Action 9: Observatory */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /observatory
+                  </span>
+                  <span className="text-muted text-xs">Observatory</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  OBSERVE NETWORK
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Stream live retain-window telemetry directly from public Technocore rooms.
+                </p>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                VERIFY READINESS
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Guided 7-stage evidence-driven verification certifying your agent is ready for development.
-              </p>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Room: /r/{workspace.project.defaultRoom}
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={observatoryUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleOpenHandoffModal("observatory")}
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              7 Stages · Blocker Diagnostics
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href="/readiness"
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Start Flow →
-              </Link>
-              <Link
-                href="/readiness"
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Open Checklist
-              </Link>
-            </div>
-          </div>
 
-          {/* Action 9: Evidence Vault */}
-          <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
-            <div>
-              <div className="flex items-center justify-between">
-                <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
-                  /evidence
-                </span>
-                <span className="text-muted text-xs">Preservation</span>
+            {/* Action 10: Trace Studio */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /trace
+                  </span>
+                  <span className="text-muted text-xs">Forensics</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  TRACE INTERACTION
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Reconstruct timelines, verify cryptographic evidence, and detect wire anomalies.
+                </p>
               </div>
-              <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
-                EVIDENCE VAULT
-              </h3>
-              <p className="text-muted mt-1 text-xs leading-relaxed">
-                Preserve and cryptographically verify signed contribution proofs before room retention advances.
-              </p>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Live Source: https://technocore.chat
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href={traceUrl}
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  Open →
+                </Link>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleOpenHandoffModal("trace", {
+                      preset: "live-public-network",
+                    })
+                  }
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Copy Link
+                </button>
+              </div>
             </div>
-            <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
-              Deterministic SHA-256 · Local-First
-            </div>
-            <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
-              <Link
-                href={evidenceUrl}
-                className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px] items-center"
-              >
-                Open Vault →
-              </Link>
-              <button
-                type="button"
-                onClick={() => handleOpenHandoffModal("evidence")}
-                className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
-              >
-                Copy Link
-              </button>
+
+            {/* Action 11: Activity Center */}
+            <div className="border-hairline bg-panel hover:border-signal/40 group flex flex-col justify-between rounded-xl border p-5 transition-all shadow-xs">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="mono bg-signal/10 text-signal rounded px-2 py-0.5 text-xs font-semibold">
+                    /activity
+                  </span>
+                  <span className="text-muted text-xs">Audit Log</span>
+                </div>
+                <h3 className="font-display text-ink mt-3 text-base font-semibold group-hover:text-signal transition-colors">
+                  ACTIVITY LOG
+                </h3>
+                <p className="text-muted mt-1 text-xs leading-relaxed">
+                  Inspect chronological audit events, dry-runs, verifications, and tool interactions.
+                </p>
+              </div>
+              <div className="border-hairline text-faint mt-4 border-t pt-3 text-[0.6875rem]">
+                Local Events · Provenance Tracking
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-hairline/60 pt-3">
+                <Link
+                  href="/activity"
+                  className="text-signal hover:underline text-xs font-semibold flex items-center gap-1 min-h-[36px]"
+                >
+                  View Activity →
+                </Link>
+                <Link
+                  href="/activity"
+                  className="border-hairline bg-panel hover:bg-panel-high text-muted hover:text-ink rounded border px-2.5 py-1 text-xs font-medium transition-colors active:scale-95"
+                >
+                  Audit Feed
+                </Link>
+              </div>
             </div>
           </div>
         </div>
